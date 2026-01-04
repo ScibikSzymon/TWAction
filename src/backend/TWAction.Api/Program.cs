@@ -10,8 +10,19 @@ builder.Services.AddPersistence(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("OpenPolicy", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
+
+app.UseCors("OpenPolicy");
 
 // Apply EF Core migrations on startup in non-production environments
 if (!app.Environment.IsProduction())
