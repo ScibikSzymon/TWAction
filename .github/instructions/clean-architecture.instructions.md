@@ -34,7 +34,7 @@ When implementing backend services, follow these Clean Architecture principles t
 - Example minimal structure:
 
 ```
-src/
+src/backedend/
   [project].Domain/
     DomainReference.cs
     Order/ 
