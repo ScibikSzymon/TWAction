@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TWAction.Infrastructure\TWAction.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\aspire\TwAction.ServiceDefaults\TwAction.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>
