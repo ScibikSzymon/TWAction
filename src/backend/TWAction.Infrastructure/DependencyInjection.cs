@@ -5,6 +5,8 @@ using Wolverine;
 using TWAction.Application.Interfaces;
 using TWAction.Persistence;
 using TWAction.Persistence.Repositories;
+using TWAction.Application.Interfaces;
+using TWAction.Application.Handlers;
 
 namespace TWAction.Infrastructure
 {
@@ -26,6 +28,12 @@ namespace TWAction.Infrastructure
             {
                 
             });
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserSessionRepository, UserSessionRepository>();
+
+            services.AddTransient<SignInWithGoogleHandler>();
+            services.AddTransient<GetAllUsersHandler>();
 
             return services;
         }

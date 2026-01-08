@@ -10,9 +10,15 @@ namespace TWAction.Persistence
 
         public DbSet<ExampleEntity> ExampleEntities { get; set; } = null!;
 
+        public DbSet<User> Users { get; set; } = null!;
+
+        public DbSet<UserSession> UserSessions { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new ExampleEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
             base.OnModelCreating(modelBuilder);
         }
     }
