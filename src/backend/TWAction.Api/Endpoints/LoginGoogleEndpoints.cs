@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text.Json;
 using TWAction.Api.Options;
+using TWAction.Application.Handlers;
 
 public static class LoginGoogleEndpoints
 {
@@ -91,11 +92,11 @@ public static class LoginGoogleEndpoints
         return JsonDocument.Parse(bytes);
     }
 
-    private static async Task<TWAction.Application.DTOs.SignInResult?> SignInAndCreateSessionAsync(IServiceProvider services, string email, string? displayName)
+    private static async Task<Application.DTOs.SignInResult?> SignInAndCreateSessionAsync(IServiceProvider services, string email, string? displayName)
     {
         using var scope = services.CreateScope();
-        var handler = scope.ServiceProvider.GetRequiredService<Application.Handlers.SignInWithGoogleHandler>();
-        var result = await handler.Handle(new Application.Commands.SignInWithGoogleCommand(email, displayName, "google"));
+        var handler = scope.ServiceProvider.GetRequiredService<SignInWithGoogleHandler>();
+        var result = await handler.Handle(new SignInWithGoogleCommand(email, displayName, "google"));
         return result;
     }
 
