@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using TWAction.Api.Options;
 using TWAction.Application.DTOs;
 using TWAction.Application.Handlers;
+using TWAction.Application.Common;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TWAction.Api.Endpoints
 {
@@ -30,23 +32,18 @@ namespace TWAction.Api.Endpoints
                     return Results.Unauthorized();
                 }
 
-                var user = await bus.InvokeAsync<UserDto?>(new GetUserBySessionQuery(sessionGuid));
+                var user = await bus.InvokeAsync<Result<UserDto>>(new GetUserBySessionQuery(sessionGuid));
                 if (user is null)
                 {
                     return Results.Unauthorized();
                 }
 
-                // Map to frontend-compatible response shape
-                // var response = new
-                // {
-                //     id = user.Id.ToString(),
-                //     email = user.Email,
-                //     displayName = user.DisplayName,
-                //     provider = user.Provider,
-                //     createdAt = user.CreatedAt.ToString("O") // ISO 8601 format
-                // };
+                if (user.IsFailure)
+                {
+                    return Results.Unauthorized();
+                }
 
-                return Results.Ok(user);
+                return Results.Ok(user.Value);
             });
 
             group.MapPost("/logout", async (HttpContext http, IOptions<AuthOptions> options, IMessageBus bus) =>
@@ -54,8 +51,18 @@ namespace TWAction.Api.Endpoints
                 var cookieName = options.Value.CookieName ?? "TWAction.Session";
                 if (http.Request.Cookies.TryGetValue(cookieName, out var sessionId) && Guid.TryParse(sessionId, out var sessionGuid))
                 {
-                    await bus.InvokeAsync(new DeleteSessionCommand(sessionGuid));
+                    var result = await bus.InvokeAsync<Result>(new DeleteSessionCommand(sessionGuid));
                     http.Response.Cookies.Delete(cookieName);
+
+                    if (!result.IsSuccess)
+                    {
+                        return Results.NotFound(new ProblemDetails
+                        {
+                            Title = "Session Not Found",
+                            Detail = result.Error,
+                            Status = StatusCodes.Status404NotFound
+                        });
+                    }
                 }
 
                 return Results.NoContent();

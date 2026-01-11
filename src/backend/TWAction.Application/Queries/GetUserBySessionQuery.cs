@@ -1,3 +1,4 @@
+using TWAction.Application.Common;
 using TWAction.Application.DTOs;
 using TWAction.Application.Interfaces;
 using TWAction.Application.Mappers;
@@ -17,15 +18,25 @@ public class GetUserBySessionHandler
         _userRepository = userRepository;
     }
 
-    public async Task<UserDto?> Handle(GetUserBySessionQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<UserDto>> Handle(GetUserBySessionQuery query, CancellationToken cancellationToken = default)
     {
         var session = await _sessionRepository.GetByIdAsync(query.SessionId, cancellationToken);
-        if (session is null) return null;
-        if (session.ExpiresAt < DateTimeOffset.UtcNow) return null;
+        if (session is null)
+        {
+            return Result.Failure<UserDto>($"Session with ID '{query.SessionId}' not found.");
+        }
+
+        if (session.ExpiresAt < DateTimeOffset.UtcNow)
+        {
+            return Result.Failure<UserDto>("Session has expired.");
+        }
 
         var user = await _userRepository.GetByIdAsync(session.UserId, cancellationToken);
-        if (user is null) return null;
+        if (user is null)
+        {
+            return Result.Failure<UserDto>($"User with ID '{session.UserId}' not found.");
+        }
 
-        return IUserMapper.ToDto(user);
+        return Result.Success(IUserMapper.ToDto(user));
     }
 }

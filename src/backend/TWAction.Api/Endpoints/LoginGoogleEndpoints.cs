@@ -13,6 +13,7 @@ using TWAction.Api.Options;
 using TWAction.Application.Handlers;
 using Wolverine;
 using TWAction.Application.DTOs;
+using TWAction.Application.Common;
 
 public static class LoginGoogleEndpoints
 {
@@ -20,7 +21,6 @@ public static class LoginGoogleEndpoints
     {
         app.MapGet("/auth/google", (HttpContext http, IOptions<GoogleOptions> googleOptions) =>
         {
-            System.Console.WriteLine("Initiating Google OAuth2 login");
             var opts = googleOptions.Value;
             var clientId = opts?.ClientId ?? "";
             var redirectUri = opts?.RedirectUri ?? "https://localhost:5001/auth/google/callback";
@@ -39,7 +39,11 @@ public static class LoginGoogleEndpoints
             IOptions<AuthOptions> authOptions) =>
         {
             var q = request.Query;
-            if (!q.TryGetValue("code", out var codeVals)) return Results.BadRequest(new { error = "Missing code" });
+            if (!q.TryGetValue("code", out var codeVals))
+            {
+                return Results.BadRequest(new { error = "Missing code" });
+            }
+
             var code = codeVals.ToString();
 
             var opts = googleOptions.Value;
@@ -48,18 +52,28 @@ public static class LoginGoogleEndpoints
             var redirectUri = opts?.RedirectUri ?? "https://localhost:5001/auth/google/callback";
 
             var idToken = await ExchangeCodeForIdTokenAsync(code, clientId, clientSecret, redirectUri);
-            if (string.IsNullOrEmpty(idToken)) return Results.StatusCode(502);
+            if (string.IsNullOrEmpty(idToken))
+            {
+                return Results.StatusCode(502);
+            }
 
             using var payloadJson = DecodeIdTokenPayload(idToken);
-            if (payloadJson is null) return Results.StatusCode(502);
+            if (payloadJson is null)
+            {
+                return Results.StatusCode(502);
+            }
 
             var email = payloadJson.RootElement.GetProperty("email").GetString() ?? string.Empty;
             var name = payloadJson.RootElement.TryGetProperty("name", out var nameEl) ? nameEl.GetString() : null;
 
-            var result = await SignInAndCreateSessionAsync(bus, email, name);
-            if (result is null) return Results.StatusCode(502);
+            var result = await bus.InvokeAsync<Result<SignInResult>>(new SignInWithGoogleCommand(email, name, "google"));
 
-            SetSessionCookie(response, authOptions, result.SessionId);
+            if (result is null)
+            {
+                return Results.StatusCode(502);
+            }
+
+            SetSessionCookie(response, authOptions, result.Value.SessionId);
             return Results.Redirect("http://localhost:3000/");
         });
 
@@ -82,28 +96,33 @@ public static class LoginGoogleEndpoints
         };
 
         var tokenResp = await http.SendAsync(tokenRequest);
-        if (!tokenResp.IsSuccessStatusCode) return null;
+        if (!tokenResp.IsSuccessStatusCode)
+        {
+            return null;
+        }
 
         var tokenJson = await tokenResp.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(tokenJson);
-        if (!doc.RootElement.TryGetProperty("id_token", out var idTokenEl)) return null;
+        if (!doc.RootElement.TryGetProperty("id_token", out var idTokenEl))
+        {
+            return null;
+        }
+
         return idTokenEl.GetString();
     }
 
     private static JsonDocument? DecodeIdTokenPayload(string idToken)
     {
         string[] parts = idToken.Split('.');
-        if (parts.Length < 2) return null;
+        if (parts.Length < 2)
+        {
+            return null;
+        }
+
         string payload = parts[1];
         payload = payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=');
         var bytes = Convert.FromBase64String(payload.Replace('-', '+').Replace('_', '/'));
         return JsonDocument.Parse(bytes);
-    }
-
-    private static async Task<SignInResult?> SignInAndCreateSessionAsync(IMessageBus bus, string email, string? displayName)
-    {
-        var result = await bus.InvokeAsync<SignInResult>(new SignInWithGoogleCommand(email, displayName, "google"));
-        return result;
     }
 
     private static void SetSessionCookie(HttpResponse response, IOptions<AuthOptions> authOptions, Guid sessionId)
