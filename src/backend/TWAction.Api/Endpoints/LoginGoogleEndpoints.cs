@@ -112,9 +112,15 @@ public static class LoginGoogleEndpoints
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,                 // dev: false, prod: true
-            SameSite = SameSiteMode.Lax,
-            Expires = DateTimeOffset.UtcNow.AddHours(8).UtcDateTime
+            Secure = authOptions?.Value?.CookieSecure ?? true,                 // dev: false, prod: true
+            SameSite = authOptions?.Value?.CookieSameSite switch
+            {
+                "Strict" => SameSiteMode.Strict,
+                "Lax" => SameSiteMode.Lax,
+                "None" => SameSiteMode.None,
+                _ => SameSiteMode.Strict
+            },
+            Expires = DateTimeOffset.UtcNow.AddHours(authOptions?.Value?.SessionExpiryHours ?? 8).UtcDateTime
         };
 
         response.Cookies.Append(cookieName, sessionId.ToString(), cookieOptions);

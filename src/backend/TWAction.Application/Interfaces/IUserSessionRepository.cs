@@ -9,4 +9,6 @@ public interface IUserSessionRepository
     Task<UserSessionEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task DeleteExpiredAsync(CancellationToken cancellationToken = default);
+
+    Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }

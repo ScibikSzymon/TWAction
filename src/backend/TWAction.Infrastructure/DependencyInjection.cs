@@ -5,7 +5,6 @@ using Wolverine;
 using TWAction.Application.Interfaces;
 using TWAction.Persistence;
 using TWAction.Persistence.Repositories;
-using TWAction.Application.Interfaces;
 using TWAction.Application.Handlers;
 
 namespace TWAction.Infrastructure
@@ -28,8 +27,6 @@ namespace TWAction.Infrastructure
             {
                 opts.Durability.Mode = DurabilityMode.MediatorOnly;
                 opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
-                Console.WriteLine(opts.DescribeHandlerMatch(typeof(SignInWithGoogleHandler)));
-
             });
 
             services.AddScoped<IUserRepository, UserRepository>();
@@ -37,6 +34,8 @@ namespace TWAction.Infrastructure
 
             services.AddTransient<SignInWithGoogleHandler>();
             services.AddTransient<GetAllUsersHandler>();
+            services.AddTransient<GetUserBySessionHandler>();
+            services.AddTransient<DeleteSessionHandler>();
 
             return services;
         }

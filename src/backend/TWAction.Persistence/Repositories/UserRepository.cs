@@ -26,4 +26,9 @@ public class UserRepository : IUserRepository
     {
         return await _db.Users.AsNoTracking().ToListAsync(cancellationToken);
     }
+
+    public async Task<UserEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _db.Users.FindAsync(new object[] { id }, cancellationToken).AsTask();
+    }
 }

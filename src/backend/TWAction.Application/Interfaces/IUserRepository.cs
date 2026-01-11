@@ -9,4 +9,6 @@ public interface IUserRepository
     Task<UserEntity> AddAsync(UserEntity user, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<UserEntity>> ListAllAsync(CancellationToken cancellationToken = default);
+    
+    Task<UserEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }

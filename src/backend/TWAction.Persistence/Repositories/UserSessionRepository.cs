@@ -31,4 +31,12 @@ public class UserSessionRepository : IUserSessionRepository
             await _db.SaveChangesAsync(cancellationToken);
         }
     }
+
+    public async Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var session = await _db.UserSessions.FindAsync(new object[] { id }, cancellationToken).AsTask();
+        if (session is null) return;
+        _db.UserSessions.Remove(session);
+        await _db.SaveChangesAsync(cancellationToken);
+    }
 }

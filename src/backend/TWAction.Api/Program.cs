@@ -9,19 +9,30 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
-builder.Services.Configure<TWAction.Api.Options.GoogleOptions>(builder.Configuration.GetSection("Google"));
-builder.Services.Configure<TWAction.Api.Options.AuthOptions>(builder.Configuration.GetSection("Auth"));
+builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection("Google"));
+builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection("Auth"));
+builder.Services.Configure<CorsOptions>(builder.Configuration.GetSection("Cors"));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowAll", corsBuilder =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .SetIsOriginAllowed(_ => true);
+        var corsOptions = builder.Configuration.GetSection("Cors").Get<CorsOptions>();
+        
+        if (corsOptions?.AllowedOrigins is null || corsOptions.AllowedOrigins.Length == 0)
+        {
+            throw new InvalidOperationException(
+                "CORS AllowedOrigins must be configured in appsettings.json. " +
+                "Ensure the 'Cors:AllowedOrigins' section contains at least one origin.");
+        }
+
+        corsBuilder.WithOrigins(corsOptions.AllowedOrigins)
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .AllowCredentials();
     });
 });
 
@@ -45,6 +56,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapLoginGoogleEndpoints();
 app.MapUsersEndpoints();
+app.MapAuthEndpoints();
 
 app.Run();
 
