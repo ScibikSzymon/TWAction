@@ -1,6 +1,6 @@
 namespace TWAction.Domain.Entities;
 
-public sealed class User
+public sealed class UserEntity
 {
     public Guid Id { get; set; }
 

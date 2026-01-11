@@ -10,19 +10,19 @@ public class UserRepository : IUserRepository
 
     public UserRepository(TWActionDbContext db) => _db = db;
 
-    public async Task<User?> FindByEmailAsync(string email, string provider, CancellationToken cancellationToken = default)
+    public async Task<UserEntity?> FindByEmailAsync(string email, string provider, CancellationToken cancellationToken = default)
     {
         return await _db.Users.FirstOrDefaultAsync(u => u.Email == email && u.Provider == provider, cancellationToken);
     }
 
-    public async Task<User> AddAsync(User user, CancellationToken cancellationToken = default)
+    public async Task<UserEntity> AddAsync(UserEntity user, CancellationToken cancellationToken = default)
     {
         await _db.Users.AddAsync(user, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
         return user;
     }
 
-    public async Task<IReadOnlyList<User>> ListAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<UserEntity>> ListAllAsync(CancellationToken cancellationToken = default)
     {
         return await _db.Users.AsNoTracking().ToListAsync(cancellationToken);
     }

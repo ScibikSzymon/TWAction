@@ -10,9 +10,9 @@ namespace TWAction.Persistence
 
         public DbSet<ExampleEntity> ExampleEntities { get; set; } = null!;
 
-        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<UserEntity> Users { get; set; } = null!;
 
-        public DbSet<UserSession> UserSessions { get; set; } = null!;
+        public DbSet<UserSessionEntity> UserSessions { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

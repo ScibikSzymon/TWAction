@@ -10,14 +10,14 @@ public class UserSessionRepository : IUserSessionRepository
 
     public UserSessionRepository(TWActionDbContext db) => _db = db;
 
-    public async Task<UserSession> CreateSessionAsync(UserSession session, CancellationToken cancellationToken = default)
+    public async Task<UserSessionEntity> CreateSessionAsync(UserSessionEntity session, CancellationToken cancellationToken = default)
     {
         await _db.UserSessions.AddAsync(session, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
         return session;
     }
 
-    public async Task<UserSession?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<UserSessionEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _db.UserSessions.FindAsync(new object[] { id }, cancellationToken).AsTask();
     }

@@ -4,9 +4,9 @@ namespace TWAction.Application.Interfaces;
 
 public interface IUserRepository
 {
-    Task<User?> FindByEmailAsync(string email, string provider, CancellationToken cancellationToken = default);
+    Task<UserEntity?> FindByEmailAsync(string email, string provider, CancellationToken cancellationToken = default);
 
-    Task<User> AddAsync(User user, CancellationToken cancellationToken = default);
+    Task<UserEntity> AddAsync(UserEntity user, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<User>> ListAllAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<UserEntity>> ListAllAsync(CancellationToken cancellationToken = default);
 }

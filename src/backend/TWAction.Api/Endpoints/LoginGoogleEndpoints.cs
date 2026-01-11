@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using TWAction.Api.Options;
 using TWAction.Application.Handlers;
+using Wolverine;
+using TWAction.Application.DTOs;
 
 public static class LoginGoogleEndpoints
 {
@@ -18,6 +20,7 @@ public static class LoginGoogleEndpoints
     {
         app.MapGet("/auth/google", (HttpContext http, IOptions<GoogleOptions> googleOptions) =>
         {
+            System.Console.WriteLine("Initiating Google OAuth2 login");
             var opts = googleOptions.Value;
             var clientId = opts?.ClientId ?? "";
             var redirectUri = opts?.RedirectUri ?? "https://localhost:5001/auth/google/callback";
@@ -28,7 +31,12 @@ public static class LoginGoogleEndpoints
             return Results.Redirect(url);
         });
 
-        app.MapGet("/auth/google/callback", async (HttpRequest request, HttpResponse response, IServiceProvider services, IOptions<GoogleOptions> googleOptions, IOptions<AuthOptions> authOptions) =>
+        app.MapGet("/auth/google/callback", async (
+            HttpRequest request, 
+            HttpResponse response, 
+            IMessageBus bus, 
+            IOptions<GoogleOptions> googleOptions, 
+            IOptions<AuthOptions> authOptions) =>
         {
             var q = request.Query;
             if (!q.TryGetValue("code", out var codeVals)) return Results.BadRequest(new { error = "Missing code" });
@@ -48,11 +56,11 @@ public static class LoginGoogleEndpoints
             var email = payloadJson.RootElement.GetProperty("email").GetString() ?? string.Empty;
             var name = payloadJson.RootElement.TryGetProperty("name", out var nameEl) ? nameEl.GetString() : null;
 
-            var result = await SignInAndCreateSessionAsync(services, email, name);
+            var result = await SignInAndCreateSessionAsync(bus, email, name);
             if (result is null) return Results.StatusCode(502);
 
             SetSessionCookie(response, authOptions, result.SessionId);
-            return Results.Json(new { success = true });
+            return Results.Redirect("http://localhost:3000/");
         });
 
         return app;
@@ -92,11 +100,9 @@ public static class LoginGoogleEndpoints
         return JsonDocument.Parse(bytes);
     }
 
-    private static async Task<Application.DTOs.SignInResult?> SignInAndCreateSessionAsync(IServiceProvider services, string email, string? displayName)
+    private static async Task<SignInResult?> SignInAndCreateSessionAsync(IMessageBus bus, string email, string? displayName)
     {
-        using var scope = services.CreateScope();
-        var handler = scope.ServiceProvider.GetRequiredService<SignInWithGoogleHandler>();
-        var result = await handler.Handle(new SignInWithGoogleCommand(email, displayName, "google"));
+        var result = await bus.InvokeAsync<SignInResult>(new SignInWithGoogleCommand(email, displayName, "google"));
         return result;
     }
 
@@ -106,8 +112,8 @@ public static class LoginGoogleEndpoints
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
+            Secure = false,                 // dev: false, prod: true
+            SameSite = SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddHours(8).UtcDateTime
         };
 

@@ -22,7 +22,7 @@ public class SignInWithGoogleHandler
         var user = await _userRepository.FindByEmailAsync(command.Email, command.Provider, cancellationToken);
         if (user is null)
         {
-            user = new User
+            user = new UserEntity
             {
                 Id = Guid.NewGuid(),
                 Email = command.Email,
@@ -33,7 +33,7 @@ public class SignInWithGoogleHandler
             user = await _userRepository.AddAsync(user, cancellationToken);
         }
 
-        var session = new UserSession
+        var session = new UserSessionEntity
         {
             Id = Guid.NewGuid(),
             UserId = user.Id,

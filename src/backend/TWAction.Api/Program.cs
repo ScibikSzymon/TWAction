@@ -16,17 +16,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("OpenPolicy", builder =>
+    options.AddPolicy("AllowAll", builder =>
     {
         builder.AllowAnyOrigin()
                .AllowAnyMethod()
-               .AllowAnyHeader();
+               .AllowAnyHeader()
+               .SetIsOriginAllowed(_ => true);
     });
 });
 
 var app = builder.Build();
 
-app.UseCors("OpenPolicy");
+app.UseCors("AllowAll");
 
 // Apply EF Core migrations on startup in non-production environments
 if (!app.Environment.IsProduction())

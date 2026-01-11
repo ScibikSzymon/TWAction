@@ -26,7 +26,10 @@ namespace TWAction.Infrastructure
             // Right now this keeps the default in-process bus (no external transports) 
             services.AddWolverine(opts =>
             {
-                
+                opts.Durability.Mode = DurabilityMode.MediatorOnly;
+                opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
+                Console.WriteLine(opts.DescribeHandlerMatch(typeof(SignInWithGoogleHandler)));
+
             });
 
             services.AddScoped<IUserRepository, UserRepository>();

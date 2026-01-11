@@ -4,9 +4,9 @@ using TWAction.Domain.Entities;
 
 namespace TWAction.Persistence.Configurations;
 
-public sealed class UserSessionConfiguration : IEntityTypeConfiguration<UserSession>
+public sealed class UserSessionConfiguration : IEntityTypeConfiguration<UserSessionEntity>
 {
-    public void Configure(EntityTypeBuilder<UserSession> builder)
+    public void Configure(EntityTypeBuilder<UserSessionEntity> builder)
     {
         builder.ToTable("UserSessions");
         builder.HasKey(x => x.Id);
