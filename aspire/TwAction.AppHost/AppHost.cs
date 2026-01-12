@@ -10,7 +10,7 @@ var api = builder.AddProject<Projects.TWAction_Api>("api")
 
 // React frontend (npm)
 // Path is relative to AppHost project folder. Adjust as needed.
-var web = builder.AddNpmApp("web", "../../src/frontend/TWActionFrontend", "dev")
+builder.AddNpmApp("web", "../../src/frontend/TWActionFrontend", "dev")
     .WithHttpEndpoint(port: 3000, env: "PORT")       // Aspire will set PORT
     .WithExternalHttpEndpoints()         // makes it reachable from host
     .WithReference(api);                 // gives the frontend info about the API
