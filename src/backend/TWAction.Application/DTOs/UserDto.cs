@@ -1,14 +1,14 @@
 namespace TWAction.Application.DTOs;
 
-public sealed class UserDto
+public sealed record UserDto
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Email { get; set; } = null!;
+    public required string Email { get; init; }
 
-    public string? DisplayName { get; set; }
+    public string? DisplayName { get; init; }
 
-    public string Provider { get; set; } = null!;
+    public required string Provider { get; init; }
 
-    public DateTimeOffset CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; init; }
 }

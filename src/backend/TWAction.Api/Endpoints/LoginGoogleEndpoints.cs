@@ -66,7 +66,7 @@ public static class LoginGoogleEndpoints
             var email = payloadJson.RootElement.GetProperty("email").GetString() ?? string.Empty;
             var name = payloadJson.RootElement.TryGetProperty("name", out var nameEl) ? nameEl.GetString() : null;
 
-            var result = await bus.InvokeAsync<Result<SignInResult>>(new SignInWithGoogleCommand(email, name, "google"));
+            var result = await bus.InvokeAsync<Result<SignInResultDto>>(new SignInWithGoogleCommand(email, name, "google"));
 
             if (result is null)
             {

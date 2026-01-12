@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { apiClient } from '../config/api'
 
 type User = {
   id: string
@@ -11,27 +12,18 @@ type User = {
 const Login = () => {
   const [user, setUser] = useState<User | null>(null)
 
-  const handleGoogleLogin = async () => {
-    try {
-      window.location.href = 'http://localhost:8000/auth/google'
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Google login error', err)
-    }
+  const handleGoogleLogin = () => {
+    window.location.href = `${apiClient.defaults.baseURL}/auth/google`
   }
 
   useEffect(() => {
     const fetchMe = async () => {
       try {
-        const res = await fetch('http://localhost:8000/auth/me', { credentials: 'include' })
-        if (res.ok) {
-          const data = await res.json()
-          setUser(data)
-        } else {
-          setUser(null)
-        }
+        const { data } = await apiClient.get<User>('/auth/me')
+        setUser(data)
       } catch (err) {
         console.error('Error fetching /auth/me', err)
+        setUser(null)
       }
     }
 
@@ -40,7 +32,7 @@ const Login = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:8000/auth/logout', { method: 'POST', credentials: 'include' })
+      await apiClient.post('/auth/logout')
       setUser(null)
     } catch (err) {
       // eslint-disable-next-line no-console

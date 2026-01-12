@@ -29,7 +29,7 @@ public class SignInWithGoogleHandler
     /// <param name="command">The sign-in command containing user email and display name.</param>
     /// <param name="cancellationToken">Cancellation token for async operations.</param>
     /// <returns>A Result containing SignInResult on success, or error information on failure.</returns>
-    public async Task<Result<SignInResult>> Handle(SignInWithGoogleCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result<SignInResultDto>> Handle(SignInWithGoogleCommand command, CancellationToken cancellationToken = default)
     {
         var user = await _userRepository.FindByEmailAsync(command.Email, command.Provider, cancellationToken);
         if (user is null)
@@ -54,7 +54,7 @@ public class SignInWithGoogleHandler
 
         session = await _sessionRepository.CreateSessionAsync(session, cancellationToken);
 
-        var result = new SignInResult
+        var result = new SignInResultDto
         {
             SessionId = session.Id,
             User = IUserMapper.ToDto(user)
