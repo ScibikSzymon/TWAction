@@ -80,7 +80,6 @@ tests/
 - **Api Layer**: Minimal API endpoints, request/response mapping. No business logic.
 - Use dependency injection for all cross-layer dependencies.
 - Avoid circular dependencies.
-- Do not use a mediator library; call service methods directly from the Api layer.
 
 ## 6. Testing and Architecture Validation
 

@@ -19,6 +19,7 @@ public class GetAllUsersHandler
     public async Task<Result<IReadOnlyList<UserDto>>> Handle(GetAllUsersQuery query, CancellationToken cancellationToken = default)
     {
         var users = await _userRepository.ListAllAsync(cancellationToken);
-        return Result.Success<IReadOnlyList<UserDto>>(users.Select(IUserMapper.ToDto).ToList());
+        var userDtos = users.Select(IUserMapper.ToDto).ToList();
+        return Result.Success<IReadOnlyList<UserDto>>(userDtos);
     }
 }
