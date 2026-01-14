@@ -54,13 +54,14 @@ public sealed class GetAllUsersHandlerTests
         var query = new GetAllUsersQuery();
         var result = await _handler.Handle(query);
 
-        result.Should().HaveCount(3);
-        result[0].Email.Should().Be("user1@example.com");
-        result[0].DisplayName.Should().Be("User One");
-        result[1].Email.Should().Be("user2@example.com");
-        result[1].DisplayName.Should().Be("User Two");
-        result[2].Email.Should().Be("user3@example.com");
-        result[2].DisplayName.Should().BeNull();
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().HaveCount(3);
+        result.Value[0].Email.Should().Be("user1@example.com");
+        result.Value[0].DisplayName.Should().Be("User One");
+        result.Value[1].Email.Should().Be("user2@example.com");
+        result.Value[1].DisplayName.Should().Be("User Two");
+        result.Value[2].Email.Should().Be("user3@example.com");
+        result.Value[2].DisplayName.Should().BeNull();
 
         await _userRepository.Received(1).ListAllAsync(Arg.Any<CancellationToken>());
     }
@@ -76,7 +77,8 @@ public sealed class GetAllUsersHandlerTests
         var query = new GetAllUsersQuery();
         var result = await _handler.Handle(query);
 
-        result.Should().BeEmpty();
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEmpty();
         await _userRepository.Received(1).ListAllAsync(Arg.Any<CancellationToken>());
     }
 
@@ -103,12 +105,13 @@ public sealed class GetAllUsersHandlerTests
         var query = new GetAllUsersQuery();
         var result = await _handler.Handle(query);
 
-        result.Should().HaveCount(1);
-        result[0].Id.Should().Be(userId);
-        result[0].Email.Should().Be("single@example.com");
-        result[0].DisplayName.Should().Be("Single User");
-        result[0].Provider.Should().Be("google");
-        result[0].CreatedAt.Should().Be(createdAt);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().HaveCount(1);
+        result.Value[0].Id.Should().Be(userId);
+        result.Value[0].Email.Should().Be("single@example.com");
+        result.Value[0].DisplayName.Should().Be("Single User");
+        result.Value[0].Provider.Should().Be("google");
+        result.Value[0].CreatedAt.Should().Be(createdAt);
     }
 
     [Fact]
@@ -153,8 +156,9 @@ public sealed class GetAllUsersHandlerTests
         var query = new GetAllUsersQuery();
         var result = await _handler.Handle(query);
 
-        result.Should().HaveCount(1);
-        var userDto = result[0];
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().HaveCount(1);
+        var userDto = result.Value[0];
         userDto.Id.Should().Be(userId);
         userDto.Email.Should().Be(email);
         userDto.DisplayName.Should().Be(displayName);
