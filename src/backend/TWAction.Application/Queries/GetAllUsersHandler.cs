@@ -16,10 +16,10 @@ public class GetAllUsersHandler
         _userRepository = userRepository;
     }
 
-    public async Task<Result<IReadOnlyList<UserDto>>> Handle(GetAllUsersQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<IEnumerable<UserDto>>> Handle(GetAllUsersQuery query, CancellationToken cancellationToken = default)
     {
         var users = await _userRepository.ListAllAsync(cancellationToken);
         var userDtos = users.Select(IUserMapper.ToDto).ToList();
-        return Result.Success<IReadOnlyList<UserDto>>(userDtos);
+        return Result.Success<IEnumerable<UserDto>>(userDtos);
     }
 }

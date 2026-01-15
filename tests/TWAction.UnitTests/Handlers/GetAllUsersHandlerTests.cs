@@ -55,13 +55,14 @@ public sealed class GetAllUsersHandlerTests
         var result = await _handler.Handle(query);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().HaveCount(3);
-        result.Value[0].Email.Should().Be("user1@example.com");
-        result.Value[0].DisplayName.Should().Be("User One");
-        result.Value[1].Email.Should().Be("user2@example.com");
-        result.Value[1].DisplayName.Should().Be("User Two");
-        result.Value[2].Email.Should().Be("user3@example.com");
-        result.Value[2].DisplayName.Should().BeNull();
+        var userList = result.Value.ToList();
+        userList.Should().HaveCount(3);
+        userList[0].Email.Should().Be("user1@example.com");
+        userList[0].DisplayName.Should().Be("User One");
+        userList[1].Email.Should().Be("user2@example.com");
+        userList[1].DisplayName.Should().Be("User Two");
+        userList[2].Email.Should().Be("user3@example.com");
+        userList[2].DisplayName.Should().BeNull();
 
         await _userRepository.Received(1).ListAllAsync(Arg.Any<CancellationToken>());
     }
@@ -106,12 +107,13 @@ public sealed class GetAllUsersHandlerTests
         var result = await _handler.Handle(query);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().HaveCount(1);
-        result.Value[0].Id.Should().Be(userId);
-        result.Value[0].Email.Should().Be("single@example.com");
-        result.Value[0].DisplayName.Should().Be("Single User");
-        result.Value[0].Provider.Should().Be("google");
-        result.Value[0].CreatedAt.Should().Be(createdAt);
+        var userList = result.Value.ToList();
+        userList.Should().HaveCount(1);
+        userList[0].Id.Should().Be(userId);
+        userList[0].Email.Should().Be("single@example.com");
+        userList[0].DisplayName.Should().Be("Single User");
+        userList[0].Provider.Should().Be("google");
+        userList[0].CreatedAt.Should().Be(createdAt);
     }
 
     [Fact]
@@ -158,7 +160,7 @@ public sealed class GetAllUsersHandlerTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().HaveCount(1);
-        var userDto = result.Value[0];
+        var userDto = result.Value.Single();
         userDto.Id.Should().Be(userId);
         userDto.Email.Should().Be(email);
         userDto.DisplayName.Should().Be(displayName);
