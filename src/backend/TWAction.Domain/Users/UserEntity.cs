@@ -1,3 +1,5 @@
+using TWAction.Domain.Schedules;
+
 namespace TWAction.Domain.Users;
 
 public sealed class UserEntity
@@ -11,4 +13,8 @@ public sealed class UserEntity
     public string Provider { get; set; } = "google";
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    public ICollection<UserSessionEntity> Sessions { get; set; } = [];
+    
+    public ICollection<ScheduleEntity> Schedules { get; set; } = [];
 }

@@ -13,5 +13,10 @@ public sealed class UserSessionConfiguration : IEntityTypeConfiguration<UserSess
         builder.Property(x => x.UserId).IsRequired();
         builder.Property(x => x.ExpiresAt).IsRequired();
         builder.HasIndex(x => x.ExpiresAt).HasDatabaseName("IX_UserSessions_ExpiresAt");
+
+        builder.HasOne<UserEntity>()
+               .WithMany(u => u.Sessions)
+               .HasForeignKey(s => s.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }
