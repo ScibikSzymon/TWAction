@@ -1,4 +1,4 @@
-namespace TWAction.Application.DTOs;
+namespace TWAction.Application.Users.DTOs;
 
 public sealed record SignInResultDto
 {

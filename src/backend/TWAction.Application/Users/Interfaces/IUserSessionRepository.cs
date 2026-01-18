@@ -1,6 +1,6 @@
-using TWAction.Domain.Entities;
+using TWAction.Domain.Users;
 
-namespace TWAction.Application.Interfaces;
+namespace TWAction.Application.Users.Interfaces;
 
 public interface IUserSessionRepository
 {

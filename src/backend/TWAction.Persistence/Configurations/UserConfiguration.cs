@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TWAction.Domain.Entities;
+using TWAction.Domain.Users;
 
 namespace TWAction.Persistence.Configurations;
 

@@ -1,4 +1,4 @@
-using TWAction.Domain.Entities;
+using TWAction.Domain.Users;
 
 namespace TWAction.IntegrationTests.Helpers;
 

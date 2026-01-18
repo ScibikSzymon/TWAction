@@ -6,6 +6,8 @@ using TWAction.Application.Interfaces;
 using TWAction.Persistence;
 using TWAction.Persistence.Repositories;
 using TWAction.Application.Handlers;
+using TWAction.Application.Users.Queries;
+using TWAction.Application.Users.Interfaces;
 
 namespace TWAction.Infrastructure
 {

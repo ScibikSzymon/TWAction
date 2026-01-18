@@ -1,4 +1,4 @@
-namespace TWAction.Domain.Entities;
+namespace TWAction.Domain.Users;
 
 public sealed class UserEntity
 {

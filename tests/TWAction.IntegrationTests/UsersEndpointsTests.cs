@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
-using TWAction.Application.DTOs;
+using TWAction.Application.Users.DTOs;
 using TWAction.IntegrationTests.Helpers;
 using TWAction.Persistence;
 

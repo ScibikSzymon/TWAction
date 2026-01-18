@@ -1,8 +1,8 @@
 using TWAction.Application.Common;
-using TWAction.Application.DTOs;
-using TWAction.Application.Interfaces;
 using TWAction.Application.Mappers;
-using TWAction.Domain.Entities;
+using TWAction.Application.Users.DTOs;
+using TWAction.Application.Users.Interfaces;
+using TWAction.Domain.Users;
 
 namespace TWAction.Application.Handlers;
 

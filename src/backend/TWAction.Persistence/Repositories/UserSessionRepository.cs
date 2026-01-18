@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using TWAction.Application.Interfaces;
-using TWAction.Domain.Entities;
+using TWAction.Application.Users.Interfaces;
+using TWAction.Domain.Users;
 
 namespace TWAction.Persistence.Repositories;
 

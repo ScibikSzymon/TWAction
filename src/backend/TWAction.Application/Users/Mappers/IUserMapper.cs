@@ -1,6 +1,6 @@
 using Riok.Mapperly.Abstractions;
-using TWAction.Application.DTOs;
-using TWAction.Domain.Entities;
+using TWAction.Application.Users.DTOs;
+using TWAction.Domain.Users;
 
 namespace TWAction.Application.Mappers;
 

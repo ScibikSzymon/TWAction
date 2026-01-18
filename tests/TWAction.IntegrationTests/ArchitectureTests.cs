@@ -1,6 +1,6 @@
 using NetArchTest.Rules;
-using TWAction.Application.Handlers;
-using TWAction.Domain.Entities;
+using TWAction.Application.Users.Queries;
+using TWAction.Domain.Users;
 
 namespace TWAction.IntegrationTests;
 

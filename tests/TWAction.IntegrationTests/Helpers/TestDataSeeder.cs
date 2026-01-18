@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TWAction.Domain.Entities;
+using TWAction.Domain.Users;
 using TWAction.Persistence;
 
 namespace TWAction.IntegrationTests.Helpers;

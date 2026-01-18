@@ -3,8 +3,8 @@ namespace TWAction.Api.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using TWAction.Application.Common;
-using TWAction.Application.DTOs;
-using TWAction.Application.Handlers;
+using TWAction.Application.Users.DTOs;
+using TWAction.Application.Users.Queries;
 using Wolverine;
 
 public static class UsersEndpoints

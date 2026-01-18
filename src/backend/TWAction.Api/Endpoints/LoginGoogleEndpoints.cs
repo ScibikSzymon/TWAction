@@ -12,8 +12,8 @@ using System.Text.Json;
 using TWAction.Api.Options;
 using TWAction.Application.Handlers;
 using Wolverine;
-using TWAction.Application.DTOs;
 using TWAction.Application.Common;
+using TWAction.Application.Users.DTOs;
 
 public static class LoginGoogleEndpoints
 {
