@@ -14,17 +14,8 @@ public sealed record CreateScheduleCommand(
     string ScheduleType
 );
 
-public class CreateScheduleHandler
+public class CreateScheduleHandler(IScheduleRepository scheduleRepository, IUserRepository userRepository)
 {
-    private readonly IScheduleRepository _scheduleRepository;
-    private readonly IUserRepository _userRepository;
-
-    public CreateScheduleHandler(IScheduleRepository scheduleRepository, IUserRepository userRepository)
-    {
-        _scheduleRepository = scheduleRepository;
-        _userRepository = userRepository;
-    }
-
     public async Task<Result<ScheduleDto>> Handle(CreateScheduleCommand command, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(command.Name))
@@ -32,7 +23,7 @@ public class CreateScheduleHandler
             return Result.Failure<ScheduleDto>("Schedule name cannot be empty.");
         }
 
-        var user = await _userRepository.GetByIdAsync(command.UserId, cancellationToken);
+        var user = await userRepository.GetByIdAsync(command.UserId, cancellationToken);
         if (user is null)
         {
             return Result.Failure<ScheduleDto>($"User with ID '{command.UserId}' not found.");
@@ -48,7 +39,7 @@ public class CreateScheduleHandler
             ScheduleType = Enum.Parse<ScheduleType>(command.ScheduleType)
         };
 
-        await _scheduleRepository.AddAsync(schedule, cancellationToken);
+        await scheduleRepository.AddAsync(schedule, cancellationToken);
 
         return Result.Success(IScheduleMapper.ToDto(schedule));
     }

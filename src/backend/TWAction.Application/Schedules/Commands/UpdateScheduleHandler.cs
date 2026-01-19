@@ -13,18 +13,11 @@ public sealed record UpdateScheduleCommand(
     string ScheduleType
 );
 
-public class UpdateScheduleHandler
+public class UpdateScheduleHandler(IScheduleRepository scheduleRepository)
 {
-    private readonly IScheduleRepository _scheduleRepository;
-
-    public UpdateScheduleHandler(IScheduleRepository scheduleRepository)
-    {
-        _scheduleRepository = scheduleRepository;
-    }
-
     public async Task<Result<ScheduleDto>> Handle(UpdateScheduleCommand command, CancellationToken cancellationToken = default)
     {
-        var schedule = await _scheduleRepository.GetByIdAsync(command.ScheduleId, cancellationToken);
+        var schedule = await scheduleRepository.GetByIdAsync(command.ScheduleId, cancellationToken);
 
         if (schedule is null)
         {
@@ -40,7 +33,7 @@ public class UpdateScheduleHandler
         schedule.World = Enum.Parse<WorldType>(command.World);
         schedule.ScheduleType = Enum.Parse<ScheduleType>(command.ScheduleType);
 
-        await _scheduleRepository.UpdateAsync(schedule, cancellationToken);
+        await scheduleRepository.UpdateAsync(schedule, cancellationToken);
 
         return Result.Success(IScheduleMapper.ToDto(schedule));
     }

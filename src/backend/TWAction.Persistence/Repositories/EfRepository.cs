@@ -3,16 +3,9 @@ using TWAction.Application.Interfaces;
 
 namespace TWAction.Persistence.Repositories;
 
-public class EfRepository<T> : IRepository<T> where T : class
+public class EfRepository<T>(TWActionDbContext db) : IRepository<T> where T : class
 {
-    private readonly TWActionDbContext _db;
-    private readonly DbSet<T> _set;
-
-    public EfRepository(TWActionDbContext db)
-    {
-        _db = db;
-        _set = db.Set<T>();
-    }
+    private readonly DbSet<T> _set = db.Set<T>();
 
     public async Task AddAsync(T entity, CancellationToken ct = default)
     {
@@ -36,6 +29,6 @@ public class EfRepository<T> : IRepository<T> where T : class
 
     public Task<int> SaveChangesAsync(CancellationToken ct = default)
     {
-        return _db.SaveChangesAsync(ct);
+        return db.SaveChangesAsync(ct);
     }
 }

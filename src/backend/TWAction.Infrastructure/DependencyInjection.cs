@@ -11,6 +11,7 @@ using TWAction.Application.Users.Interfaces;
 using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Schedules.Queries;
 using TWAction.Application.Schedules.Commands;
+using TWAction.Application.Users.Commands;
 
 namespace TWAction.Infrastructure
 {

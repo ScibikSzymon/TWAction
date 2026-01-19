@@ -7,20 +7,11 @@ namespace TWAction.Application.Users.Queries;
 
 public sealed record GetUserBySessionQuery(Guid SessionId);
 
-public class GetUserBySessionHandler
+public class GetUserBySessionHandler(IUserSessionRepository sessionRepository, IUserRepository userRepository)
 {
-    private readonly IUserSessionRepository _sessionRepository;
-    private readonly IUserRepository _userRepository;
-
-    public GetUserBySessionHandler(IUserSessionRepository sessionRepository, IUserRepository userRepository)
-    {
-        _sessionRepository = sessionRepository;
-        _userRepository = userRepository;
-    }
-
     public async Task<Result<UserDto>> Handle(GetUserBySessionQuery query, CancellationToken cancellationToken = default)
     {
-        var session = await _sessionRepository.GetByIdAsync(query.SessionId, cancellationToken);
+        var session = await sessionRepository.GetByIdAsync(query.SessionId, cancellationToken);
         if (session is null)
         {
             return Result.Failure<UserDto>($"Session with ID '{query.SessionId}' not found.");
@@ -31,7 +22,7 @@ public class GetUserBySessionHandler
             return Result.Failure<UserDto>("Session has expired.");
         }
 
-        var user = await _userRepository.GetByIdAsync(session.UserId, cancellationToken);
+        var user = await userRepository.GetByIdAsync(session.UserId, cancellationToken);
         if (user is null)
         {
             return Result.Failure<UserDto>($"User with ID '{session.UserId}' not found.");

@@ -6,6 +6,7 @@ using TWAction.Application.Common;
 using Microsoft.AspNetCore.Mvc;
 using TWAction.Application.Users.DTOs;
 using TWAction.Application.Users.Queries;
+using TWAction.Application.Users.Commands;
 
 namespace TWAction.Api.Endpoints;
 

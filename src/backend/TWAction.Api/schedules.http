@@ -5,7 +5,7 @@
 @baseUrl = http://localhost:8000
 ### Zmieñ na rzeczywisty userId z bazy danych!
 @userId = 5a5bc3b3-6a7c-49d8-8714-f0eeaeee0bf6
-@scheduleId = WILL_BE_PROVIDED_BY_CREATE_RESPONSE
+@scheduleId = 7bb24d4b-c9b5-44fd-8ce1-8f8ecf559ffe
 
 ### ===== STEP 1: POBRANIE ISTNIEJ¥CEGO USER_ID =====
 ### Uruchom to zapytanie aby dowiedzieæ siê jakie userId istniej¹ w bazie

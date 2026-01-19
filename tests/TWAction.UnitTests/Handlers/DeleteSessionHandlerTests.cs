@@ -1,6 +1,6 @@
 using AwesomeAssertions;
 using NSubstitute;
-using TWAction.Application.Handlers;
+using TWAction.Application.Users.Commands;
 using TWAction.Application.Users.Interfaces;
 using TWAction.Domain.Users;
 

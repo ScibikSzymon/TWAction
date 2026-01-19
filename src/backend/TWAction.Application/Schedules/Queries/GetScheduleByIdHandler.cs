@@ -7,19 +7,12 @@ namespace TWAction.Application.Schedules.Queries;
 
 public sealed record GetScheduleByIdQuery(Guid ScheduleId);
 
-public class GetScheduleByIdHandler
+public class GetScheduleByIdHandler(IScheduleRepository scheduleRepository)
 {
-    private readonly IScheduleRepository _scheduleRepository;
-
-    public GetScheduleByIdHandler(IScheduleRepository scheduleRepository)
-    {
-        _scheduleRepository = scheduleRepository;
-    }
-
     public async Task<Result<ScheduleDto>> Handle(GetScheduleByIdQuery query, CancellationToken cancellationToken = default)
     {
-        var schedule = await _scheduleRepository.GetByIdAsync(query.ScheduleId, cancellationToken);
-        
+        var schedule = await scheduleRepository.GetByIdAsync(query.ScheduleId, cancellationToken);
+
         if (schedule is null)
         {
             return Result.Failure<ScheduleDto>($"Schedule with ID '{query.ScheduleId}' not found.");

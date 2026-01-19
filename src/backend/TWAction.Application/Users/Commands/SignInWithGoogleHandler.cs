@@ -12,17 +12,8 @@ public sealed record SignInWithGoogleCommand(string Email, string? DisplayName, 
 /// Handles sign-in operations using Google authentication.
 /// Creates new users if they don't exist and manages session creation.
 /// </summary>
-public class SignInWithGoogleHandler
+public class SignInWithGoogleHandler(IUserRepository userRepository, IUserSessionRepository sessionRepository)
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IUserSessionRepository _sessionRepository;
-
-    public SignInWithGoogleHandler(IUserRepository userRepository, IUserSessionRepository sessionRepository)
-    {
-        _userRepository = userRepository;
-        _sessionRepository = sessionRepository;
-    }
-
     /// <summary>
     /// Processes a Google sign-in command and returns a result containing session information.
     /// </summary>
@@ -31,7 +22,7 @@ public class SignInWithGoogleHandler
     /// <returns>A Result containing SignInResult on success, or error information on failure.</returns>
     public async Task<Result<SignInResultDto>> Handle(SignInWithGoogleCommand command, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.FindByEmailAsync(command.Email, command.Provider, cancellationToken);
+        var user = await userRepository.FindByEmailAsync(command.Email, command.Provider, cancellationToken);
         if (user is null)
         {
             user = new UserEntity
@@ -42,7 +33,7 @@ public class SignInWithGoogleHandler
                 Provider = command.Provider,
                 CreatedAt = DateTimeOffset.UtcNow
             };
-            user = await _userRepository.AddAsync(user, cancellationToken);
+            user = await userRepository.AddAsync(user, cancellationToken);
         }
 
         var session = new UserSessionEntity
@@ -52,7 +43,7 @@ public class SignInWithGoogleHandler
             ExpiresAt = DateTimeOffset.UtcNow.AddHours(8)
         };
 
-        session = await _sessionRepository.CreateSessionAsync(session, cancellationToken);
+        session = await sessionRepository.CreateSessionAsync(session, cancellationToken);
 
         var result = new SignInResultDto
         {
