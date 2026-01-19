@@ -13,43 +13,42 @@ using TWAction.Application.Schedules.Queries;
 using TWAction.Application.Schedules.Commands;
 using TWAction.Application.Users.Commands;
 
-namespace TWAction.Infrastructure
+namespace TWAction.Infrastructure;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+        var conn = configuration.GetConnectionString("TWActionDatabase");
+        services.AddDbContext<TWActionDbContext>(opts => opts.UseNpgsql(conn));
+        services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+        return services;
+    }
+
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+
+        // Right now this keeps the default in-process bus (no external transports) 
+        services.AddWolverine(opts =>
         {
-            var conn = configuration.GetConnectionString("TWActionDatabase");
-            services.AddDbContext<TWActionDbContext>(opts => opts.UseNpgsql(conn));
-            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-            return services;
-        }
+            opts.Durability.Mode = DurabilityMode.MediatorOnly;
+            opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
+        });
 
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
-        {
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserSessionRepository, UserSessionRepository>();
+        services.AddScoped<IScheduleRepository, ScheduleRepository>();
 
-            // Right now this keeps the default in-process bus (no external transports) 
-            services.AddWolverine(opts =>
-            {
-                opts.Durability.Mode = DurabilityMode.MediatorOnly;
-                opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
-            });
+        services.AddTransient<SignInWithGoogleHandler>();
+        services.AddTransient<GetAllUsersHandler>();
+        services.AddTransient<GetUserBySessionHandler>();
+        services.AddTransient<DeleteSessionHandler>();
+        services.AddTransient<GetAllSchedulesHandler>();
+        services.AddTransient<GetScheduleByIdHandler>();
+        services.AddTransient<CreateScheduleHandler>();
+        services.AddTransient<UpdateScheduleHandler>();
+        services.AddTransient<DeleteScheduleHandler>();
 
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IUserSessionRepository, UserSessionRepository>();
-            services.AddScoped<IScheduleRepository, ScheduleRepository>();
-
-            services.AddTransient<SignInWithGoogleHandler>();
-            services.AddTransient<GetAllUsersHandler>();
-            services.AddTransient<GetUserBySessionHandler>();
-            services.AddTransient<DeleteSessionHandler>();
-            services.AddTransient<GetAllSchedulesHandler>();
-            services.AddTransient<GetScheduleByIdHandler>();
-            services.AddTransient<CreateScheduleHandler>();
-            services.AddTransient<UpdateScheduleHandler>();
-            services.AddTransient<DeleteScheduleHandler>();
-
-            return services;
-        }
+        return services;
     }
 }
