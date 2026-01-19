@@ -1,0 +1,85 @@
+### Schedule API Tests - Improved Version
+### This file now includes examples with proper User validation
+
+### Variables
+@baseUrl = http://localhost:8000
+### Zmieñ na rzeczywisty userId z bazy danych!
+@userId = 5a5bc3b3-6a7c-49d8-8714-f0eeaeee0bf6
+@scheduleId = WILL_BE_PROVIDED_BY_CREATE_RESPONSE
+
+### ===== STEP 1: POBRANIE ISTNIEJ¥CEGO USER_ID =====
+### Uruchom to zapytanie aby dowiedzieæ siê jakie userId istniej¹ w bazie
+GET {{baseUrl}}/users
+Accept: application/json
+
+### Skopiuj ID jednego z u¿ytkowników i zast¹p @userId powy¿ej
+
+### ===== STEP 2: TWORZENIE SCHEDULE'I =====
+
+### CREATE Schedule - Main variant (pl218 world)
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "name": "Daily Farm Schedule",
+  "world": "pl218",
+  "scheduleType": "Main"
+}
+
+### CREATE Schedule - Reconnaissance variant (pl219 world)
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "name": "Reconnaissance Mission",
+  "world": "pl219",
+  "scheduleType": "Reconaissance"
+}
+
+### CREATE Schedule - Fake attack
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "name": "Fake Attack Training",
+  "world": "pl220",
+  "scheduleType": "Fake"
+}
+
+### ===== STEP 3: POBIERANIE SCHEDULE'I =====
+
+### GET all schedules for user
+GET {{baseUrl}}/schedules/{{userId}}
+Accept: application/json
+
+### GET schedule by ID (zmieñ {{scheduleId}} na ID ze zwróconej odpowiedzi powy¿ej)
+GET {{baseUrl}}/schedules/{{userId}}/{{scheduleId}}
+Accept: application/json
+
+### ===== STEP 4: AKTUALIZACJA I USUNIÊCIE =====
+
+### UPDATE schedule - change to Reconnaissance
+PUT {{baseUrl}}/schedules/{{scheduleId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Daily Farm Schedule",
+  "world": "pl221",
+  "scheduleType": "Reconaissance"
+}
+
+### DELETE schedule
+DELETE {{baseUrl}}/schedules/{{scheduleId}}
+
+### ===== INSTRUKCJA =====
+### 1. Uruchom GET /users - otrzymasz listê istniej¹cych u¿ytkowników
+### 2. Skopiuj ID jednego z u¿ytkowników (pole "id")
+### 3. Zast¹p @userId tym ID w zmiennej powy¿ej
+### 4. Teraz mo¿esz testowaæ CREATE, GET, PUT, DELETE
+### 5. Po ka¿dym CREATE skopiuj zwrócony "id" i podstaw do {{scheduleId}}
+
+### Available World values: pl218, pl219, pl220, pl221, pl222, pl223
+### Available ScheduleType values: Fake, Reconaissance, Main

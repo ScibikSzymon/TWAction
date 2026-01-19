@@ -57,6 +57,7 @@ if (app.Environment.IsDevelopment())
 app.MapLoginGoogleEndpoints();
 app.MapUsersEndpoints();
 app.MapAuthEndpoints();
+app.MapScheduleEndpoints();
 
 app.Run();
 

@@ -8,6 +8,9 @@ using TWAction.Persistence.Repositories;
 using TWAction.Application.Handlers;
 using TWAction.Application.Users.Queries;
 using TWAction.Application.Users.Interfaces;
+using TWAction.Application.Schedules.Interfaces;
+using TWAction.Application.Schedules.Queries;
+using TWAction.Application.Schedules.Commands;
 
 namespace TWAction.Infrastructure
 {
@@ -33,11 +36,17 @@ namespace TWAction.Infrastructure
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserSessionRepository, UserSessionRepository>();
+            services.AddScoped<IScheduleRepository, ScheduleRepository>();
 
             services.AddTransient<SignInWithGoogleHandler>();
             services.AddTransient<GetAllUsersHandler>();
             services.AddTransient<GetUserBySessionHandler>();
             services.AddTransient<DeleteSessionHandler>();
+            services.AddTransient<GetAllSchedulesHandler>();
+            services.AddTransient<GetScheduleByIdHandler>();
+            services.AddTransient<CreateScheduleHandler>();
+            services.AddTransient<UpdateScheduleHandler>();
+            services.AddTransient<DeleteScheduleHandler>();
 
             return services;
         }
