@@ -4,6 +4,7 @@ using TWAction.Infrastructure;
 using TWAction.Persistence;
 using TWAction.Api.Options;
 using TWAction.Api.Endpoints;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,12 @@ builder.Services.Configure<CorsOptions>(builder.Configuration.GetSection("Cors")
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Configure JSON serialization to use string values for enums
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddCors(options =>
 {
