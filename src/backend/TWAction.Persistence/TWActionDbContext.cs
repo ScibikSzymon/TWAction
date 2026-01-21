@@ -5,11 +5,8 @@ using TWAction.Persistence.Configurations;
 
 namespace TWAction.Persistence;
 
-public class TWActionDbContext : DbContext
+public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : DbContext(options)
 {
-    public TWActionDbContext(DbContextOptions<TWActionDbContext> options) : base(options) { }
-
-
     public DbSet<UserEntity> Users { get; set; } = null!;
 
     public DbSet<UserSessionEntity> UserSessions { get; set; } = null!;
