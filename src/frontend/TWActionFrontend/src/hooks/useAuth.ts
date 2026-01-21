@@ -10,18 +10,14 @@ export const useAuth = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        console.log("useAuth: Starting to fetch user...");
         setIsLoading(true);
         setError(null);
         const userData = await authService.getMe();
-        console.log("useAuth: User fetched successfully", userData);
         setUser(userData);
       } catch (err) {
-        console.error("useAuth: Error fetching user:", err);
+        console.error("Error fetching user:", err);
         setUser(null);
-        // Don't set error for unauthenticated users - it's expected
       } finally {
-        console.log("useAuth: Setting isLoading to false");
         setIsLoading(false);
       }
     };

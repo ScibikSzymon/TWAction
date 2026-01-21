@@ -48,13 +48,6 @@ export const ScheduleForm = ({
         ? { name, world, scheduleType }
         : { userId, name, world, scheduleType };
 
-      console.log("Submitting schedule with data:", requestData);
-      console.log("Types:", {
-        name: typeof name,
-        world: typeof world,
-        scheduleType: typeof scheduleType,
-      });
-
       if (schedule) {
         await onSubmit(requestData as UpdateScheduleRequest);
       } else {

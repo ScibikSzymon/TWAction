@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { useActiveSchedule } from "../hooks/useActiveSchedule";
 import type {
   Schedule,
   CreateScheduleRequest,
@@ -18,6 +19,7 @@ const HomePage = () => {
     logout,
     isAuthenticated,
   } = useAuth();
+  const { activeScheduleId, setActive, isActive } = useActiveSchedule();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isLoadingSchedules, setIsLoadingSchedules] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -98,8 +100,6 @@ const HomePage = () => {
     setShowForm(true);
   };
 
-  console.log("HomePage render:", { authLoading, isAuthenticated, user });
-
   if (authLoading) {
     return (
       <div className={styles.container}>
@@ -158,8 +158,10 @@ const HomePage = () => {
           ) : (
             <ScheduleList
               schedules={schedules}
+              activeScheduleId={activeScheduleId}
               onEdit={handleEdit}
               onDelete={handleDeleteSchedule}
+              onSetActive={setActive}
             />
           )}
         </>

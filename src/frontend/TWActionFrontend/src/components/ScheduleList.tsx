@@ -4,14 +4,18 @@ import styles from "./ScheduleList.module.css";
 
 interface ScheduleListProps {
   schedules: Schedule[];
+  activeScheduleId: string | null;
   onEdit: (schedule: Schedule) => void;
   onDelete: (scheduleId: string) => Promise<void>;
+  onSetActive: (scheduleId: string) => void;
 }
 
 export const ScheduleList = ({
   schedules,
+  activeScheduleId,
   onEdit,
   onDelete,
+  onSetActive,
 }: ScheduleListProps) => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -52,36 +56,54 @@ export const ScheduleList = ({
 
   return (
     <div className={styles.list}>
-      {schedules.map((schedule) => (
-        <div key={schedule.id} className={styles.item}>
-          <div className={styles.info}>
-            <h3>{schedule.name}</h3>
-            <div className={styles.details}>
-              <span className={styles.badge}>{schedule.world}</span>
-              <span className={styles.badge}>{schedule.scheduleType}</span>
+      {schedules.map((schedule) => {
+        const isActive = activeScheduleId === schedule.id;
+        return (
+          <div
+            key={schedule.id}
+            className={`${styles.item} ${isActive ? styles.active : ""}`}
+          >
+            <div className={styles.info}>
+              <div className={styles.header}>
+                <h3>{schedule.name}</h3>
+                {isActive && <span className={styles.activeBadge}>Aktywna</span>}
+              </div>
+              <div className={styles.details}>
+                <span className={styles.badge}>{schedule.world}</span>
+                <span className={styles.badge}>{schedule.scheduleType}</span>
+              </div>
+              <p className={styles.date}>
+                Utworzono: {formatDate(schedule.creationDate)}
+              </p>
             </div>
-            <p className={styles.date}>
-              Utworzono: {formatDate(schedule.creationDate)}
-            </p>
+            <div className={styles.actions}>
+              {!isActive && (
+                <button
+                  onClick={() => onSetActive(schedule.id)}
+                  disabled={deletingId === schedule.id}
+                  className={styles.activeBtn}
+                >
+                  Ustaw jako aktywną
+                </button>
+              )}
+              <button
+                onClick={() => onEdit(schedule)}
+                disabled={deletingId === schedule.id}
+                className={styles.editBtn}
+              >
+                Edytuj
+              </button>
+              <button
+                onClick={() => handleDelete(schedule.id)}
+                disabled={deletingId === schedule.id}
+                className={styles.deleteBtn}
+              >
+                {deletingId === schedule.id ? "Usuwanie..." : "Usuń"}
+              </button>
+            </div>
           </div>
-          <div className={styles.actions}>
-            <button
-              onClick={() => onEdit(schedule)}
-              disabled={deletingId === schedule.id}
-              className={styles.editBtn}
-            >
-              Edytuj
-            </button>
-            <button
-              onClick={() => handleDelete(schedule.id)}
-              disabled={deletingId === schedule.id}
-              className={styles.deleteBtn}
-            >
-              {deletingId === schedule.id ? "Usuwanie..." : "Usuń"}
-            </button>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
