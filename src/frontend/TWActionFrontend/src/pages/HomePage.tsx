@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useActiveSchedule } from "../hooks/useActiveSchedule";
 import type {
@@ -28,13 +28,7 @@ const HomePage = () => {
     undefined,
   );
 
-  useEffect(() => {
-    if (user?.id) {
-      loadSchedules();
-    }
-  }, [user]);
-
-  const loadSchedules = async () => {
+  const loadSchedules = useCallback(async () => {
     if (!user?.id) return;
 
     setIsLoadingSchedules(true);
@@ -48,7 +42,13 @@ const HomePage = () => {
     } finally {
       setIsLoadingSchedules(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.id) {
+      loadSchedules();
+    }
+  }, [user?.id, loadSchedules]);
 
   const handleCreateSchedule = async (request: CreateScheduleRequest) => {
     try {
@@ -77,6 +77,16 @@ const HomePage = () => {
     } catch (err) {
       console.error("Error updating schedule:", err);
       throw err;
+    }
+  };
+
+  const handleSubmitSchedule = async (
+    request: CreateScheduleRequest | UpdateScheduleRequest,
+  ) => {
+    if (editingSchedule) {
+      await handleUpdateSchedule(request as UpdateScheduleRequest);
+    } else {
+      await handleCreateSchedule(request as CreateScheduleRequest);
     }
   };
 
@@ -140,9 +150,7 @@ const HomePage = () => {
         <ScheduleForm
           userId={user!.id}
           schedule={editingSchedule}
-          onSubmit={
-            editingSchedule ? handleUpdateSchedule : handleCreateSchedule
-          }
+          onSubmit={handleSubmitSchedule}
           onCancel={handleCancelForm}
         />
       ) : (
