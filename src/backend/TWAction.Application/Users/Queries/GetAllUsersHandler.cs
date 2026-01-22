@@ -5,7 +5,7 @@ using TWAction.Application.Users.Interfaces;
 
 namespace TWAction.Application.Users.Queries;
 
-public sealed class GetAllUsersQuery;
+public sealed class GetAllUsersQuery { }
 
 public class GetAllUsersHandler(IUserRepository userRepository)
 {
