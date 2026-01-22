@@ -77,7 +77,7 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
             userId: user.Id,
             name: "Test Schedule",
             world: WorldType.pl219,
-            scheduleType: ScheduleType.Reconaissance);
+            scheduleType: ScheduleType.Reconnaissance);
 
         var response = await _client.GetAsync($"/schedules/{user.Id}");
 
