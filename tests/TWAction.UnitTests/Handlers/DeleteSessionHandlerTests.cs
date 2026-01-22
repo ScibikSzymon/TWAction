@@ -1,8 +1,8 @@
 using AwesomeAssertions;
 using NSubstitute;
-using TWAction.Application.Handlers;
-using TWAction.Application.Interfaces;
-using TWAction.Domain.Entities;
+using TWAction.Application.Users.Commands;
+using TWAction.Application.Users.Interfaces;
+using TWAction.Domain.Users;
 
 namespace TWAction.UnitTests.Handlers;
 

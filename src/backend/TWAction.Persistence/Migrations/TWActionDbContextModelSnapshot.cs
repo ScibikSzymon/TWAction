@@ -22,7 +22,36 @@ namespace TWAction.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TWAction.Domain.Entities.UserEntity", b =>
+            modelBuilder.Entity("TWAction.Domain.Schedules.ScheduleEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ScheduleType")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("World")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserGuid");
+
+                    b.ToTable("Schedules", (string)null);
+                });
+
+            modelBuilder.Entity("TWAction.Domain.Users.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -50,7 +79,7 @@ namespace TWAction.Persistence.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("TWAction.Domain.Entities.UserSessionEntity", b =>
+            modelBuilder.Entity("TWAction.Domain.Users.UserSessionEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -70,7 +99,34 @@ namespace TWAction.Persistence.Migrations
                     b.HasIndex("ExpiresAt")
                         .HasDatabaseName("IX_UserSessions_ExpiresAt");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("UserSessions", (string)null);
+                });
+
+            modelBuilder.Entity("TWAction.Domain.Schedules.ScheduleEntity", b =>
+                {
+                    b.HasOne("TWAction.Domain.Users.UserEntity", null)
+                        .WithMany("Schedules")
+                        .HasForeignKey("UserGuid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TWAction.Domain.Users.UserSessionEntity", b =>
+                {
+                    b.HasOne("TWAction.Domain.Users.UserEntity", null)
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TWAction.Domain.Users.UserEntity", b =>
+                {
+                    b.Navigation("Schedules");
+
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }

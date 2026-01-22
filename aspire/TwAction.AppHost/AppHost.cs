@@ -6,7 +6,8 @@ var appDb = postgres.AddDatabase("TWActionDatabase");
 
 // Backend API (.NET project)
 var api = builder.AddProject<Projects.TWAction_Api>("api")
-    .WithReference(appDb); // passes connection info to the API
+    .WithReference(appDb)
+    .WaitFor(appDb);
 
 // React frontend (npm)
 // Path is relative to AppHost project folder. Adjust as needed.

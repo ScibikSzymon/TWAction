@@ -12,8 +12,8 @@ using System.Text.Json;
 using TWAction.Api.Options;
 using TWAction.Application.Handlers;
 using Wolverine;
-using TWAction.Application.DTOs;
 using TWAction.Application.Common;
+using TWAction.Application.Users.DTOs;
 
 public static class LoginGoogleEndpoints
 {
@@ -74,7 +74,7 @@ public static class LoginGoogleEndpoints
             }
 
             SetSessionCookie(response, authOptions, result.Value.SessionId);
-            return Results.Redirect("http://localhost:3000/");
+            return Results.Redirect("http://localhost:3001/");
         });
 
         return app;

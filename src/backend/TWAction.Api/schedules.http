@@ -1,0 +1,83 @@
+### Schedule API Tests - Improved Version
+### This file now includes examples with proper User validation
+
+### Variables
+@baseUrl = http://localhost:8000
+### Update with actual userId from database
+@userId = 5a5bc3b3-6a7c-49d8-8714-f0eeaeee0bf6
+@scheduleId = 7bb24d4b-c9b5-44fd-8ce1-8f8ecf559ffe
+
+### ===== STEP 1: GET EXISTING USER_ID =====
+### Run this query to see what userIds exist in database
+GET {{baseUrl}}/users
+Accept: application/json
+
+### Copy ID of one user and replace @userId above
+
+### CREATE Schedule - Main variant (pl218 world)
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "name": "Daily Farm Schedule",
+  "world": "pl218",
+  "scheduleType": "Main"
+}
+
+### CREATE Schedule - Reconnaissance variant (pl219 world)
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "name": "Reconnaissance Mission",
+  "world": "pl219",
+  "scheduleType": "Reconnaissance"
+}
+
+### CREATE Schedule - Fake attack
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "name": "Fake Attack Training",
+  "world": "pl220",
+  "scheduleType": "Fake"
+}
+
+### ===== STEP 3: FETCHING SCHEDULES =====
+
+### GET all schedules for user
+GET {{baseUrl}}/schedules/{{userId}}
+Accept: application/json
+
+### GET schedule by ID (replace {{scheduleId}} with ID from response above)
+GET {{baseUrl}}/schedules/{{userId}}/{{scheduleId}}
+Accept: application/json
+
+### ===== STEP 4: UPDATE AND DELETE =====
+
+### UPDATE schedule - change to Reconnaissance
+PUT {{baseUrl}}/schedules/{{scheduleId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Daily Farm Schedule",
+  "world": "pl221",
+  "scheduleType": "Reconnaissance"
+}
+
+### DELETE schedule
+DELETE {{baseUrl}}/schedules/{{scheduleId}}
+
+### ===== INSTRUCTIONS =====
+### 1. Run GET /users - you will get list of existing users
+### 2. Copy ID of one user (field "id")
+### 3. Replace @userId with that ID in variable above
+### 4. Now you can test CREATE, GET, PUT, DELETE
+### 5. After each CREATE copy returned "id" and put it in {{scheduleId}}
+
+### Available World values: pl218, pl219, pl220, pl221, pl222, pl223
+### Available ScheduleType values: Fake, Reconnaissance, Main
