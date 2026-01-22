@@ -58,6 +58,10 @@ public static class ScheduleEndpoints
             return Results.NotFound(new { error = result.Error });
         }
 
+        if (result.Value.UserId != userId)
+        {
+            return Results.NotFound(new { error = "Schedule not found for specified user." });
+        }
         return Results.Ok(result.Value);
     }
 
