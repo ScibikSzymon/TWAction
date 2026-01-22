@@ -66,7 +66,9 @@ export const ScheduleList = ({
             <div className={styles.info}>
               <div className={styles.header}>
                 <h3>{schedule.name}</h3>
-                {isActive && <span className={styles.activeBadge}>Aktywna</span>}
+                {isActive && (
+                  <span className={styles.activeBadge}>Aktywna</span>
+                )}
               </div>
               <div className={styles.details}>
                 <span className={styles.badge}>{schedule.world}</span>
