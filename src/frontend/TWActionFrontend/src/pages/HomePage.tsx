@@ -19,7 +19,7 @@ const HomePage = () => {
     logout,
     isAuthenticated,
   } = useAuth();
-  const { activeScheduleId, setActive, isActive } = useActiveSchedule();
+  const { activeScheduleId, setActive } = useActiveSchedule();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isLoadingSchedules, setIsLoadingSchedules] = useState(false);
   const [error, setError] = useState<string | null>(null);
