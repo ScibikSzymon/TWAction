@@ -30,9 +30,19 @@ public class UpdateScheduleHandler(IScheduleRepository scheduleRepository)
         }
 
         schedule.Name = command.Name;
-        schedule.World = Enum.Parse<WorldType>(command.World);
-        schedule.ScheduleType = Enum.Parse<ScheduleType>(command.ScheduleType);
 
+        if (!Enum.TryParse<WorldType>(command.World, ignoreCase: true, out var world))
+        {
+            return Result.Failure<ScheduleDto>($"Invalid world value '{command.World}'.");
+        }
+
+        if (!Enum.TryParse<ScheduleType>(command.ScheduleType, ignoreCase: true, out var scheduleType))
+        {
+            return Result.Failure<ScheduleDto>($"Invalid schedule type value '{command.ScheduleType}'.");
+        }
+
+        schedule.World = world;
+        schedule.ScheduleType = scheduleType;
         await scheduleRepository.UpdateAsync(schedule, cancellationToken);
 
         return Result.Success(IScheduleMapper.ToDto(schedule));
