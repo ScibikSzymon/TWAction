@@ -29,14 +29,24 @@ public class CreateScheduleHandler(IScheduleRepository scheduleRepository, IUser
             return Result.Failure<ScheduleDto>($"User with ID '{command.UserId}' not found.");
         }
 
+        if (!Enum.TryParse<WorldType>(command.World, ignoreCase: true, out var world))
+        {
+            return Result.Failure<ScheduleDto>($"Invalid world value '{command.World}'.");
+        }
+
+        if (!Enum.TryParse<ScheduleType>(command.ScheduleType, ignoreCase: true, out var scheduleType))
+        {
+            return Result.Failure<ScheduleDto>($"Invalid schedule type value '{command.ScheduleType}'.");
+        }
+
         var schedule = new ScheduleEntity
         {
             Id = Guid.NewGuid(),
             UserGuid = command.UserId,
             Name = command.Name,
             CreationDate = DateTime.UtcNow,
-            World = Enum.Parse<WorldType>(command.World),
-            ScheduleType = Enum.Parse<ScheduleType>(command.ScheduleType)
+            World = world,
+            ScheduleType = scheduleType
         };
 
         await scheduleRepository.AddAsync(schedule, cancellationToken);
