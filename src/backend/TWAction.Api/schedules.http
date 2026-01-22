@@ -3,18 +3,16 @@
 
 ### Variables
 @baseUrl = http://localhost:8000
-### Zmieñ na rzeczywisty userId z bazy danych!
+### Update with actual userId from database
 @userId = 5a5bc3b3-6a7c-49d8-8714-f0eeaeee0bf6
 @scheduleId = 7bb24d4b-c9b5-44fd-8ce1-8f8ecf559ffe
 
-### ===== STEP 1: POBRANIE ISTNIEJ¥CEGO USER_ID =====
-### Uruchom to zapytanie aby dowiedzieæ siê jakie userId istniej¹ w bazie
+### ===== STEP 1: GET EXISTING USER_ID =====
+### Run this query to see what userIds exist in database
 GET {{baseUrl}}/users
 Accept: application/json
 
-### Skopiuj ID jednego z u¿ytkowników i zast¹p @userId powy¿ej
-
-### ===== STEP 2: TWORZENIE SCHEDULE'I =====
+### Copy ID of one user and replace @userId above
 
 ### CREATE Schedule - Main variant (pl218 world)
 POST {{baseUrl}}/schedules
@@ -49,17 +47,17 @@ Content-Type: application/json
   "scheduleType": "Fake"
 }
 
-### ===== STEP 3: POBIERANIE SCHEDULE'I =====
+### ===== STEP 3: FETCHING SCHEDULES =====
 
 ### GET all schedules for user
 GET {{baseUrl}}/schedules/{{userId}}
 Accept: application/json
 
-### GET schedule by ID (zmieñ {{scheduleId}} na ID ze zwróconej odpowiedzi powy¿ej)
+### GET schedule by ID (replace {{scheduleId}} with ID from response above)
 GET {{baseUrl}}/schedules/{{userId}}/{{scheduleId}}
 Accept: application/json
 
-### ===== STEP 4: AKTUALIZACJA I USUNIÊCIE =====
+### ===== STEP 4: UPDATE AND DELETE =====
 
 ### UPDATE schedule - change to Reconnaissance
 PUT {{baseUrl}}/schedules/{{scheduleId}}
@@ -74,12 +72,12 @@ Content-Type: application/json
 ### DELETE schedule
 DELETE {{baseUrl}}/schedules/{{scheduleId}}
 
-### ===== INSTRUKCJA =====
-### 1. Uruchom GET /users - otrzymasz listê istniej¹cych u¿ytkowników
-### 2. Skopiuj ID jednego z u¿ytkowników (pole "id")
-### 3. Zast¹p @userId tym ID w zmiennej powy¿ej
-### 4. Teraz mo¿esz testowaæ CREATE, GET, PUT, DELETE
-### 5. Po ka¿dym CREATE skopiuj zwrócony "id" i podstaw do {{scheduleId}}
+### ===== INSTRUCTIONS =====
+### 1. Run GET /users - you will get list of existing users
+### 2. Copy ID of one user (field "id")
+### 3. Replace @userId with that ID in variable above
+### 4. Now you can test CREATE, GET, PUT, DELETE
+### 5. After each CREATE copy returned "id" and put it in {{scheduleId}}
 
 ### Available World values: pl218, pl219, pl220, pl221, pl222, pl223
 ### Available ScheduleType values: Fake, Reconaissance, Main
