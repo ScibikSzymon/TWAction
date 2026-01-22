@@ -33,7 +33,7 @@ Content-Type: application/json
   "userId": "{{userId}}",
   "name": "Reconnaissance Mission",
   "world": "pl219",
-  "scheduleType": "Reconaissance"
+  "scheduleType": "Reconnaissance"
 }
 
 ### CREATE Schedule - Fake attack
@@ -66,7 +66,7 @@ Content-Type: application/json
 {
   "name": "Updated Daily Farm Schedule",
   "world": "pl221",
-  "scheduleType": "Reconaissance"
+  "scheduleType": "Reconnaissance"
 }
 
 ### DELETE schedule
@@ -80,4 +80,4 @@ DELETE {{baseUrl}}/schedules/{{scheduleId}}
 ### 5. After each CREATE copy returned "id" and put it in {{scheduleId}}
 
 ### Available World values: pl218, pl219, pl220, pl221, pl222, pl223
-### Available ScheduleType values: Fake, Reconaissance, Main
+### Available ScheduleType values: Fake, Reconnaissance, Main
