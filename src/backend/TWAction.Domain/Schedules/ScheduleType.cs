@@ -3,6 +3,6 @@
 public enum ScheduleType
 {
     Fake,
-    Reconaissance,
+    Reconnaissance,
     Main
 }

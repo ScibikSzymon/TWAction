@@ -11,7 +11,7 @@ export type WorldType = (typeof WorldType)[keyof typeof WorldType];
 
 export const ScheduleType = {
   Fake: "Fake",
-  Reconaissance: "Reconaissance",
+  Reconnaissance: "Reconnaissance",
   Main: "Main",
 } as const;
 
