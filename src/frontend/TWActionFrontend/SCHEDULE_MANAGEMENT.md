@@ -1,185 +1,227 @@
-# Dokumentacja Systemu Zarządzania Rozpiskami
+# Schedule Management System Documentation
 
-## Przegląd
+## Overview
 
-System umożliwia zalogowanym użytkownikom:
+The system allows authenticated users to:
 
-- Przeglądanie swoich rozpisek
-- Tworzenie nowych rozpisek
-- Edycję istniejących rozpisek
-- Usuwanie rozpisek
-- Wylogowanie się z systemu
+- View their schedules
+- Create new schedules
+- Edit existing schedules
+- Delete schedules
+- Logout from the system
 
-## Struktura Projektu
+## Project Structure
 
-### Typy TypeScript
+### TypeScript Types
 
-**`types/schedule.ts`** - Definicje typów dla rozpisek:
+**`types/schedule.ts`** - Type definitions for schedules:
 
-- `WorldType` - enum światów (pl218-pl223)
-- `ScheduleType` - enum typów rozpisek (Fake, Reconaissance, Main)
-- `Schedule` - interfejs rozpiski
-- `CreateScheduleRequest` - request do tworzenia
-- `UpdateScheduleRequest` - request do aktualizacji
+- `WorldType` - enum of worlds (pl218-pl223)
+- `ScheduleType` - enum of schedule types (Fake, Reconnaissance, Main)
+- `Schedule` - schedule interface
+- `CreateScheduleRequest` - request for creating
+- `UpdateScheduleRequest` - request for updating
 
-**`types/user.ts`** - Definicje typów dla użytkownika
+**`types/user.ts`** - Type definitions for user
 
-### Serwisy API
+### API Services
 
-**`services/scheduleService.ts`** - Obsługa wszystkich operacji CRUD na rozpiskach:
+**`services/scheduleService.ts`** - Handles all CRUD operations on schedules:
 
-- `getSchedulesByUser(userId)` - pobieranie rozpisek użytkownika
-- `getScheduleById(userId, scheduleId)` - pobieranie pojedynczej rozpiski
-- `createSchedule(request)` - tworzenie nowej rozpiski
-- `updateSchedule(scheduleId, request)` - aktualizacja rozpiski
-- `deleteSchedule(scheduleId)` - usuwanie rozpiski
+- `getSchedulesByUser(userId)` - fetch user's schedules
+- `getScheduleById(userId, scheduleId)` - fetch single schedule
+- `createSchedule(request)` - create new schedule
+- `updateSchedule(scheduleId, request)` - update schedule
+- `deleteSchedule(scheduleId)` - delete schedule
 
-**`services/authService.ts`** - Obsługa autentykacji:
+**`services/authService.ts`** - Handles authentication:
 
-- `getMe()` - pobieranie danych zalogowanego użytkownika
-- `logout()` - wylogowanie
-- `redirectToGoogleLogin()` - przekierowanie do logowania Google
+- `getMe()` - fetch logged-in user data
+- `logout()` - logout
+- `redirectToGoogleLogin()` - redirect to Google login
 
 ### Custom Hooks
 
-**`hooks/useAuth.ts`** - Hook do zarządzania sesją użytkownika:
+**`hooks/useAuth.ts`** - Hook for managing user session:
 
-- Automatycznie sprawdza stan sesji przy montowaniu
-- Zapewnia metody login/logout
-- Zarządza stanem ładowania i błędów
-- Zwraca status autentykacji
+- Automatically checks session state on mount
+- Provides login/logout methods
+- Manages loading and error states
+- Returns authentication status
 
-### Komponenty
+**`hooks/useActiveSchedule.ts`** - Hook for managing active schedule:
 
-**`components/ScheduleForm.tsx`** - Formularz tworzenia/edycji rozpiski:
+- Stores active schedule ID in localStorage
+- Provides methods to set/clear active schedule
+- Persists selection across sessions
 
-- Walidacja nazwy (wymagana)
-- Wybór świata z selecta
-- Wybór typu rozpiski
-- Obsługa stanu ładowania
-- Wyświetlanie błędów
+### Components
 
-**`components/ScheduleList.tsx`** - Lista rozpisek:
+**`components/ScheduleForm.tsx`** - Form for creating/editing schedule:
 
-- Wyświetlanie wszystkich rozpisek użytkownika
-- Formatowanie daty utworzenia
-- Przyciski edycji i usuwania
-- Potwierdzenie przed usunięciem
-- Stan pustej listy
+- Name validation (required)
+- World selection from select
+- Schedule type selection
+- Loading state handling
+- Error display
 
-### Strony
+**`components/ScheduleList.tsx`** - Schedule list:
 
-**`pages/HomePage.tsx`** - Główna strona aplikacji:
+- Display all user's schedules
+- Creation date formatting
+- Edit and delete buttons
+- Confirmation before deletion
+- Empty list state
+- Visual indication of active schedule
+- Button to set schedule as active
 
-- Ekran logowania dla niezalogowanych użytkowników
-- Panel rozpisek dla zalogowanych użytkowników
-- Obsługa wszystkich operacji CRUD
-- Zarządzanie stanem formularza (tworzenie/edycja)
+### Pages
 
-## Przepływ Aplikacji
+**`pages/HomePage.tsx`** - Main application page:
 
-### 1. Logowanie
+- Login screen for unauthenticated users
+- Schedule panel for authenticated users
+- Handles all CRUD operations
+- Form state management (create/edit)
+- Active schedule management
 
-```
-Użytkownik niezalogowany → Przycisk "Zaloguj się przez Google"
-→ Przekierowanie do auth/google → Po zalogowaniu powrót do aplikacji
-→ Hook useAuth automatycznie pobiera dane użytkownika
-```
+## Application Flow
 
-### 2. Wyświetlanie Rozpisek
-
-```
-HomePage montowanie → useAuth pobiera użytkownika
-→ useEffect wykrywa user.id → loadSchedules()
-→ scheduleService.getSchedulesByUser() → Aktualizacja stanu schedules
-→ ScheduleList renderuje listę
-```
-
-### 3. Tworzenie Rozpiski
+### 1. Login
 
 ```
-Przycisk "Nowa rozpiska" → setShowForm(true)
-→ Renderowanie ScheduleForm → Wypełnienie formularza
+Unauthenticated user → "Sign in with Google" button
+→ Redirect to auth/google → After login return to app
+→ useAuth hook automatically fetches user data
+```
+
+### 2. Displaying Schedules
+
+```
+HomePage mount → useAuth fetches user
+→ useEffect detects user.id → loadSchedules()
+→ scheduleService.getSchedulesByUser() → Update schedules state
+→ ScheduleList renders list with active schedule highlighted
+```
+
+### 3. Creating Schedule
+
+```
+"New schedule" button → setShowForm(true)
+→ Render ScheduleForm → Fill form
 → Submit → handleCreateSchedule() → scheduleService.createSchedule()
-→ Dodanie do stanu → Zamknięcie formularza
+→ Add to state → Close form
 ```
 
-### 4. Edycja Rozpiski
+### 4. Editing Schedule
 
 ```
-Przycisk "Edytuj" → setEditingSchedule() + setShowForm(true)
-→ ScheduleForm z danymi rozpiski → Modyfikacja
+"Edit" button → setEditingSchedule() + setShowForm(true)
+→ ScheduleForm with schedule data → Modification
 → Submit → handleUpdateSchedule() → scheduleService.updateSchedule()
-→ Aktualizacja w stanie → Zamknięcie formularza
+→ Update in state → Close form
 ```
 
-### 5. Usuwanie Rozpiski
+### 5. Deleting Schedule
 
 ```
-Przycisk "Usuń" → Potwierdzenie (confirm)
+"Delete" button → Confirmation (confirm)
 → handleDeleteSchedule() → scheduleService.deleteSchedule()
-→ Usunięcie ze stanu
+→ Remove from state
 ```
 
-### 6. Wylogowanie
+### 6. Setting Active Schedule
 
 ```
-Przycisk "Wyloguj się" → logout() z useAuth
-→ authService.logout() → Czyszczenie stanu użytkownika
-→ Przekierowanie do ekranu logowania
+"Set as active" button → onSetActive(scheduleId)
+→ useActiveSchedule stores ID in localStorage
+→ Visual update: blue border, gradient background, "ACTIVE" badge
 ```
 
-## Dobre Praktyki Zastosowane
+### 7. Logout
+
+```
+"Logout" button → logout() from useAuth
+→ authService.logout() → Clear user state
+→ Redirect to login screen
+```
+
+## Best Practices Applied
 
 ### React Best Practices
 
-1. **Functional Components & Hooks** - Wszystkie komponenty jako funkcje z hookami
-2. **Custom Hooks** - `useAuth` enkapsuluje logikę autentykacji
-3. **Controlled Components** - Formularze używają controlled inputs
-4. **Proper State Management** - Stan lokalny dla UI, serwisy dla API
-5. **Error Handling** - Try-catch we wszystkich operacjach async
-6. **Loading States** - Wskaźniki ładowania dla lepszego UX
-7. **TypeScript** - Pełne typowanie dla type safety
-8. **CSS Modules** - Izolowane style dla każdego komponentu
+1. **Functional Components & Hooks** - All components as functions with hooks
+2. **Custom Hooks** - `useAuth` encapsulates authentication logic, `useActiveSchedule` for active schedule
+3. **Controlled Components** - Forms use controlled inputs
+4. **Proper State Management** - Local state for UI, services for API, localStorage for persistence
+5. **Error Handling** - Try-catch in all async operations
+6. **Loading States** - Loading indicators for better UX
+7. **TypeScript** - Full typing for type safety
+8. **CSS Modules** - Isolated styles for each component
 
-### Zarządzanie Sesją
+### Session Management
 
-1. **Automatic Session Check** - useAuth sprawdza sesję przy montowaniu
-2. **Credentials Handling** - `withCredentials: true` w axios dla cookies
-3. **Error Recovery** - Graceful handling błędów autentykacji
-4. **Conditional Rendering** - Różne widoki dla zalogowanych/niezalogowanych
+1. **Automatic Session Check** - useAuth checks session on mount
+2. **Credentials Handling** - `withCredentials: true` in axios for cookies
+3. **Error Recovery** - Graceful handling of authentication errors
+4. **Conditional Rendering** - Different views for authenticated/unauthenticated
 
-### Struktura Kodu
+### Code Structure
 
-1. **Separation of Concerns** - Serwisy, hooki, komponenty oddzielnie
-2. **Reusable Components** - ScheduleForm dla create i edit
-3. **Type Safety** - Type-only imports gdzie wymagane
-4. **Clean Architecture** - Logika biznesowa oddzielona od UI
+1. **Separation of Concerns** - Services, hooks, components separated
+2. **Reusable Components** - ScheduleForm for both create and edit
+3. **Type Safety** - Type-only imports where required
+4. **Clean Architecture** - Business logic separated from UI
 
-## Endpointy API (Backend)
+### UI/UX Design
+
+1. **Dark Theme** - Modern dark color scheme with CSS variables
+2. **Consistent Design** - Unified styling across all components
+3. **Visual Feedback** - Hover effects, transitions, loading states
+4. **Accessibility** - Focus states, keyboard navigation
+5. **Semantic Colors** - Blue for primary actions, green for success, red for danger
+
+## API Endpoints (Backend)
 
 ```
-GET    /schedules/{userId}              - Pobierz wszystkie rozpiski użytkownika
-GET    /schedules/{userId}/{scheduleId} - Pobierz pojedynczą rozpiskę
-POST   /schedules                       - Utwórz nową rozpiskę
-PUT    /schedules/{scheduleId}          - Zaktualizuj rozpiskę
-DELETE /schedules/{scheduleId}          - Usuń rozpiskę
+GET    /schedules/{userId}              - Get all user's schedules
+GET    /schedules/{userId}/{scheduleId} - Get single schedule
+POST   /schedules                       - Create new schedule
+PUT    /schedules/{scheduleId}          - Update schedule
+DELETE /schedules/{scheduleId}          - Delete schedule
 ```
 
-## Testowanie
+## Backend Configuration
 
-1. **Sprawdź logowanie** - Przekierowanie do Google auth
-2. **Sprawdź pustą listę** - Komunikat "Brak rozpisek"
-3. **Utwórz rozpiskę** - Formularz, walidacja, zapisanie
-4. **Edytuj rozpiskę** - Załadowanie danych, modyfikacja
-5. **Usuń rozpiskę** - Potwierdzenie, usunięcie
-6. **Wyloguj się** - Powrót do ekranu logowania
+**Enum Serialization** - Backend configured to serialize enums as strings (not numbers):
 
-## Potencjalne Rozszerzenia
+```csharp
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+```
 
-- Paginacja dla dużej liczby rozpisek
-- Filtrowanie i sortowanie
-- Wyszukiwanie rozpisek
-- Szczegóły rozpiski (osobna strona)
-- Udostępnianie rozpisek
-- Import/Export rozpisek
+This ensures that `WorldType` and `ScheduleType` are sent as strings like `"pl218"` and `"Fake"` instead of numeric values.
+
+## Testing
+
+1. **Check login** - Redirect to Google auth
+2. **Check empty list** - "No schedules" message
+3. **Create schedule** - Form, validation, save
+4. **Edit schedule** - Load data, modification
+5. **Delete schedule** - Confirmation, deletion
+6. **Set active schedule** - Visual indication, persistence across reload
+7. **Logout** - Return to login screen
+
+## Potential Extensions
+
+- Pagination for large number of schedules
+- Filtering and sorting
+- Schedule search
+- Schedule details (separate page)
+- Schedule sharing
+- Import/Export schedules
+- Schedule templates
+- Bulk operations
+- Schedule history/versioning
