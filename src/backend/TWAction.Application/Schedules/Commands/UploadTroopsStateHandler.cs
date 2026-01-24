@@ -13,7 +13,8 @@ public class UploadTroopsStateHandler(
     IScheduleRepository scheduleRepository,
     ITroopsStateRepository troopsStateRepository,
     TroopsStateValidator validator,
-    TroopsStateCompressionService compressionService)
+    TroopsStateCompressionService compressionService,
+    TroopsStateStatsExtractor statsExtractor)
 {
     public async Task<Result<TroopsStateDto>> Handle(UploadTroopsStateCommand command, CancellationToken cancellationToken = default)
     {
@@ -30,6 +31,9 @@ public class UploadTroopsStateHandler(
         {
             return Result.Failure<TroopsStateDto>(parseResult.Error);
         }
+
+        // Extract stats
+        var stats = statsExtractor.Extract(parseResult.Value);
 
         // Compress data
         var compressedData = compressionService.Compress(command.RawData);
@@ -59,6 +63,17 @@ public class UploadTroopsStateHandler(
             troopsState = await troopsStateRepository.CreateAsync(troopsState, cancellationToken);
         }
 
-        return Result.Success(ITroopsStateMapper.ToDto(troopsState));
+        var dto = new TroopsStateDto
+        {
+            Id = troopsState.Id,
+            ScheduleId = troopsState.ScheduleId,
+            VillageCount = stats.VillageCount,
+            PlayerCount = stats.PlayerCount,
+            CreatedAt = troopsState.CreatedAt,
+            UpdatedAt = troopsState.UpdatedAt
+        };
+
+        return Result.Success(dto);
     }
 }
+

@@ -4,13 +4,26 @@
 @baseUrl = http://localhost:8000
 @scheduleId = 3a336a89-4279-4243-9d1d-6da5c432a7a6
 
+### ===== GET TROOPS STATE =====
+### Retrieve troops state for a schedule (includes row count and player count)
+GET {{baseUrl}}/schedules/{{scheduleId}}/troops
+Accept: application/json
+
 ### ===== UPLOAD TROOPS STATE =====
-### Upload troops state data for a schedule
+### Upload/Update troops state data for a schedule (returns row count and player count)
 POST {{baseUrl}}/schedules/{{scheduleId}}/troops
 Content-Type: application/json
 
 {
   "rawData": "PlayerName,Village,Spear,Sword,Archer,Marcher,Catapult,Axe,Polearm,Ram,Trebuchet\n6ikanar6 x Ciawka24,492|577,140,140,345,0,45,5505,2194,298,4\n6ikanar6 x Ciawka24,505|571,0,54,50,0,0,0,0,0,0\n6ikanar6 x Ciawka24,509|564,200,200,0,0,0,0,0,0,0\nAASgirl,495|566,177,160,0,0,0,0,0,0,0\nAASgirl,507|561,175,238,385,0,0,0,16,0,0\nAASgirl,504|562,143,57,915,0,0,39,17,0,0\nAASgirl,493|569,624,1134,2669,0,50,340,0,20,0\nAlpakancka Partyzantka,485|653,685,550,262,0,54,50,200,0,0"
+}
+
+### ===== UPLOAD WITH POLISH HEADER =====
+POST {{baseUrl}}/schedules/{{scheduleId}}/troops
+Content-Type: application/json
+
+{
+  "rawData": "Nazwa gracza,Wioska,Piki,Miecze,Zwiad,CK,Katasy,Topory,LK,Tarany,Grube\n6ikanar6 x Ciawka24,492|577,140,140,345,0,45,5505,2194,298,4\n6ikanar6 x Ciawka24,505|571,0,54,50,0,0,0,0,0,0\nAASgirl,495|566,177,160,0,0,0,0,0,0,0"
 }
 
 ### ===== UPLOAD WITH WINDOWS LINE ENDINGS =====
@@ -56,5 +69,8 @@ Content-Type: application/json
 
 ### Replace {{scheduleId}} with actual schedule ID from /schedules endpoint
 ### Valid coordinate format: X|Y where X and Y are integers
-### Valid header: PlayerName,Village,Spear,Sword,Archer,Marcher,Catapult,Axe,Polearm,Ram,Trebuchet
+### Valid headers: 
+###   - English: PlayerName,Village,Spear,Sword,Archer,Marcher,Catapult,Axe,Polearm,Ram,Trebuchet
+###   - Polish: Nazwa gracza,Wioska,Piki,Miecze,Zwiad,CK,Katasy,Topory,LK,Tarany,Grube
 ### Data stored in database as gzip-compressed base64 string
+### Response includes: id, scheduleId, villageCount (unique villages), playerCount (unique players), createdAt, updatedAt

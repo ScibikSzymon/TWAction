@@ -6,6 +6,10 @@ public sealed record TroopsStateDto
 
     public required Guid ScheduleId { get; init; }
 
+    public required int VillageCount { get; init; }
+
+    public required int PlayerCount { get; init; }
+
     public required DateTime CreatedAt { get; init; }
 
     public required DateTime UpdatedAt { get; init; }

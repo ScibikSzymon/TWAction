@@ -43,6 +43,7 @@ public static class DependencyInjection
 
         services.AddSingleton<TroopsStateValidator>();
         services.AddSingleton<TroopsStateCompressionService>();
+        services.AddSingleton<TroopsStateStatsExtractor>();
 
         services.AddTransient<SignInWithGoogleHandler>();
         services.AddTransient<GetAllUsersHandler>();
@@ -54,6 +55,7 @@ public static class DependencyInjection
         services.AddTransient<UpdateScheduleHandler>();
         services.AddTransient<DeleteScheduleHandler>();
         services.AddTransient<UploadTroopsStateHandler>();
+        services.AddTransient<GetTroopsStateHandler>();
 
         return services;
     }
