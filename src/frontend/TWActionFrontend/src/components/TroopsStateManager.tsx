@@ -147,9 +147,9 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
             className={styles.textarea}
             value={rawData}
             onChange={(e) => setRawData(e.target.value)}
-            placeholder="Nazwa gracza,Wioska,Piki,Miecze,Zwiad,CK,Katasy,Topory,LK,Tarany,Grube
+            placeholder={`Nazwa gracza,Wioska,Piki,Miecze,Zwiad,CK,Katasy,Topory,LK,Tarany,Grube
 wwwwwwQ,492|577,140,140,345,0,45,5505,2194,298,4
-Zennirox,505|571,0,54,50,0,0,0,0,0,0"
+Zennirox,505|571,0,54,50,0,0,0,0,0,0`}
             disabled={isUploading}
           />
           <p className={styles.hint}>
