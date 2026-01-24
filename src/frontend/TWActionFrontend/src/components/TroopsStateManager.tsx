@@ -14,7 +14,7 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const successTimeoutRef = useRef<number | null>(null);
+  const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (scheduleId) {
@@ -82,7 +82,7 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
       if (successTimeoutRef.current !== null) {
         clearTimeout(successTimeoutRef.current);
       }
-      successTimeoutRef.current = window.setTimeout(() => {
+      successTimeoutRef.current = setTimeout(() => {
         setSuccessMessage(null);
         successTimeoutRef.current = null;
       }, 5000);
