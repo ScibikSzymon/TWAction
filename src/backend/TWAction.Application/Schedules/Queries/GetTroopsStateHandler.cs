@@ -26,7 +26,7 @@ public class GetTroopsStateHandler(
         var decompressResult = compressionService.Decompress(troopsState.CompressedData);
         if (decompressResult.IsFailure)
         {
-            return Result.Failure<TroopsStateDto>($"Failed to decompress troops data: {decompressResult.Error}");
+            return Result.Failure<TroopsStateDto>(decompressResult.Error);
         }
 
         // Parse to get stats
