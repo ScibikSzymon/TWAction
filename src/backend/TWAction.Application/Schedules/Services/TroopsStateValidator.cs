@@ -59,7 +59,7 @@ public sealed class TroopsStateValidator
             var villageValidation = ValidateVillageCoordinates(columns[1], i + 1);
             if (villageValidation.IsFailure)
             {
-                return villageValidation;
+                return Result.Failure<List<string[]>>(villageValidation.Error);
             }
 
             // Validate unit counts (columns 2-10)
@@ -79,26 +79,26 @@ public sealed class TroopsStateValidator
         return Result.Success(dataRows);
     }
 
-    private Result<List<string[]>> ValidateVillageCoordinates(string coordinates, int rowNumber)
+    private Result ValidateVillageCoordinates(string coordinates, int rowNumber)
     {
         if (string.IsNullOrWhiteSpace(coordinates))
         {
-            return Result.Failure<List<string[]>>($"Row {rowNumber}: Village coordinates cannot be empty.");
+            return Result.Failure($"Row {rowNumber}: Village coordinates cannot be empty.");
         }
 
         var parts = coordinates.Split('|');
         if (parts.Length != 2)
         {
-            return Result.Failure<List<string[]>>(
+            return Result.Failure(
                 $"Row {rowNumber}: Village coordinates must be in format 'X|Y', got '{coordinates}'.");
         }
 
         if (!int.TryParse(parts[0], out _) || !int.TryParse(parts[1], out _))
         {
-            return Result.Failure<List<string[]>>(
+            return Result.Failure(
                 $"Row {rowNumber}: Village coordinates must contain valid integers in format 'X|Y'.");
         }
 
-        return Result.Success(new List<string[]>());
+        return Result.Success();
     }
 }
