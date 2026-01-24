@@ -1,5 +1,4 @@
 using TWAction.Application.Common;
-using TWAction.Application.Mappers;
 using TWAction.Application.Schedules.DTOs;
 using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Schedules.Services;
