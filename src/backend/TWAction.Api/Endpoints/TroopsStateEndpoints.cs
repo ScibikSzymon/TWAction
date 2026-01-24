@@ -34,6 +34,11 @@ public static class TroopsStateEndpoints
 
         if (result.IsFailure)
         {
+            if (result.Error.Contains("not found", StringComparison.OrdinalIgnoreCase))
+            {
+                return Results.NotFound(new { error = result.Error });
+            }
+
             return Results.BadRequest(new { error = result.Error });
         }
 
