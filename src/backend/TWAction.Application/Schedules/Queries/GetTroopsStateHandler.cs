@@ -19,21 +19,21 @@ public class GetTroopsStateHandler(
 
         if (troopsState is null)
         {
-            return Result.Failure<TroopsStateDto>($"Troops state for schedule '{query.ScheduleId}' not found.");
+            return Result.Failure<TroopsStateDto>($"Troops state for schedule '{query.ScheduleId}' not found.", ErrorType.NotFound);
         }
 
         // Decompress data to extract stats
         var decompressResult = compressionService.Decompress(troopsState.CompressedData);
         if (decompressResult.IsFailure)
         {
-            return Result.Failure<TroopsStateDto>(decompressResult.Error);
+            return Result.Failure<TroopsStateDto>(decompressResult.Error, ErrorType.Internal);
         }
 
         // Parse to get stats
         var parseResult = validator.ValidateAndParse(decompressResult.Value);
         if (parseResult.IsFailure)
         {
-            return Result.Failure<TroopsStateDto>($"Failed to parse troops data: {parseResult.Error}");
+            return Result.Failure<TroopsStateDto>($"Failed to parse troops data: {parseResult.Error}", ErrorType.Internal);
         }
 
         var stats = statsExtractor.Extract(parseResult.Value);
