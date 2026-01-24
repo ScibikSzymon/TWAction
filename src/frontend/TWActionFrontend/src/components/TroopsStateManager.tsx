@@ -77,10 +77,16 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
       if (err && typeof err === "object" && "response" in err) {
         const axiosError = err as {
           response?: {
+            status?: number;
             data?: { error?: string };
           };
         };
-        if (axiosError.response?.data?.error) {
+        
+        // Handle 404 - schedule not found
+        if (axiosError.response?.status === 404) {
+          errorMessage = "Rozpiska nie istnieje. Została prawdopodobnie usunięta. Odśwież stronę, aby zaktualizować listę rozpisek.";
+        } else if (axiosError.response?.data?.error) {
+          // Handle other errors (like 400 validation errors)
           errorMessage = axiosError.response.data.error;
         }
       }
