@@ -16,12 +16,12 @@ public enum ErrorType
     NotFound,
     
     /// <summary>
-    /// Validation or processing error (e.g., invalid input, parsing failure).
+    /// Validation error (e.g., invalid input format).
     /// </summary>
     Validation,
     
     /// <summary>
-    /// Internal server error (e.g., decompression failure, unexpected exceptions).
+    /// Internal server error (e.g., decompression failure, parsing failure, unexpected exceptions).
     /// </summary>
     Internal
 }
