@@ -9,6 +9,7 @@ import type {
 import { scheduleService } from "../services/scheduleService";
 import { ScheduleList } from "../components/ScheduleList";
 import { ScheduleForm } from "../components/ScheduleForm";
+import { TroopsStateManager } from "../components/TroopsStateManager";
 import styles from "./HomePage.module.css";
 
 const HomePage = () => {
@@ -164,13 +165,16 @@ const HomePage = () => {
           {isLoadingSchedules ? (
             <div className={styles.loading}>Ładowanie rozpisek...</div>
           ) : (
-            <ScheduleList
-              schedules={schedules}
-              activeScheduleId={activeScheduleId}
-              onEdit={handleEdit}
-              onDelete={handleDeleteSchedule}
-              onSetActive={setActive}
-            />
+            <>
+              <ScheduleList
+                schedules={schedules}
+                activeScheduleId={activeScheduleId}
+                onEdit={handleEdit}
+                onDelete={handleDeleteSchedule}
+                onSetActive={setActive}
+              />
+              <TroopsStateManager scheduleId={activeScheduleId} />
+            </>
           )}
         </>
       )}
