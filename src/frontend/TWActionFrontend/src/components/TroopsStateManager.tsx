@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { troopsStateService } from "../services/troopsStateService";
 import type { TroopsState } from "../types/troopsState";
 import styles from "./TroopsStateManager.module.css";
@@ -16,24 +16,7 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (scheduleId) {
-      loadTroopsState();
-    } else {
-      setTroopsState(null);
-    }
-  }, [scheduleId]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (successTimeoutRef.current !== null) {
-        clearTimeout(successTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const loadTroopsState = async () => {
+  const loadTroopsState = useCallback(async () => {
     if (!scheduleId) return;
 
     setIsLoading(true);
@@ -58,7 +41,24 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [scheduleId]);
+
+  useEffect(() => {
+    if (scheduleId) {
+      loadTroopsState();
+    } else {
+      setTroopsState(null);
+    }
+  }, [scheduleId, loadTroopsState]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (successTimeoutRef.current !== null) {
+        clearTimeout(successTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleUpload = async () => {
     if (!scheduleId || !rawData.trim()) {
