@@ -1,0 +1,60 @@
+### Troops State API Tests
+
+### Variables
+@baseUrl = http://localhost:8000
+@scheduleId = 3a336a89-4279-4243-9d1d-6da5c432a7a6
+
+### ===== UPLOAD TROOPS STATE =====
+### Upload troops state data for a schedule
+POST {{baseUrl}}/schedules/{{scheduleId}}/troops
+Content-Type: application/json
+
+{
+  "rawData": "PlayerName,Village,Spear,Sword,Archer,Marcher,Catapult,Axe,Polearm,Ram,Trebuchet\n6ikanar6 x Ciawka24,492|577,140,140,345,0,45,5505,2194,298,4\n6ikanar6 x Ciawka24,505|571,0,54,50,0,0,0,0,0,0\n6ikanar6 x Ciawka24,509|564,200,200,0,0,0,0,0,0,0\nAASgirl,495|566,177,160,0,0,0,0,0,0,0\nAASgirl,507|561,175,238,385,0,0,0,16,0,0\nAASgirl,504|562,143,57,915,0,0,39,17,0,0\nAASgirl,493|569,624,1134,2669,0,50,340,0,20,0\nAlpakancka Partyzantka,485|653,685,550,262,0,54,50,200,0,0"
+}
+
+### ===== UPLOAD WITH WINDOWS LINE ENDINGS =====
+POST {{baseUrl}}/schedules/{{scheduleId}}/troops
+Content-Type: application/json
+
+{
+  "rawData": "PlayerName,Village,Spear,Sword,Archer,Marcher,Catapult,Axe,Polearm,Ram,Trebuchet\r\n6ikanar6 x Ciawka24,492|577,140,140,345,0,45,5505,2194,298,4\r\n6ikanar6 x Ciawka24,505|571,0,54,50,0,0,0,0,0,0\r\nAASgirl,495|566,177,160,0,0,0,0,0,0,0"
+}
+
+### ===== TEST INVALID DATA =====
+### Missing header
+POST {{baseUrl}}/schedules/{{scheduleId}}/troops
+Content-Type: application/json
+
+{
+  "rawData": "6ikanar6 x Ciawka24,492|577,140,140,345,0,45,5505,2194,298,4"
+}
+
+### ===== TEST INVALID COORDINATES =====
+POST {{baseUrl}}/schedules/{{scheduleId}}/troops
+Content-Type: application/json
+
+{
+  "rawData": "PlayerName,Village,Spear,Sword,Archer,Marcher,Catapult,Axe,Polearm,Ram,Trebuchet\n6ikanar6 x Ciawka24,INVALID,140,140,345,0,45,5505,2194,298,4"
+}
+
+### ===== TEST INVALID UNIT COUNT =====
+POST {{baseUrl}}/schedules/{{scheduleId}}/troops
+Content-Type: application/json
+
+{
+  "rawData": "PlayerName,Village,Spear,Sword,Archer,Marcher,Catapult,Axe,Polearm,Ram,Trebuchet\n6ikanar6 x Ciawka24,492|577,INVALID,140,345,0,45,5505,2194,298,4"
+}
+
+### ===== TEST WRONG COLUMN COUNT =====
+POST {{baseUrl}}/schedules/{{scheduleId}}/troops
+Content-Type: application/json
+
+{
+  "rawData": "PlayerName,Village,Spear,Sword,Archer,Marcher,Catapult,Axe,Polearm,Ram,Trebuchet\n6ikanar6 x Ciawka24,492|577,140,140,345"
+}
+
+### Replace {{scheduleId}} with actual schedule ID from /schedules endpoint
+### Valid coordinate format: X|Y where X and Y are integers
+### Valid header: PlayerName,Village,Spear,Sword,Archer,Marcher,Catapult,Axe,Polearm,Ram,Trebuchet
+### Data stored in database as gzip-compressed base64 string

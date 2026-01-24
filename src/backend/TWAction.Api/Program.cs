@@ -65,6 +65,7 @@ app.MapLoginGoogleEndpoints();
 app.MapUsersEndpoints();
 app.MapAuthEndpoints();
 app.MapScheduleEndpoints();
+app.MapTroopsStateEndpoints();
 
 app.Run();
 
