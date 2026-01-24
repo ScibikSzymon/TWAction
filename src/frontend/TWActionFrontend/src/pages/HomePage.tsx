@@ -20,7 +20,7 @@ const HomePage = () => {
     logout,
     isAuthenticated,
   } = useAuth();
-  const { activeScheduleId, setActive } = useActiveSchedule();
+  const { activeScheduleId, setActive, clearActive } = useActiveSchedule();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isLoadingSchedules, setIsLoadingSchedules] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,6 +94,9 @@ const HomePage = () => {
   const handleDeleteSchedule = async (scheduleId: string) => {
     await scheduleService.deleteSchedule(scheduleId);
     setSchedules((prev) => prev.filter((s) => s.id !== scheduleId));
+    if (activeScheduleId === scheduleId) {
+      clearActive();
+    }
   };
 
   const handleEdit = (schedule: Schedule) => {
@@ -173,7 +176,9 @@ const HomePage = () => {
                 onDelete={handleDeleteSchedule}
                 onSetActive={setActive}
               />
-              <TroopsStateManager scheduleId={activeScheduleId} />
+              {activeScheduleId && schedules.some(s => s.id === activeScheduleId) && (
+                <TroopsStateManager scheduleId={activeScheduleId} />
+              )}
             </>
           )}
         </>
