@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { troopsStateService } from "../services/troopsStateService";
 import type { TroopsState } from "../types/troopsState";
 import styles from "./TroopsStateManager.module.css";
@@ -14,6 +14,7 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const successTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (scheduleId) {
@@ -22,6 +23,15 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
       setTroopsState(null);
     }
   }, [scheduleId]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (successTimeoutRef.current !== null) {
+        clearTimeout(successTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const loadTroopsState = async () => {
     if (!scheduleId) return;
@@ -68,7 +78,14 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
       setSuccessMessage(
         `Stan wojsk został pomyślnie wgrany! Znaleziono ${data.villageCount} wiosek i ${data.playerCount} graczy.`,
       );
-      setTimeout(() => setSuccessMessage(null), 5000);
+      // Clear any existing timeout before setting a new one
+      if (successTimeoutRef.current !== null) {
+        clearTimeout(successTimeoutRef.current);
+      }
+      successTimeoutRef.current = window.setTimeout(() => {
+        setSuccessMessage(null);
+        successTimeoutRef.current = null;
+      }, 5000);
     } catch (err: unknown) {
       console.error("Error uploading troops state:", err);
 
