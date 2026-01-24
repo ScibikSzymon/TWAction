@@ -22,14 +22,14 @@ public class UploadTroopsStateHandler(
         var schedule = await scheduleRepository.GetByIdAsync(command.ScheduleId, cancellationToken);
         if (schedule is null)
         {
-            return Result.Failure<TroopsStateDto>($"Schedule with ID '{command.ScheduleId}' not found.");
+            return Result.Failure<TroopsStateDto>($"Schedule with ID '{command.ScheduleId}' not found.", ErrorType.NotFound);
         }
 
         // Validate and parse troops data
         var parseResult = validator.ValidateAndParse(command.RawData);
         if (parseResult.IsFailure)
         {
-            return Result.Failure<TroopsStateDto>(parseResult.Error);
+            return Result.Failure<TroopsStateDto>(parseResult.Error, ErrorType.Validation);
         }
 
         // Extract stats

@@ -34,7 +34,13 @@ public static class TroopsStateEndpoints
 
         if (result.IsFailure)
         {
-            return Results.BadRequest(new { error = result.Error });
+            return result.ErrorType switch
+            {
+                ErrorType.NotFound => Results.NotFound(new { error = result.Error }),
+                ErrorType.Validation => Results.BadRequest(new { error = result.Error }),
+                ErrorType.Internal => Results.Problem(detail: result.Error, statusCode: StatusCodes.Status500InternalServerError),
+                _ => Results.Problem(detail: result.Error, statusCode: StatusCodes.Status500InternalServerError)
+            };
         }
 
         return Results.Created($"/schedules/{scheduleId}/troops", result.Value);
