@@ -9,6 +9,7 @@ import type {
 import { scheduleService } from "../services/scheduleService";
 import { ScheduleList } from "../components/ScheduleList";
 import { ScheduleForm } from "../components/ScheduleForm";
+import { TroopsStateManager } from "../components/TroopsStateManager";
 import styles from "./HomePage.module.css";
 
 const HomePage = () => {
@@ -19,7 +20,7 @@ const HomePage = () => {
     logout,
     isAuthenticated,
   } = useAuth();
-  const { activeScheduleId, setActive } = useActiveSchedule();
+  const { activeScheduleId, setActive, clearActive } = useActiveSchedule();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isLoadingSchedules, setIsLoadingSchedules] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,6 +94,9 @@ const HomePage = () => {
   const handleDeleteSchedule = async (scheduleId: string) => {
     await scheduleService.deleteSchedule(scheduleId);
     setSchedules((prev) => prev.filter((s) => s.id !== scheduleId));
+    if (activeScheduleId === scheduleId) {
+      clearActive();
+    }
   };
 
   const handleEdit = (schedule: Schedule) => {
@@ -164,13 +168,18 @@ const HomePage = () => {
           {isLoadingSchedules ? (
             <div className={styles.loading}>Ładowanie rozpisek...</div>
           ) : (
-            <ScheduleList
-              schedules={schedules}
-              activeScheduleId={activeScheduleId}
-              onEdit={handleEdit}
-              onDelete={handleDeleteSchedule}
-              onSetActive={setActive}
-            />
+            <>
+              <ScheduleList
+                schedules={schedules}
+                activeScheduleId={activeScheduleId}
+                onEdit={handleEdit}
+                onDelete={handleDeleteSchedule}
+                onSetActive={setActive}
+              />
+              {activeScheduleId && schedules.some(s => s.id === activeScheduleId) && (
+                <TroopsStateManager scheduleId={activeScheduleId} />
+              )}
+            </>
           )}
         </>
       )}

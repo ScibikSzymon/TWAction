@@ -12,6 +12,7 @@ using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Schedules.Queries;
 using TWAction.Application.Schedules.Commands;
 using TWAction.Application.Users.Commands;
+using TWAction.Application.Schedules.Services;
 
 namespace TWAction.Infrastructure;
 
@@ -38,6 +39,11 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
+        services.AddScoped<ITroopsStateRepository, TroopsStateRepository>();
+
+        services.AddSingleton<TroopsStateValidator>();
+        services.AddSingleton<TroopsStateCompressionService>();
+        services.AddSingleton<TroopsStateStatsExtractor>();
 
         services.AddTransient<SignInWithGoogleHandler>();
         services.AddTransient<GetAllUsersHandler>();
@@ -48,6 +54,8 @@ public static class DependencyInjection
         services.AddTransient<CreateScheduleHandler>();
         services.AddTransient<UpdateScheduleHandler>();
         services.AddTransient<DeleteScheduleHandler>();
+        services.AddTransient<UploadTroopsStateHandler>();
+        services.AddTransient<GetTroopsStateHandler>();
 
         return services;
     }
