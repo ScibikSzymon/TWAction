@@ -98,7 +98,7 @@ public static class ScheduleEndpoints
             request.Name,
             request.World,
             request.ScheduleType,
-            request.EnemyTribalWarsIds ?? []
+            request.EnemyTribalWarsIds
         );
 
         var result = await bus.InvokeAsync<Result<ScheduleDto>>(command);
