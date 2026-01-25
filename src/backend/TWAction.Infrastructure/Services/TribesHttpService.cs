@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Net.Http;
 using TWAction.Application.Common;
 using TWAction.Application.Tribes.Interfaces;
 using TWAction.Domain.Schedules;
@@ -10,7 +11,7 @@ namespace TWAction.Infrastructure.Services;
 /// Service for fetching TribalWars tribe data with in-memory caching
 /// </summary>
 public sealed class TribesHttpService(
-    HttpClient httpClient,
+    IHttpClientFactory httpClientFactory,
     TribesCsvParser parser) : ITribesService
 {
     private const int CacheDurationMinutes = 15;
@@ -33,6 +34,7 @@ public sealed class TribesHttpService(
         try
         {
             var url = $"https://{worldString}.plemiona.pl/map/ally.txt";
+            using var httpClient = httpClientFactory.CreateClient();
             using var response = await httpClient.GetAsync(url, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
