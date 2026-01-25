@@ -5,9 +5,4 @@ export interface Tribe {
   villagesCount: number;
 }
 
-export interface EnemyTribeSnapshot {
-  tribalWarsId: number;
-  name: string;
-  short: string;
-  villagesCount: number;
-}
+export type EnemyTribeSnapshot = Tribe;
