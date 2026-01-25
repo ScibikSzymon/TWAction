@@ -26,6 +26,9 @@ public static class ScheduleEndpoints
         group.MapPut("/{scheduleId}", UpdateSchedule)
             .WithName("UpdateSchedule");
 
+        group.MapPut("/{scheduleId}/enemies", SetScheduleEnemies)
+            .WithName("SetScheduleEnemies");
+
         group.MapDelete("/{scheduleId}", DeleteSchedule)
             .WithName("DeleteSchedule");
 
@@ -62,6 +65,7 @@ public static class ScheduleEndpoints
         {
             return Results.NotFound(new { error = "Schedule not found for specified user." });
         }
+
         return Results.Ok(result.Value);
     }
 
@@ -108,6 +112,23 @@ public static class ScheduleEndpoints
         return Results.Ok(result.Value);
     }
 
+    private static async Task<IResult> SetScheduleEnemies(
+        Guid scheduleId,
+        SetScheduleEnemiesRequest request,
+        IMessageBus bus)
+    {
+        var command = new SetScheduleEnemiesCommand(scheduleId, request.EnemyTribalWarsIds);
+
+        var result = await bus.InvokeAsync<Result<ScheduleDto>>(command);
+
+        if (result.IsFailure)
+        {
+            return Results.BadRequest(new { error = result.Error });
+        }
+
+        return Results.Ok(result.Value);
+    }
+
     private static async Task<IResult> DeleteSchedule(
         Guid scheduleId,
         IMessageBus bus)
@@ -135,3 +156,4 @@ public sealed record UpdateScheduleRequest(
     string World,
     string ScheduleType
 );
+

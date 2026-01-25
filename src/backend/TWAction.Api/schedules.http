@@ -1,5 +1,5 @@
 ### Schedule API Tests - Improved Version
-### This file now includes examples with proper User validation
+### This file now includes examples with proper User validation and enemy management
 
 ### Variables
 @baseUrl = http://localhost:8000
@@ -13,6 +13,8 @@ GET {{baseUrl}}/users
 Accept: application/json
 
 ### Copy ID of one user and replace @userId above
+
+### ===== STEP 2: CREATE SCHEDULES =====
 
 ### CREATE Schedule - Main variant (pl218 world)
 POST {{baseUrl}}/schedules
@@ -57,7 +59,47 @@ Accept: application/json
 GET {{baseUrl}}/schedules/{{userId}}/{{scheduleId}}
 Accept: application/json
 
-### ===== STEP 4: UPDATE AND DELETE =====
+### ===== STEP 4: GET TRIBES FOR WORLD =====
+### Fetch list of tribes/enemies for schedule's world (cached for 15 minutes)
+### Copy tribe IDs you want to set as enemies
+GET {{baseUrl}}/worlds/pl218/tribes
+Accept: application/json
+
+### ===== STEP 5: SET SCHEDULE ENEMIES =====
+### Set enemy tribes for schedule by their TribalWars IDs
+### Note: All provided IDs must exist in the world's tribe list
+PUT {{baseUrl}}/schedules/{{scheduleId}}/enemies
+Content-Type: application/json
+
+{
+  "enemyTribalWarsIds": [189, 197, 205]
+}
+
+### SET ENEMIES - Multiple enemies
+PUT {{baseUrl}}/schedules/{{scheduleId}}/enemies
+Content-Type: application/json
+
+{
+  "enemyTribalWarsIds": [189, 197, 205, 210, 215]
+}
+
+### SET ENEMIES - Single enemy
+PUT {{baseUrl}}/schedules/{{scheduleId}}/enemies
+Content-Type: application/json
+
+{
+  "enemyTribalWarsIds": [189]
+}
+
+### SET ENEMIES - Clear enemies (empty list)
+PUT {{baseUrl}}/schedules/{{scheduleId}}/enemies
+Content-Type: application/json
+
+{
+  "enemyTribalWarsIds": []
+}
+
+### ===== STEP 6: UPDATE AND DELETE =====
 
 ### UPDATE schedule - change to Reconnaissance
 PUT {{baseUrl}}/schedules/{{scheduleId}}
@@ -69,15 +111,21 @@ Content-Type: application/json
   "scheduleType": "Reconnaissance"
 }
 
-### DELETE schedule
+### DELETE schedule (also deletes associated enemies)
 DELETE {{baseUrl}}/schedules/{{scheduleId}}
 
 ### ===== INSTRUCTIONS =====
 ### 1. Run GET /users - you will get list of existing users
-### 2. Copy ID of one user (field "id")
-### 3. Replace @userId with that ID in variable above
-### 4. Now you can test CREATE, GET, PUT, DELETE
-### 5. After each CREATE copy returned "id" and put it in {{scheduleId}}
+### 2. Copy ID of one user (field "id") and replace @userId
+### 3. Create a schedule using POST /schedules
+### 4. Copy returned schedule ID and replace @scheduleId
+### 5. Fetch tribes using GET /worlds/{world}/tribes
+### 6. Choose tribe IDs you want as enemies
+### 7. Set enemies using PUT /schedules/{scheduleId}/enemies
+### 8. GET schedule to verify enemies are set (returned in Enemies field)
+### 9. Update/Delete schedule as needed
 
 ### Available World values: pl218, pl219, pl220, pl221, pl222, pl223
 ### Available ScheduleType values: Fake, Reconnaissance, Main
+### Note: When setting enemies, all provided TribalWarsIds must exist in the selected world
+

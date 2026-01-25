@@ -41,6 +41,11 @@ public class UpdateScheduleHandler(IScheduleRepository scheduleRepository)
             return Result.Failure<ScheduleDto>($"Invalid schedule type value '{command.ScheduleType}'.");
         }
 
+        if(world != schedule.World)
+        {
+            schedule.Enemies.Clear();
+        }
+
         schedule.World = world;
         schedule.ScheduleType = scheduleType;
         await scheduleRepository.UpdateAsync(schedule, cancellationToken);

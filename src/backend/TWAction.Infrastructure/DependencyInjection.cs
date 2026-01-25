@@ -66,7 +66,9 @@ public static class DependencyInjection
         services.AddTransient<UploadTroopsStateHandler>();
         services.AddTransient<GetTroopsStateHandler>();
         services.AddTransient<GetTribesHandler>();
+        services.AddTransient<SetScheduleEnemiesHandler>();
 
         return services;
+
     }
 }
