@@ -51,6 +51,7 @@ public sealed class TribesHttpService(
 
             // Sort by VillagesCount descending
             var sortedTribes = parseResult.Value
+                .Where(e=>e.VillagesCount > 0)
                 .OrderByDescending(t => t.VillagesCount)
                 .ToList();
 
