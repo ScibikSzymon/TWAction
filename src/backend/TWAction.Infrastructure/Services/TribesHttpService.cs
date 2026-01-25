@@ -33,7 +33,7 @@ public sealed class TribesHttpService(
         try
         {
             var url = $"https://{worldString}.plemiona.pl/map/ally.txt";
-            var response = await httpClient.GetAsync(url, cancellationToken);
+            using var response = await httpClient.GetAsync(url, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
