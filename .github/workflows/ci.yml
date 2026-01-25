@@ -1,138 +1,79 @@
-name: deploy
+name: CIBUILD
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-      - dev
-      - feat/**
-
-permissions:
-  id-token: write
-  contents: read
-
-env:
-  AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-  REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-  BACKEND_CONTAINER_NAME: ${{ secrets.BACKEND_CONTAINER_NAME }}
-  FRONTEND_CONTAINER_NAME: ${{ secrets.FRONTEND_CONTAINER_NAME }}
-  AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-  BACKEND_CONTAINER_APP_NAME: ${{ secrets.BACKEND_CONTAINER_APP_NAME }}
-  FRONTEND_CONTAINER_APP_NAME: ${{ secrets.FRONTEND_CONTAINER_APP_NAME }}
+    branches: [ main ]
+  pull_request:
 
 jobs:
-  build-and-deploy-backend:
-    name: Build and Deploy Backend
+  backend:
+    name: Build and Test Backend
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Login to Azure Container Registry
-      uses: docker/login-action@v3
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
       with:
-        registry: ${{ env.AZURE_CONTAINER_REGISTRY }}
-        username: ${{ env.REGISTRY_USERNAME }}
-        password: ${{ env.REGISTRY_PASSWORD }}
+        dotnet-version: '10.0.x'
     
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+    - name: Restore dependencies
+      run: dotnet restore TWAction.sln
     
-    - name: Extract metadata for Docker
-      id: meta
-      uses: docker/metadata-action@v5
+    - name: Build
+      run: dotnet build TWAction.sln --configuration Release --no-restore
+    
+    - name: Run Unit Tests
+      run: dotnet test tests/TWAction.UnitTests/TWAction.UnitTests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=unit-tests.trx"
+    
+    - name: Run Integration Tests
+      run: dotnet test tests/TWAction.IntegrationTests/TWAction.IntegrationTests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=integration-tests.trx"
+      env:
+        # Integration tests use Testcontainers which requires Docker
+        TESTCONTAINERS_RYUK_DISABLED: false
+    
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
       with:
-        images: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_CONTAINER_NAME }}
-        tags: |
-          type=sha,prefix={{branch}}-
-          type=ref,event=branch
-          type=semver,pattern={{version}}
-          type=raw,value=latest,enable={{is_default_branch}}
-    
-    - name: Build and push Backend Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./src/backend/TWAction.Api/Dockerfile
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=registry,ref=${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_CONTAINER_NAME }}:buildcache
-        cache-to: type=registry,ref=${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_CONTAINER_NAME }}:buildcache,mode=max
-    
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    
-    - name: Deploy to Azure Container Apps
-      uses: azure/container-apps-deploy-action@v1
-      with:
-        resourceGroup: ${{ env.AZURE_RESOURCE_GROUP }}
-        containerAppName: ${{ env.BACKEND_CONTAINER_APP_NAME }}
-        imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_CONTAINER_NAME }}:latest
-        registryUrl: ${{ env.AZURE_CONTAINER_REGISTRY }}
-        registryUsername: ${{ env.REGISTRY_USERNAME }}
-        registryPassword: ${{ env.REGISTRY_PASSWORD }}
+        name: backend-test-results
+        path: |
+          tests/TWAction.UnitTests/TestResults/*.trx
+          tests/TWAction.IntegrationTests/TestResults/*.trx
 
-  build-and-deploy-frontend:
-    name: Build and Deploy Frontend
+  frontend:
+    name: Build and Lint Frontend
     runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: src/frontend/TWActionFrontend
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Login to Azure Container Registry
-      uses: docker/login-action@v3
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        registry: ${{ env.AZURE_CONTAINER_REGISTRY }}
-        username: ${{ env.REGISTRY_USERNAME }}
-        password: ${{ env.REGISTRY_PASSWORD }}
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: src/frontend/TWActionFrontend/package-lock.json
     
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+    - name: Install dependencies
+      run: npm ci
     
-    - name: Extract metadata for Docker
-      id: meta
-      uses: docker/metadata-action@v5
+    - name: Lint
+      run: npm run lint
+    
+    - name: Build
+      run: npm run build
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
       with:
-        images: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_CONTAINER_NAME }}
-        tags: |
-          type=sha,prefix={{branch}}-
-          type=ref,event=branch
-          type=semver,pattern={{version}}
-          type=raw,value=latest,enable={{is_default_branch}}
-    
-    - name: Build and push Frontend Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./src/frontend/TWActionFrontend
-        file: ./src/frontend/TWActionFrontend/Dockerfile
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=registry,ref=${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_CONTAINER_NAME }}:buildcache
-        cache-to: type=registry,ref=${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_CONTAINER_NAME }}:buildcache,mode=max
-    
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    
-    - name: Deploy to Azure Container Apps
-      uses: azure/container-apps-deploy-action@v1
-      with:
-        resourceGroup: ${{ env.AZURE_RESOURCE_GROUP }}
-        containerAppName: ${{ env.FRONTEND_CONTAINER_APP_NAME }}
-        imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_CONTAINER_NAME }}:latest
-        registryUrl: ${{ env.AZURE_CONTAINER_REGISTRY }}
-        registryUsername: ${{ env.REGISTRY_USERNAME }}
-        registryPassword: ${{ env.REGISTRY_PASSWORD }}
+        name: frontend-build
+        path: src/frontend/TWActionFrontend/dist
