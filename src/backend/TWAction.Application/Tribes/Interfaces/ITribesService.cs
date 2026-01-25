@@ -5,7 +5,8 @@ namespace TWAction.Application.Tribes.Interfaces;
 
 public interface ITribesService
 {
-    Task<List<TribeInfo>> GetTribesAsync(WorldType world, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<TribeInfo>> GetTribesAsync(WorldType world, CancellationToken cancellationToken = default);
 }
+
 
 

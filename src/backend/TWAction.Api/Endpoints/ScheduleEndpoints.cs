@@ -75,8 +75,9 @@ public static class ScheduleEndpoints
             request.Name,
             request.World,
             request.ScheduleType,
-            request.EnemyTribalWarsIds
+            request.EnemyTribalWarsIds ?? Array.Empty<int>()
         );
+
 
         var result = await bus.InvokeAsync<Result<ScheduleDto>>(command);
 
@@ -122,6 +123,7 @@ public static class ScheduleEndpoints
             return Results.NotFound(new { error = result.Error });
         }
 
+
         return Results.NoContent();
     }
 }
@@ -131,14 +133,16 @@ public sealed record CreateScheduleRequest(
     string Name,
     string World,
     string ScheduleType,
-    List<int> EnemyTribalWarsIds
+    IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
 
 public sealed record UpdateScheduleRequest(
     string Name,
     string World,
     string ScheduleType,
-    List<int> EnemyTribalWarsIds
+    IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
+
+
 
 

@@ -26,7 +26,7 @@ public static class TribesEndpoints
     {
         var query = new GetTribesQuery(world);
 
-        var result = await bus.InvokeAsync<Result<List<TribeDto>>>(query);
+        var result = await bus.InvokeAsync<Result<IReadOnlyList<TribeDto>>>(query);
 
         if (result.IsFailure)
         {
@@ -35,5 +35,6 @@ public static class TribesEndpoints
 
         return Results.Ok(result.Value);
     }
+
 }
 

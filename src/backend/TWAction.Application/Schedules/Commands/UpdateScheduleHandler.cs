@@ -13,8 +13,9 @@ public sealed record UpdateScheduleCommand(
     string Name,
     string World,
     string ScheduleType,
-    List<int> EnemyTribalWarsIds
+    IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
+
 
 public class UpdateScheduleHandler(
     IScheduleRepository scheduleRepository,

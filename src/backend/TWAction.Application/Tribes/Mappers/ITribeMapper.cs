@@ -15,5 +15,7 @@ public static partial class ITribeMapper
         VillagesCount = tribe.VillagesCount
     };
 
-    public static List<TribeDto> ToDtos(List<TribeInfo> tribes) => tribes.Select(ToDto).ToList();
+    public static IReadOnlyList<TribeDto> ToDtos(IReadOnlyList<TribeInfo> tribes) => 
+        tribes.Select(ToDto).ToList();
 }
+

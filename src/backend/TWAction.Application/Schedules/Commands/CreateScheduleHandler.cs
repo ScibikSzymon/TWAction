@@ -14,8 +14,9 @@ public sealed record CreateScheduleCommand(
     string Name,
     string World,
     string ScheduleType,
-    List<int> EnemyTribalWarsIds
+    IReadOnlyList<int> EnemyTribalWarsIds
 );
+
 
 public class CreateScheduleHandler(
     IScheduleRepository scheduleRepository,
@@ -53,11 +54,11 @@ public class CreateScheduleHandler(
             CreationDate = DateTime.UtcNow,
             World = world,
             ScheduleType = scheduleType,
-            Enemies = []
+            Enemies = new List<TribeInfo>()
         };
 
         // Handle enemies if provided
-        if (command.EnemyTribalWarsIds?.Any() == true)
+        if (command.EnemyTribalWarsIds.Any())
         {
             try
             {
@@ -66,6 +67,7 @@ public class CreateScheduleHandler(
                 var enemies = tribes
                     .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))
                     .ToList();
+
 
                 if (enemies.Count != command.EnemyTribalWarsIds.Count)
                 {

@@ -16,7 +16,8 @@ public sealed record ScheduleDto
 
     public required ScheduleType ScheduleType { get; init; }
 
-    public required List<int> EnemyIds { get; init; }
+    public required IReadOnlyList<int> EnemyIds { get; init; }
 }
+
 
 

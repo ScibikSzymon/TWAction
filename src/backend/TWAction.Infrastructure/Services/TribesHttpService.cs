@@ -18,13 +18,13 @@ public sealed class TribesHttpService(
     /// <summary>
     /// Fetches tribes from TribalWars API with 15-minute caching
     /// </summary>
-    public async Task<List<TribeInfo>> GetTribesAsync(WorldType world, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<TribeInfo>> GetTribesAsync(WorldType world, CancellationToken cancellationToken = default)
     {
         var worldString = world.ToString();
         var cacheKey = $"tribal_wars_tribes_{worldString}";
 
         // Try to get from cache
-        if (cache.TryGetValue(cacheKey, out List<TribeInfo>? cachedTribes))
+        if (cache.TryGetValue(cacheKey, out IReadOnlyList<TribeInfo>? cachedTribes))
         {
             return cachedTribes;
         }
@@ -52,4 +52,5 @@ public sealed class TribesHttpService(
 
         return sortedTribes;
     }
+
 }

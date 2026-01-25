@@ -10,7 +10,7 @@ public sealed record GetTribesQuery(WorldType World);
 
 public class GetTribesHandler(ITribesService tribesService)
 {
-    public async Task<Result<List<TribeDto>>> Handle(GetTribesQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<IReadOnlyList<TribeDto>>> Handle(GetTribesQuery query, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -19,18 +19,19 @@ public class GetTribesHandler(ITribesService tribesService)
         }
         catch (HttpRequestException ex)
         {
-            return Result.Failure<List<TribeDto>>($"Failed to fetch tribes: {ex.Message}");
+            return Result.Failure<IReadOnlyList<TribeDto>>($"Failed to fetch tribes: {ex.Message}");
         }
         catch (InvalidOperationException ex)
         {
-            return Result.Failure<List<TribeDto>>($"Invalid tribes data: {ex.Message}");
+            return Result.Failure<IReadOnlyList<TribeDto>>($"Invalid tribes data: {ex.Message}");
         }
         catch (Exception ex)
         {
-            return Result.Failure<List<TribeDto>>($"Error fetching tribes: {ex.Message}");
+            return Result.Failure<IReadOnlyList<TribeDto>>($"Error fetching tribes: {ex.Message}");
         }
     }
 }
+
 
 
 

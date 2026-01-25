@@ -11,7 +11,7 @@ public sealed class TribesCsvParser
     /// Expected format: TribalWarsID,Name,Short,PlayersCount,VillagesCount,Top40Points,TotalPoints,Ranking
     /// Throws exceptions on validation failure
     /// </summary>
-    public List<TribeInfo> Parse(string csvData)
+    public IReadOnlyList<TribeInfo> Parse(string csvData)
     {
         if (string.IsNullOrWhiteSpace(csvData))
         {
