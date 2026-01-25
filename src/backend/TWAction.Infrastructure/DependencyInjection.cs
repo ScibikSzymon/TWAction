@@ -39,8 +39,8 @@ public static class DependencyInjection
             opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
         });
 
-        // Register HttpClient as singleton for TribalWars API calls
-        services.AddSingleton(new HttpClient());
+        // Register HttpClient factory for TribalWars API calls
+        services.AddHttpClient();
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
