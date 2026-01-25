@@ -17,13 +17,6 @@ export const ScheduleType = {
 
 export type ScheduleType = (typeof ScheduleType)[keyof typeof ScheduleType];
 
-export interface EnemyTribe {
-  tribalWarsId: number;
-  name: string;
-  short: string;
-  villagesCount: number;
-}
-
 export interface Schedule {
   id: string;
   userId: string;
