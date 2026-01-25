@@ -33,22 +33,34 @@ export const ScheduleForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tribesLoaded, setTribesLoaded] = useState(false);
+  const [previousWorld, setPreviousWorld] = useState<WorldType | null>(null);
 
   useEffect(() => {
     if (schedule) {
       setName(schedule.name);
       setWorld(schedule.world);
+      setPreviousWorld(schedule.world);
       setScheduleType(schedule.scheduleType);
       setTribesLoaded(false);
       // enemyIds będą przekonwertowane na pełne obiekty po załadowaniu plemion
     } else {
       setName("");
       setWorld(WorldType.pl218);
+      setPreviousWorld(WorldType.pl218);
       setScheduleType(ScheduleType.Main);
       setEnemies([]);
       setTribesLoaded(false);
     }
   }, [schedule]);
+
+  // Wyczyść listę wrogich plemion gdy użytkownik zmieni świat
+  useEffect(() => {
+    if (previousWorld !== null && previousWorld !== world) {
+      setEnemies([]);
+      setTribesLoaded(false);
+    }
+    setPreviousWorld(world);
+  }, [world]);
 
   const handleTribesLoaded = (loadedTribes: EnemyTribeSnapshot[]) => {
     if (!tribesLoaded && schedule?.enemyIds && schedule.enemyIds.length > 0) {
