@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+      - dev
+      - feat/**
 
 env:
   AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
