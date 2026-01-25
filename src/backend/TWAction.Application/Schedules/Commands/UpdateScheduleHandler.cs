@@ -2,7 +2,9 @@ using TWAction.Application.Common;
 using TWAction.Application.Mappers;
 using TWAction.Application.Schedules.DTOs;
 using TWAction.Application.Schedules.Interfaces;
+using TWAction.Application.Tribes.Interfaces;
 using TWAction.Domain.Schedules;
+using TWAction.Domain.Tribes;
 
 namespace TWAction.Application.Schedules.Commands;
 
@@ -10,10 +12,13 @@ public sealed record UpdateScheduleCommand(
     Guid ScheduleId,
     string Name,
     string World,
-    string ScheduleType
+    string ScheduleType,
+    List<int>? EnemyTribalWarsIds = null
 );
 
-public class UpdateScheduleHandler(IScheduleRepository scheduleRepository)
+public class UpdateScheduleHandler(
+    IScheduleRepository scheduleRepository,
+    ITribesService tribesService)
 {
     public async Task<Result<ScheduleDto>> Handle(UpdateScheduleCommand command, CancellationToken cancellationToken = default)
     {
@@ -41,15 +46,50 @@ public class UpdateScheduleHandler(IScheduleRepository scheduleRepository)
             return Result.Failure<ScheduleDto>($"Invalid schedule type value '{command.ScheduleType}'.");
         }
 
-        if(world != schedule.World)
+        // Clear enemies if world changed
+        if (world != schedule.World)
         {
             schedule.Enemies.Clear();
         }
 
         schedule.World = world;
         schedule.ScheduleType = scheduleType;
+
+        // Handle enemies if provided
+        if (command.EnemyTribalWarsIds != null)
+        {
+            if (command.EnemyTribalWarsIds.Any())
+            {
+                var tribesResult = await tribesService.GetTribesAsync(world, cancellationToken);
+                if (tribesResult.IsFailure)
+                {
+                    return Result.Failure<ScheduleDto>($"Failed to fetch tribes: {tribesResult.Error}");
+                }
+
+                var enemies = tribesResult.Value
+                    .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))
+                    .ToList();
+
+                if (enemies.Count != command.EnemyTribalWarsIds.Count)
+                {
+                    var notFound = command.EnemyTribalWarsIds
+                        .Except(enemies.Select(e => e.TribalWarsId))
+                        .ToList();
+                    return Result.Failure<ScheduleDto>($"The following tribe IDs were not found: {string.Join(", ", notFound)}");
+                }
+
+                schedule.Enemies = enemies;
+            }
+            else
+            {
+                // Empty list means clear enemies
+                schedule.Enemies = new List<TribeInfo>();
+            }
+        }
+
         await scheduleRepository.UpdateAsync(schedule, cancellationToken);
 
         return Result.Success(IScheduleMapper.ToDto(schedule));
     }
 }
+

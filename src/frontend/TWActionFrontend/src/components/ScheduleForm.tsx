@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { WorldType, ScheduleType } from "../types/schedule";
 import type {
   Schedule,
   CreateScheduleRequest,
   UpdateScheduleRequest,
 } from "../types/schedule";
+import { TribeSelector } from "./TribeSelector";
+import type { EnemyTribeSnapshot } from "../types/tribe";
 import styles from "./ScheduleForm.module.css";
 
 interface ScheduleFormProps {
@@ -22,15 +24,42 @@ export const ScheduleForm = ({
   onSubmit,
   onCancel,
 }: ScheduleFormProps) => {
-  const [name, setName] = useState(schedule?.name || "");
-  const [world, setWorld] = useState<WorldType>(
-    schedule?.world || WorldType.pl218,
-  );
+  const [name, setName] = useState("");
+  const [world, setWorld] = useState<WorldType>(WorldType.pl218);
   const [scheduleType, setScheduleType] = useState<ScheduleType>(
-    schedule?.scheduleType || ScheduleType.Main,
+    ScheduleType.Main,
   );
+  const [enemies, setEnemies] = useState<EnemyTribeSnapshot[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tribesLoaded, setTribesLoaded] = useState(false);
+
+  useEffect(() => {
+    if (schedule) {
+      setName(schedule.name);
+      setWorld(schedule.world);
+      setScheduleType(schedule.scheduleType);
+      setTribesLoaded(false);
+      // enemyIds będą przekonwertowane na pełne obiekty po załadowaniu plemion
+    } else {
+      setName("");
+      setWorld(WorldType.pl218);
+      setScheduleType(ScheduleType.Main);
+      setEnemies([]);
+      setTribesLoaded(false);
+    }
+  }, [schedule]);
+
+  const handleTribesLoaded = (loadedTribes: EnemyTribeSnapshot[]) => {
+    if (!tribesLoaded && schedule?.enemyIds && schedule.enemyIds.length > 0) {
+      // Konwertuj enemyIds na pełne obiekty plemion
+      const selectedTribes = loadedTribes.filter((tribe) =>
+        schedule.enemyIds!.includes(tribe.tribalWarsId),
+      );
+      setEnemies(selectedTribes);
+      setTribesLoaded(true);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,13 +69,20 @@ export const ScheduleForm = ({
       return;
     }
 
+    if (enemies.length > 10) {
+      setError("Możesz wybrać maksymalnie 10 wrogich plemion");
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
     try {
+      const enemyTribalWarsIds = enemies.map((e) => e.tribalWarsId);
+
       const requestData = schedule
-        ? { name, world, scheduleType }
-        : { userId, name, world, scheduleType };
+        ? { name, world, scheduleType, enemyTribalWarsIds }
+        : { userId, name, world, scheduleType, enemyTribalWarsIds };
 
       if (schedule) {
         await onSubmit(requestData as UpdateScheduleRequest);
@@ -115,6 +151,15 @@ export const ScheduleForm = ({
           )}
         </select>
       </div>
+
+      <TribeSelector
+        key={schedule?.id || "new"}
+        world={world}
+        selectedTribes={enemies}
+        onSelectionChange={setEnemies}
+        onTribesLoaded={handleTribesLoaded}
+        maxTribes={10}
+      />
 
       <div className={styles.actions}>
         <button

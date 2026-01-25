@@ -1,6 +1,5 @@
 namespace TWAction.Application.Schedules.DTOs;
 
-using TWAction.Application.Tribes.DTOs;
 using TWAction.Domain.Schedules;
 
 public sealed record ScheduleDto
@@ -17,6 +16,7 @@ public sealed record ScheduleDto
 
     public required ScheduleType ScheduleType { get; init; }
 
-    public required List<TribeDto> Enemies { get; init; }
+    public required List<int> EnemyIds { get; init; }
 }
+
 

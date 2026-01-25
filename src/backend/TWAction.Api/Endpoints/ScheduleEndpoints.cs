@@ -26,9 +26,6 @@ public static class ScheduleEndpoints
         group.MapPut("/{scheduleId}", UpdateSchedule)
             .WithName("UpdateSchedule");
 
-        group.MapPut("/{scheduleId}/enemies", SetScheduleEnemies)
-            .WithName("SetScheduleEnemies");
-
         group.MapDelete("/{scheduleId}", DeleteSchedule)
             .WithName("DeleteSchedule");
 
@@ -77,7 +74,8 @@ public static class ScheduleEndpoints
             request.UserId,
             request.Name,
             request.World,
-            request.ScheduleType
+            request.ScheduleType,
+            request.EnemyTribalWarsIds ?? []
         );
 
         var result = await bus.InvokeAsync<Result<ScheduleDto>>(command);
@@ -99,7 +97,8 @@ public static class ScheduleEndpoints
             scheduleId,
             request.Name,
             request.World,
-            request.ScheduleType
+            request.ScheduleType,
+            request.EnemyTribalWarsIds ?? []
         );
 
         var result = await bus.InvokeAsync<Result<ScheduleDto>>(command);
@@ -107,23 +106,6 @@ public static class ScheduleEndpoints
         if (result.IsFailure)
         {
             return Results.NotFound(new { error = result.Error });
-        }
-
-        return Results.Ok(result.Value);
-    }
-
-    private static async Task<IResult> SetScheduleEnemies(
-        Guid scheduleId,
-        SetScheduleEnemiesRequest request,
-        IMessageBus bus)
-    {
-        var command = new SetScheduleEnemiesCommand(scheduleId, request.EnemyTribalWarsIds);
-
-        var result = await bus.InvokeAsync<Result<ScheduleDto>>(command);
-
-        if (result.IsFailure)
-        {
-            return Results.BadRequest(new { error = result.Error });
         }
 
         return Results.Ok(result.Value);
@@ -148,12 +130,15 @@ public sealed record CreateScheduleRequest(
     Guid UserId,
     string Name,
     string World,
-    string ScheduleType
+    string ScheduleType,
+    List<int>? EnemyTribalWarsIds = null
 );
 
 public sealed record UpdateScheduleRequest(
     string Name,
     string World,
-    string ScheduleType
+    string ScheduleType,
+    List<int>? EnemyTribalWarsIds = null
 );
+
 

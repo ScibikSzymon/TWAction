@@ -17,6 +17,13 @@ export const ScheduleType = {
 
 export type ScheduleType = (typeof ScheduleType)[keyof typeof ScheduleType];
 
+export interface EnemyTribe {
+  tribalWarsId: number;
+  name: string;
+  short: string;
+  villagesCount: number;
+}
+
 export interface Schedule {
   id: string;
   userId: string;
@@ -24,6 +31,7 @@ export interface Schedule {
   creationDate: string;
   world: WorldType;
   scheduleType: ScheduleType;
+  enemyIds?: number[];
 }
 
 export interface CreateScheduleRequest {
@@ -31,10 +39,12 @@ export interface CreateScheduleRequest {
   name: string;
   world: string;
   scheduleType: string;
+  enemyTribalWarsIds?: number[];
 }
 
 export interface UpdateScheduleRequest {
   name: string;
   world: string;
   scheduleType: string;
+  enemyTribalWarsIds?: number[];
 }

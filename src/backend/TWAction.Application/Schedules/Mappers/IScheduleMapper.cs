@@ -7,8 +7,6 @@ namespace TWAction.Application.Mappers;
 [Mapper]
 public static partial class IScheduleMapper
 {
-    [MapProperty(nameof(ScheduleEntity.UserGuid), nameof(ScheduleDto.UserId))]
-    [MapProperty(nameof(ScheduleEntity.Enemies), nameof(ScheduleDto.Enemies))]
     public static ScheduleDto ToDto(ScheduleEntity schedule) => new ScheduleDto
     {
         Id = schedule.Id,
@@ -17,7 +15,8 @@ public static partial class IScheduleMapper
         CreationDate = schedule.CreationDate,
         World = schedule.World,
         ScheduleType = schedule.ScheduleType,
-        Enemies = ITribeMapper.ToDtos(schedule.Enemies)
+        EnemyIds = schedule.Enemies.Select(e => e.TribalWarsId).ToList()
     };
 }
+
 
