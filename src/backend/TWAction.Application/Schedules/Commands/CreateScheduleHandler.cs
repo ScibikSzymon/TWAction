@@ -51,11 +51,12 @@ public class CreateScheduleHandler(
             Id = Guid.NewGuid(),
             UserGuid = command.UserId,
             Name = command.Name,
-            CreationDate = DateTime.UtcNow,
+            CreationDate = DateTimeOffset.UtcNow,
             World = world,
             ScheduleType = scheduleType,
             Enemies = new List<TribeInfo>()
         };
+
 
         // Handle enemies if provided
         if (command.EnemyTribalWarsIds.Any())

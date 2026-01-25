@@ -45,7 +45,7 @@ public class UploadTroopsStateHandler(
         {
             // Update existing
             existingTroopsState.CompressedData = compressedData;
-            existingTroopsState.UpdatedAt = DateTime.UtcNow;
+            existingTroopsState.UpdatedAt = DateTimeOffset.UtcNow;
             troopsState = await troopsStateRepository.UpdateAsync(existingTroopsState, cancellationToken);
         }
         else
@@ -56,8 +56,8 @@ public class UploadTroopsStateHandler(
                 Id = Guid.NewGuid(),
                 ScheduleId = command.ScheduleId,
                 CompressedData = compressedData,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
             };
             troopsState = await troopsStateRepository.CreateAsync(troopsState, cancellationToken);
         }
@@ -68,6 +68,7 @@ public class UploadTroopsStateHandler(
             ScheduleId = troopsState.ScheduleId,
             VillageCount = stats.VillageCount,
             PlayerCount = stats.PlayerCount,
+
             CreatedAt = troopsState.CreatedAt,
             UpdatedAt = troopsState.UpdatedAt
         };

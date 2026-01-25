@@ -10,7 +10,7 @@ public class ScheduleEntity
     
     public string Name { get; set; } = null!;
     
-    public DateTime CreationDate { get; set; }
+    public DateTimeOffset CreationDate { get; set; }
     
     public WorldType World { get; set; }
     
@@ -18,4 +18,5 @@ public class ScheduleEntity
     
     public List<TribeInfo> Enemies { get; set; } = new();
 }
+
 
