@@ -12,16 +12,27 @@ public class GetTribesHandler(ITribesService tribesService)
 {
     public async Task<Result<List<TribeDto>>> Handle(GetTribesQuery query, CancellationToken cancellationToken = default)
     {
-        var result = await tribesService.GetTribesAsync(query.World, cancellationToken);
-
-        if (result.IsFailure)
+        try
         {
-            return Result.Failure<List<TribeDto>>(result.Error);
+            var tribes = await tribesService.GetTribesAsync(query.World, cancellationToken);
+            return Result.Success(ITribeMapper.ToDtos(tribes));
         }
-
-        return Result.Success(ITribeMapper.ToDtos(result.Value));
+        catch (HttpRequestException ex)
+        {
+            return Result.Failure<List<TribeDto>>($"Failed to fetch tribes: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Result.Failure<List<TribeDto>>($"Invalid tribes data: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<List<TribeDto>>($"Error fetching tribes: {ex.Message}");
+        }
     }
 }
+
+
 
 
 

@@ -39,8 +39,9 @@ public static class DependencyInjection
             opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
         });
 
-        // Register HttpClient factory for TribalWars API calls
-        services.AddHttpClient();
+        // Register HttpClient factory and IMemoryCache for TribalWars API calls
+        services.AddHttpClient<TribesHttpService>();
+        services.AddMemoryCache();
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
@@ -51,8 +52,7 @@ public static class DependencyInjection
         services.AddSingleton<TroopsStateCompressionService>();
         services.AddSingleton<TroopsStateStatsExtractor>();
         services.AddSingleton<TribesCsvParser>();
-        services.AddSingleton<TribesHttpService>();
-        services.AddScoped<ITribesService>(sp => sp.GetRequiredService<TribesHttpService>());
+        services.AddScoped<ITribesService, TribesHttpService>();
 
         services.AddTransient<SignInWithGoogleHandler>();
         services.AddTransient<GetAllUsersHandler>();

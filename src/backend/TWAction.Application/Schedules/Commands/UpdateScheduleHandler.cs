@@ -56,38 +56,44 @@ public class UpdateScheduleHandler(
         schedule.ScheduleType = scheduleType;
 
         // Handle enemies if provided        
-        if (command.EnemyTribalWarsIds.Any())
+        if (command.EnemyTribalWarsIds != null)
         {
-            var tribesResult = await tribesService.GetTribesAsync(world, cancellationToken);
-            if (tribesResult.IsFailure)
+            if (command.EnemyTribalWarsIds.Any())
             {
-                return Result.Failure<ScheduleDto>($"Failed to fetch tribes: {tribesResult.Error}");
+                try
+                {
+                    var tribes = await tribesService.GetTribesAsync(world, cancellationToken);
+
+                    var enemies = tribes
+                        .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))
+                        .ToList();
+
+                    if (enemies.Count != command.EnemyTribalWarsIds.Count)
+                    {
+                        var notFound = command.EnemyTribalWarsIds
+                            .Except(enemies.Select(e => e.TribalWarsId))
+                            .ToList();
+                        return Result.Failure<ScheduleDto>($"The following tribe IDs were not found: {string.Join(", ", notFound)}");
+                    }
+
+                    schedule.Enemies = enemies;
+                }
+                catch (Exception ex)
+                {
+                    return Result.Failure<ScheduleDto>($"Failed to fetch tribes: {ex.Message}");
+                }
             }
-
-            var enemies = tribesResult.Value
-                .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))
-                .ToList();
-
-            if (enemies.Count != command.EnemyTribalWarsIds.Count)
+            else
             {
-                var notFound = command.EnemyTribalWarsIds
-                    .Except(enemies.Select(e => e.TribalWarsId))
-                    .ToList();
-                return Result.Failure<ScheduleDto>($"The following tribe IDs were not found: {string.Join(", ", notFound)}");
+                // Empty list means clear enemies
+                schedule.Enemies = new List<TribeInfo>();
             }
-
-            schedule.Enemies = enemies;
         }
-        else
-        {
-            // Empty list means clear enemies
-            schedule.Enemies = [];
-        }
-        
 
         await scheduleRepository.UpdateAsync(schedule, cancellationToken);
 
         return Result.Success(IScheduleMapper.ToDto(schedule));
+
     }
 }
 

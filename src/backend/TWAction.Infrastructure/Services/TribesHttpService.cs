@@ -1,6 +1,4 @@
-using System.Collections.Concurrent;
-using System.Net.Http;
-using TWAction.Application.Common;
+using Microsoft.Extensions.Caching.Memory;
 using TWAction.Application.Tribes.Interfaces;
 using TWAction.Domain.Schedules;
 using TWAction.Domain.Tribes;
@@ -11,67 +9,47 @@ namespace TWAction.Infrastructure.Services;
 /// Service for fetching TribalWars tribe data with in-memory caching
 /// </summary>
 public sealed class TribesHttpService(
-    IHttpClientFactory httpClientFactory,
-    TribesCsvParser parser) : ITribesService
+    HttpClient httpClient,
+    TribesCsvParser parser,
+    IMemoryCache cache) : ITribesService
 {
     private const int CacheDurationMinutes = 15;
-    private readonly ConcurrentDictionary<string, (DateTime expiry, List<TribeInfo> data)> _cache = new();
 
     /// <summary>
     /// Fetches tribes from TribalWars API with 15-minute caching
     /// </summary>
-    public async Task<Result<List<TribeInfo>>> GetTribesAsync(WorldType world, CancellationToken cancellationToken = default)
+    public async Task<List<TribeInfo>> GetTribesAsync(WorldType world, CancellationToken cancellationToken = default)
     {
         var worldString = world.ToString();
         var cacheKey = $"tribal_wars_tribes_{worldString}";
 
         // Try to get from cache
-        if (_cache.TryGetValue(cacheKey, out var cached) && DateTime.UtcNow < cached.expiry)
+        if (cache.TryGetValue(cacheKey, out List<TribeInfo>? cachedTribes))
         {
-            return Result.Success(cached.data);
+            return cachedTribes;
         }
 
-        try
+        var url = $"https://{worldString}.plemiona.pl/map/ally.txt";
+        var response = await httpClient.GetAsync(url, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
         {
-            var url = $"https://{worldString}.plemiona.pl/map/ally.txt";
-            using var httpClient = httpClientFactory.CreateClient();
-            using var response = await httpClient.GetAsync(url, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return Result.Failure<List<TribeInfo>>(
-                    $"Failed to fetch tribes from TribalWars. Status: {response.StatusCode}");
-            }
-
-            var csvContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            var parseResult = parser.Parse(csvContent);
-
-            if (parseResult.IsFailure)
-            {
-                return parseResult;
-            }
-
-            // Sort by VillagesCount descending
-            var sortedTribes = parseResult.Value
-                .Where(e=>e.VillagesCount > 0)
-                .OrderByDescending(t => t.VillagesCount)
-                .ToList();
-
-            // Cache for 15 minutes
-            var expiry = DateTime.UtcNow.AddMinutes(CacheDurationMinutes);
-            _cache[cacheKey] = (expiry, sortedTribes);
-
-            return Result.Success(sortedTribes);
+            throw new HttpRequestException(
+                $"Failed to fetch tribes from TribalWars. Status: {response.StatusCode}");
         }
-        catch (HttpRequestException ex)
-        {
-            return Result.Failure<List<TribeInfo>>($"HTTP request error: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure<List<TribeInfo>>($"Error fetching tribes: {ex.Message}");
-        }
+
+        var csvContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        var tribes = parser.Parse(csvContent);
+
+        // Sort by VillagesCount descending
+        var sortedTribes = tribes
+            .Where(e => e.VillagesCount > 0)
+            .OrderByDescending(t => t.VillagesCount)
+            .ToList();
+
+        // Cache for 15 minutes
+        cache.Set(cacheKey, sortedTribes, TimeSpan.FromMinutes(CacheDurationMinutes));
+
+        return sortedTribes;
     }
 }
-
-

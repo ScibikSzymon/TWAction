@@ -1,19 +1,21 @@
-using TWAction.Application.Common;
 using TWAction.Domain.Tribes;
 
 namespace TWAction.Infrastructure.Services;
 
 public sealed class TribesCsvParser
 {
+    private const int ExpectedColumnCount = 8;
+
     /// <summary>
-    /// Parses TribalWars ally.txt CSV format
+    /// Parses TribalWars ally.txt CSV format (NO HEADER)
     /// Expected format: TribalWarsID,Name,Short,PlayersCount,VillagesCount,Top40Points,TotalPoints,Ranking
+    /// Throws exceptions on validation failure
     /// </summary>
-    public Result<List<TribeInfo>> Parse(string csvData)
+    public List<TribeInfo> Parse(string csvData)
     {
         if (string.IsNullOrWhiteSpace(csvData))
         {
-            return Result.Failure<List<TribeInfo>>("CSV data cannot be empty.");
+            throw new InvalidOperationException("CSV data cannot be empty.");
         }
 
         var lines = csvData.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
@@ -23,36 +25,40 @@ public sealed class TribesCsvParser
 
         if (lines.Count == 0)
         {
-            return Result.Failure<List<TribeInfo>>("No data rows found in CSV.");
+            throw new InvalidOperationException("No data rows found in CSV.");
         }
 
         var tribes = new List<TribeInfo>();
 
-        foreach (var (line, index) in lines.Select((line, i) => (line, i)))
+        // Parse all rows (no header in ally.txt)
+        for (int i = 0; i < lines.Count; i++)
         {
-            var columns = line.Split(',');
+            var columns = lines[i].Split(',');
 
             if (columns.Length < 5)
             {
-                return Result.Failure<List<TribeInfo>>(
-                    $"Row {index + 1}: Expected at least 5 columns, got {columns.Length}.");
+                throw new InvalidOperationException(
+                    $"Row {i + 1} has {columns.Length} columns, expected at least 5.");
             }
 
-            // Parse TribalWarsID
+            // Parse TribalWarsID (column 0)
             if (!int.TryParse(columns[0].Trim(), out var tribalWarsId))
             {
-                return Result.Failure<List<TribeInfo>>(
-                    $"Row {index + 1}: Invalid TribalWarsID. Must be integer.");
+                throw new InvalidOperationException(
+                    $"Row {i + 1}: Invalid TribalWarsID. Must be integer.");
             }
 
+            // Name (column 1) - URL encoded
             var name = System.Net.WebUtility.UrlDecode(columns[1].Trim());
+            
+            // Short (column 2) - URL encoded
             var shortName = System.Net.WebUtility.UrlDecode(columns[2].Trim());
 
-            // Parse VillagesCount
+            // VillagesCount (column 4)
             if (!int.TryParse(columns[4].Trim(), out var villagesCount))
             {
-                return Result.Failure<List<TribeInfo>>(
-                    $"Row {index + 1}: Invalid VillagesCount. Must be integer.");
+                throw new InvalidOperationException(
+                    $"Row {i + 1}: Invalid VillagesCount. Must be integer.");
             }
 
             tribes.Add(new TribeInfo
@@ -64,6 +70,8 @@ public sealed class TribesCsvParser
             });
         }
 
-        return Result.Success(tribes);
+        return tribes;
     }
 }
+
+

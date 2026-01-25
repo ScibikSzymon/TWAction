@@ -59,25 +59,28 @@ public class CreateScheduleHandler(
         // Handle enemies if provided
         if (command.EnemyTribalWarsIds?.Any() == true)
         {
-            var tribesResult = await tribesService.GetTribesAsync(world, cancellationToken);
-            if (tribesResult.IsFailure)
+            try
             {
-                return Result.Failure<ScheduleDto>($"Failed to fetch tribes: {tribesResult.Error}");
-            }
+                var tribes = await tribesService.GetTribesAsync(world, cancellationToken);
 
-            var enemies = tribesResult.Value
-                .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))
-                .ToList();
-
-            if (enemies.Count != command.EnemyTribalWarsIds.Count)
-            {
-                var notFound = command.EnemyTribalWarsIds
-                    .Except(enemies.Select(e => e.TribalWarsId))
+                var enemies = tribes
+                    .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))
                     .ToList();
-                return Result.Failure<ScheduleDto>($"The following tribe IDs were not found: {string.Join(", ", notFound)}");
-            }
 
-            schedule.Enemies = enemies;
+                if (enemies.Count != command.EnemyTribalWarsIds.Count)
+                {
+                    var notFound = command.EnemyTribalWarsIds
+                        .Except(enemies.Select(e => e.TribalWarsId))
+                        .ToList();
+                    return Result.Failure<ScheduleDto>($"The following tribe IDs were not found: {string.Join(", ", notFound)}");
+                }
+
+                schedule.Enemies = enemies;
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure<ScheduleDto>($"Failed to fetch tribes: {ex.Message}");
+            }
         }
 
         await scheduleRepository.AddAsync(schedule, cancellationToken);
@@ -85,4 +88,5 @@ public class CreateScheduleHandler(
         return Result.Success(IScheduleMapper.ToDto(schedule));
     }
 }
+
 
