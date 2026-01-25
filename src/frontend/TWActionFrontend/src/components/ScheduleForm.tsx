@@ -90,12 +90,7 @@ export const ScheduleForm = ({
     setError(null);
 
     try {
-      // When editing and tribes haven't loaded yet (or world hasn't changed),
-      // fall back to the original enemyIds to avoid unintentionally clearing enemies
-      const enemyTribalWarsIds =
-        schedule && !tribesLoaded && previousWorld === world
-          ? schedule.enemyIds || []
-          : enemies.map((e) => e.tribalWarsId);
+      const enemyTribalWarsIds = enemies.map((e) => e.tribalWarsId);
 
       const requestData = schedule
         ? { name, world, scheduleType, enemyTribalWarsIds }
