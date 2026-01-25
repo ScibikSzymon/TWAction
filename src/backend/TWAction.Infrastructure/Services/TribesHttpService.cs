@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using Microsoft.Extensions.Caching.Memory;
 using TWAction.Application.Tribes.Interfaces;
 using TWAction.Domain.Schedules;
@@ -16,12 +17,12 @@ public sealed class TribesHttpService(
     private const int CacheDurationMinutes = 15;
 
     /// <summary>
-    /// Fetches tribes from TribalWars API with 15-minute caching
+    /// Fetches tribes from TribalWars API with 15-minute caching (gzip compressed)
     /// </summary>
     public async Task<IReadOnlyList<TribeInfo>> GetTribesAsync(WorldType world, CancellationToken cancellationToken = default)
     {
         var worldString = world.ToString();
-        var cacheKey = $"tribal_wars_tribes_{worldString}";
+        var cacheKey = $"tw_tribes_{worldString}";
 
         // Try to get from cache
         if (cache.TryGetValue(cacheKey, out IReadOnlyList<TribeInfo>? cachedTribes))
@@ -29,7 +30,8 @@ public sealed class TribesHttpService(
             return cachedTribes;
         }
 
-        var url = $"https://{worldString}.plemiona.pl/map/ally.txt";
+        // Download gzip compressed file
+        var url = $"https://{worldString}.plemiona.pl/map/ally.txt.gz";
         var response = await httpClient.GetAsync(url, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
@@ -38,7 +40,12 @@ public sealed class TribesHttpService(
                 $"Failed to fetch tribes from TribalWars. Status: {response.StatusCode}");
         }
 
-        var csvContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        // Decompress gzip and read content
+        await using var compressedStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        await using var gzipStream = new GZipStream(compressedStream, CompressionMode.Decompress);
+        using var reader = new StreamReader(gzipStream);
+        var csvContent = await reader.ReadToEndAsync(cancellationToken);
+
         var tribes = parser.Parse(csvContent);
 
         // Sort by VillagesCount descending
@@ -52,5 +59,4 @@ public sealed class TribesHttpService(
 
         return sortedTribes;
     }
-
 }
