@@ -13,7 +13,7 @@ public sealed record UpdateScheduleCommand(
     string Name,
     string World,
     string ScheduleType,
-    List<int>? EnemyTribalWarsIds = null
+    List<int> EnemyTribalWarsIds
 );
 
 public class UpdateScheduleHandler(
@@ -55,37 +55,35 @@ public class UpdateScheduleHandler(
         schedule.World = world;
         schedule.ScheduleType = scheduleType;
 
-        // Handle enemies if provided
-        if (command.EnemyTribalWarsIds != null)
+        // Handle enemies if provided        
+        if (command.EnemyTribalWarsIds.Any())
         {
-            if (command.EnemyTribalWarsIds.Any())
+            var tribesResult = await tribesService.GetTribesAsync(world, cancellationToken);
+            if (tribesResult.IsFailure)
             {
-                var tribesResult = await tribesService.GetTribesAsync(world, cancellationToken);
-                if (tribesResult.IsFailure)
-                {
-                    return Result.Failure<ScheduleDto>($"Failed to fetch tribes: {tribesResult.Error}");
-                }
+                return Result.Failure<ScheduleDto>($"Failed to fetch tribes: {tribesResult.Error}");
+            }
 
-                var enemies = tribesResult.Value
-                    .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))
+            var enemies = tribesResult.Value
+                .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))
+                .ToList();
+
+            if (enemies.Count != command.EnemyTribalWarsIds.Count)
+            {
+                var notFound = command.EnemyTribalWarsIds
+                    .Except(enemies.Select(e => e.TribalWarsId))
                     .ToList();
-
-                if (enemies.Count != command.EnemyTribalWarsIds.Count)
-                {
-                    var notFound = command.EnemyTribalWarsIds
-                        .Except(enemies.Select(e => e.TribalWarsId))
-                        .ToList();
-                    return Result.Failure<ScheduleDto>($"The following tribe IDs were not found: {string.Join(", ", notFound)}");
-                }
-
-                schedule.Enemies = enemies;
+                return Result.Failure<ScheduleDto>($"The following tribe IDs were not found: {string.Join(", ", notFound)}");
             }
-            else
-            {
-                // Empty list means clear enemies
-                schedule.Enemies = new List<TribeInfo>();
-            }
+
+            schedule.Enemies = enemies;
         }
+        else
+        {
+            // Empty list means clear enemies
+            schedule.Enemies = [];
+        }
+        
 
         await scheduleRepository.UpdateAsync(schedule, cancellationToken);
 

@@ -75,7 +75,7 @@ public static class ScheduleEndpoints
             request.Name,
             request.World,
             request.ScheduleType,
-            request.EnemyTribalWarsIds ?? []
+            request.EnemyTribalWarsIds
         );
 
         var result = await bus.InvokeAsync<Result<ScheduleDto>>(command);
@@ -131,14 +131,14 @@ public sealed record CreateScheduleRequest(
     string Name,
     string World,
     string ScheduleType,
-    List<int>? EnemyTribalWarsIds = null
+    List<int> EnemyTribalWarsIds
 );
 
 public sealed record UpdateScheduleRequest(
     string Name,
     string World,
     string ScheduleType,
-    List<int>? EnemyTribalWarsIds = null
+    List<int> EnemyTribalWarsIds
 );
 
 

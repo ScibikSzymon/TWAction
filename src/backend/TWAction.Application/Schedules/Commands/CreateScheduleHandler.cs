@@ -14,7 +14,7 @@ public sealed record CreateScheduleCommand(
     string Name,
     string World,
     string ScheduleType,
-    List<int>? EnemyTribalWarsIds = null
+    List<int> EnemyTribalWarsIds
 );
 
 public class CreateScheduleHandler(
@@ -53,7 +53,7 @@ public class CreateScheduleHandler(
             CreationDate = DateTime.UtcNow,
             World = world,
             ScheduleType = scheduleType,
-            Enemies = new List<TribeInfo>()
+            Enemies = []
         };
 
         // Handle enemies if provided
