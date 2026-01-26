@@ -66,7 +66,7 @@ jobs:
       with:
         resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
         containerAppName: ${{ secrets.BACKEND_CONTAINER_APP_NAME }}
-        imageToDeploy: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+        imageToDeploy: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ secrets.BACKEND_CONTAINER_NAME }}:${{ github.ref_name }}
         registryUrl: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
         registryUsername: ${{ secrets.REGISTRY_USERNAME }}
         registryPassword: ${{ secrets.REGISTRY_PASSWORD }}
@@ -120,7 +120,7 @@ jobs:
       with:
         resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
         containerAppName: ${{ secrets.FRONTEND_CONTAINER_APP_NAME }}
-        imageToDeploy: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+        imageToDeploy: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ secrets.FRONTEND_CONTAINER_NAME }}:${{ github.ref_name }}
         registryUrl: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
         registryUsername: ${{ secrets.REGISTRY_USERNAME }}
         registryPassword: ${{ secrets.REGISTRY_PASSWORD }}
