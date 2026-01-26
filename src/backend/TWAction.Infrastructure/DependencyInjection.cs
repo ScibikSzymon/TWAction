@@ -5,6 +5,7 @@ using Wolverine;
 using TWAction.Application.Interfaces;
 using TWAction.Persistence;
 using TWAction.Persistence.Repositories;
+using TWAction.Infrastructure.Services;
 using TWAction.Application.Handlers;
 using TWAction.Application.Users.Queries;
 using TWAction.Application.Users.Interfaces;
@@ -13,6 +14,8 @@ using TWAction.Application.Schedules.Queries;
 using TWAction.Application.Schedules.Commands;
 using TWAction.Application.Users.Commands;
 using TWAction.Application.Schedules.Services;
+using TWAction.Application.Tribes.Interfaces;
+using TWAction.Application.Tribes.Queries;
 
 namespace TWAction.Infrastructure;
 
@@ -36,6 +39,10 @@ public static class DependencyInjection
             opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
         });
 
+        // Register HttpClient factory and IMemoryCache for TribalWars API calls
+        services.AddHttpClient<TribesHttpService>();
+        services.AddMemoryCache();
+
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
@@ -44,6 +51,8 @@ public static class DependencyInjection
         services.AddSingleton<TroopsStateValidator>();
         services.AddSingleton<TroopsStateCompressionService>();
         services.AddSingleton<TroopsStateStatsExtractor>();
+        services.AddSingleton<TribesCsvParser>();
+        services.AddScoped<ITribesService, TribesHttpService>();
 
         services.AddTransient<SignInWithGoogleHandler>();
         services.AddTransient<GetAllUsersHandler>();
@@ -56,7 +65,10 @@ public static class DependencyInjection
         services.AddTransient<DeleteScheduleHandler>();
         services.AddTransient<UploadTroopsStateHandler>();
         services.AddTransient<GetTroopsStateHandler>();
+        services.AddTransient<GetTribesHandler>();
 
         return services;
+
+
     }
 }

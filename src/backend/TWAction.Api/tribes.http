@@ -1,0 +1,33 @@
+### TribalWars Tribes API Tests
+
+### Variables
+@baseUrl = http://localhost:8000
+
+### ===== GET TRIBES FOR WORLD =====
+### Retrieve list of all tribes from TribalWars (cached for 15 minutes)
+### Result is sorted by VillagesCount in descending order
+GET {{baseUrl}}/worlds/pl218/tribes
+Accept: application/json
+
+### ===== GET TRIBES FROM DIFFERENT WORLD =====
+GET {{baseUrl}}/worlds/pl219/tribes
+Accept: application/json
+
+### ===== GET TRIBES FROM ANOTHER WORLD =====
+GET {{baseUrl}}/worlds/pl220/tribes
+Accept: application/json
+
+### Response format for each tribe:
+### {
+###   "tribalWarsId": 189,
+###   "name": "Piekielne Alpaki",
+###   "short": "AHA",
+###   "villagesCount": 2660
+### }
+
+### Notes:
+### - World parameter is typed as WorldType enum (pl218, pl219, pl220, pl221, pl222, pl223)
+### - Data is cached for 15 minutes per world
+### - List is sorted by VillagesCount descending (highest villages first)
+### - Player names are automatically URL-decoded from the TribalWars CSV format
+

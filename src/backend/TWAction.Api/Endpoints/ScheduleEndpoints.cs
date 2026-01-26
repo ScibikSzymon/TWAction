@@ -62,6 +62,7 @@ public static class ScheduleEndpoints
         {
             return Results.NotFound(new { error = "Schedule not found for specified user." });
         }
+
         return Results.Ok(result.Value);
     }
 
@@ -73,8 +74,10 @@ public static class ScheduleEndpoints
             request.UserId,
             request.Name,
             request.World,
-            request.ScheduleType
+            request.ScheduleType,
+            request.EnemyTribalWarsIds ?? Array.Empty<int>()
         );
+
 
         var result = await bus.InvokeAsync<Result<ScheduleDto>>(command);
 
@@ -95,7 +98,8 @@ public static class ScheduleEndpoints
             scheduleId,
             request.Name,
             request.World,
-            request.ScheduleType
+            request.ScheduleType,
+            request.EnemyTribalWarsIds
         );
 
         var result = await bus.InvokeAsync<Result<ScheduleDto>>(command);
@@ -119,6 +123,7 @@ public static class ScheduleEndpoints
             return Results.NotFound(new { error = result.Error });
         }
 
+
         return Results.NoContent();
     }
 }
@@ -127,11 +132,17 @@ public sealed record CreateScheduleRequest(
     Guid UserId,
     string Name,
     string World,
-    string ScheduleType
+    string ScheduleType,
+    IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
 
 public sealed record UpdateScheduleRequest(
     string Name,
     string World,
-    string ScheduleType
+    string ScheduleType,
+    IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
+
+
+
+

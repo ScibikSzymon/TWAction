@@ -10,9 +10,15 @@ public sealed record ScheduleDto
 
     public required string Name { get; init; }
 
-    public required DateTime CreationDate { get; init; }
+    public required DateTimeOffset CreationDate { get; init; }
 
     public required WorldType World { get; init; }
 
     public required ScheduleType ScheduleType { get; init; }
+
+    public required IReadOnlyList<int> EnemyIds { get; init; }
 }
+
+
+
+

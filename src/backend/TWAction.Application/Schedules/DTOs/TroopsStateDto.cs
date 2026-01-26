@@ -10,12 +10,13 @@ public sealed record TroopsStateDto
 
     public required int PlayerCount { get; init; }
 
-    public required DateTime CreatedAt { get; init; }
+    public required DateTimeOffset CreatedAt { get; init; }
 
-    public required DateTime UpdatedAt { get; init; }
+    public required DateTimeOffset UpdatedAt { get; init; }
 }
 
 public sealed record UploadTroopsStateRequest
 {
     public required string RawData { get; init; }
 }
+

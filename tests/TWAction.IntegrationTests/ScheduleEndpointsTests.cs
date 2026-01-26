@@ -147,7 +147,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
             UserId: user.Id,
             Name: "New Schedule",
             World: WorldType.pl220.ToString(),
-            ScheduleType: ScheduleType.Main.ToString()
+            ScheduleType: ScheduleType.Main.ToString(),
+            []
         );
 
         var response = await _client.PostAsJsonAsync("/schedules", request, _jsonOptions);
@@ -176,7 +177,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
             UserId: user.Id,
             Name: "New Schedule",
             World: WorldType.pl218.ToString(),
-            ScheduleType: ScheduleType.Fake.ToString()
+            ScheduleType: ScheduleType.Fake.ToString(),
+            []
         );
 
         var response = await _client.PostAsJsonAsync("/schedules", request, _jsonOptions);
@@ -196,7 +198,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
             UserId: Guid.NewGuid(),
             Name: "New Schedule",
             World: WorldType.pl218.ToString(),
-            ScheduleType: ScheduleType.Main.ToString()
+            ScheduleType: ScheduleType.Main.ToString(),
+            []
         );
 
         var response = await _client.PostAsJsonAsync("/schedules", request, _jsonOptions);
@@ -220,7 +223,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
         var updateRequest = new UpdateScheduleRequest(
             Name: "Updated Name",
             World: WorldType.pl221.ToString(),
-            ScheduleType: ScheduleType.Main.ToString()
+            ScheduleType: ScheduleType.Main.ToString(),
+            []
         );
 
         var response = await _client.PutAsJsonAsync($"/schedules/{schedule.Id}", updateRequest, _jsonOptions);
@@ -242,7 +246,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
         var updateRequest = new UpdateScheduleRequest(
             Name: "Updated Name",
             World: WorldType.pl218.ToString(),
-            ScheduleType: ScheduleType.Main.ToString()
+            ScheduleType: ScheduleType.Main.ToString(),
+            []
         );
 
         var response = await _client.PutAsJsonAsync($"/schedules/{scheduleId}", updateRequest, _jsonOptions);

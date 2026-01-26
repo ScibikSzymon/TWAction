@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TWAction.Persistence;
@@ -11,9 +12,11 @@ using TWAction.Persistence;
 namespace TWAction.Persistence.Migrations
 {
     [DbContext(typeof(TWActionDbContext))]
-    partial class TWActionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260125142035_Enemies")]
+    partial class Enemies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,7 +31,7 @@ namespace TWAction.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("CreationDate")
+                    b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Enemies")
@@ -65,13 +68,13 @@ namespace TWAction.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("ScheduleId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");

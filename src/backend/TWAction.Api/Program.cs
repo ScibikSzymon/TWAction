@@ -66,6 +66,7 @@ app.MapUsersEndpoints();
 app.MapAuthEndpoints();
 app.MapScheduleEndpoints();
 app.MapTroopsStateEndpoints();
+app.MapTribesEndpoints();
 
 app.Run();
 

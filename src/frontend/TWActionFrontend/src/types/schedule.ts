@@ -24,6 +24,7 @@ export interface Schedule {
   creationDate: string;
   world: WorldType;
   scheduleType: ScheduleType;
+  enemyIds?: number[];
 }
 
 export interface CreateScheduleRequest {
@@ -31,10 +32,12 @@ export interface CreateScheduleRequest {
   name: string;
   world: string;
   scheduleType: string;
+  enemyTribalWarsIds?: number[];
 }
 
 export interface UpdateScheduleRequest {
   name: string;
   world: string;
   scheduleType: string;
+  enemyTribalWarsIds?: number[];
 }

@@ -99,9 +99,19 @@ const HomePage = () => {
     }
   };
 
-  const handleEdit = (schedule: Schedule) => {
-    setEditingSchedule(schedule);
-    setShowForm(true);
+  const handleEdit = async (schedule: Schedule) => {
+    try {
+      // Pobierz najnowsze dane rozpiski z bazy
+      const freshSchedule = await scheduleService.getScheduleById(
+        user!.id,
+        schedule.id,
+      );
+      setEditingSchedule(freshSchedule);
+      setShowForm(true);
+    } catch (err) {
+      console.error("Error loading schedule for edit:", err);
+      setError("Nie udało się załadować rozpiski do edycji");
+    }
   };
 
   const handleCancelForm = () => {
@@ -176,9 +186,10 @@ const HomePage = () => {
                 onDelete={handleDeleteSchedule}
                 onSetActive={setActive}
               />
-              {activeScheduleId && schedules.some(s => s.id === activeScheduleId) && (
-                <TroopsStateManager scheduleId={activeScheduleId} />
-              )}
+              {activeScheduleId &&
+                schedules.some((s) => s.id === activeScheduleId) && (
+                  <TroopsStateManager scheduleId={activeScheduleId} />
+                )}
             </>
           )}
         </>

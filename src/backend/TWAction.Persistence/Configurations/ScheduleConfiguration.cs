@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Text.Json;
 using TWAction.Domain.Schedules;
+using TWAction.Domain.Tribes;
 using TWAction.Domain.Users;
 
 namespace TWAction.Persistence.Configurations;
@@ -16,6 +18,13 @@ public sealed class ScheduleConfiguration : IEntityTypeConfiguration<ScheduleEnt
         builder.Property(x => x.CreationDate).IsRequired();
         builder.Property(x => x.World).IsRequired();
         builder.Property(x => x.ScheduleType).IsRequired();
+        
+        // Store enemies as JSON
+        var options = new JsonSerializerOptions();
+        builder.Property(x => x.Enemies)
+               .HasConversion(
+                   v => JsonSerializer.Serialize(v, options),
+                   v => JsonSerializer.Deserialize<List<TribeInfo>>(v, options) ?? new List<TribeInfo>());
 
         builder.HasOne<UserEntity>()
                .WithMany(u => u.Schedules)
@@ -23,3 +32,5 @@ public sealed class ScheduleConfiguration : IEntityTypeConfiguration<ScheduleEnt
                .OnDelete(DeleteBehavior.Cascade);
     }
 }
+
+
