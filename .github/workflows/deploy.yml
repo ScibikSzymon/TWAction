@@ -7,14 +7,14 @@ on:
   pull_request:
 
 env:
-  AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  AZURE_CONTAINER_REGISTRY: ${{ vars.AZURE_CONTAINER_REGISTRY }}
   REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
   REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-  BACKEND_CONTAINER_NAME: ${{ secrets.BACKEND_CONTAINER_NAME }}
-  FRONTEND_CONTAINER_NAME: ${{ secrets.FRONTEND_CONTAINER_NAME }}
-  AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-  BACKEND_CONTAINER_APP_NAME: ${{ secrets.BACKEND_CONTAINER_APP_NAME }}
-  FRONTEND_CONTAINER_APP_NAME: ${{ secrets.FRONTEND_CONTAINER_APP_NAME }}
+  BACKEND_CONTAINER_NAME: ${{ vars.BACKEND_CONTAINER_NAME }}
+  FRONTEND_CONTAINER_NAME: ${{ vars.FRONTEND_CONTAINER_NAME }}
+  AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+  BACKEND_CONTAINER_APP_NAME: ${{ vars.BACKEND_CONTAINER_APP_NAME }}
+  FRONTEND_CONTAINER_APP_NAME: ${{ vars.FRONTEND_CONTAINER_APP_NAME }}
 
 jobs:
   build-and-deploy-backend:
@@ -28,7 +28,7 @@ jobs:
     - name: Login to Azure Container Registry
       uses: docker/login-action@v3
       with:
-        registry: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+        registry: ${{ vars.AZURE_CONTAINER_REGISTRY }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     
@@ -39,7 +39,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ secrets.BACKEND_CONTAINER_NAME }}
+        images: ${{ vars.AZURE_CONTAINER_REGISTRY }}/${{ vars.BACKEND_CONTAINER_NAME }}
         tags: |
           type=sha,prefix=
           type=ref,event=branch
@@ -53,8 +53,8 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=registry,ref=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ secrets.BACKEND_CONTAINER_NAME }}:buildcache
-        cache-to: type=registry,ref=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ secrets.BACKEND_CONTAINER_NAME }}:buildcache,mode=max
+        cache-from: type=registry,ref=${{ vars.AZURE_CONTAINER_REGISTRY }}/${{ vars.BACKEND_CONTAINER_NAME }}:buildcache
+        cache-to: type=registry,ref=${{ vars.AZURE_CONTAINER_REGISTRY }}/${{ vars.BACKEND_CONTAINER_NAME }}:buildcache,mode=max
     
     - name: Azure Login
       uses: azure/login@v2
@@ -64,10 +64,10 @@ jobs:
     - name: Deploy to Azure Container Apps
       uses: azure/container-apps-deploy-action@v1
       with:
-        resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
-        containerAppName: ${{ secrets.BACKEND_CONTAINER_APP_NAME }}
-        imageToDeploy: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ secrets.BACKEND_CONTAINER_NAME }}:${{ steps.meta.outputs.version }}
-        registryUrl: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+        resourceGroup: ${{ vars.AZURE_RESOURCE_GROUP }}
+        containerAppName: ${{ vars.BACKEND_CONTAINER_APP_NAME }}
+        imageToDeploy: ${{ vars.AZURE_CONTAINER_REGISTRY }}/${{ vars.BACKEND_CONTAINER_NAME }}:${{ steps.meta.outputs.version }}
+        registryUrl: ${{ vars.AZURE_CONTAINER_REGISTRY }}
         registryUsername: ${{ secrets.REGISTRY_USERNAME }}
         registryPassword: ${{ secrets.REGISTRY_PASSWORD }}
 
@@ -82,7 +82,7 @@ jobs:
     - name: Login to Azure Container Registry
       uses: docker/login-action@v3
       with:
-        registry: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+        registry: ${{ vars.AZURE_CONTAINER_REGISTRY }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     
@@ -93,7 +93,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ secrets.FRONTEND_CONTAINER_NAME }}
+        images: ${{ vars.AZURE_CONTAINER_REGISTRY }}/${{ vars.FRONTEND_CONTAINER_NAME }}
         tags: |
           type=sha,prefix=
           type=ref,event=branch
@@ -108,9 +108,9 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |
-          VITE_API_BASE_URL=${{ secrets.BACKEND_URL }}
-        cache-from: type=registry,ref=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ secrets.FRONTEND_CONTAINER_NAME }}:buildcache
-        cache-to: type=registry,ref=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ secrets.FRONTEND_CONTAINER_NAME }}:buildcache,mode=max
+          VITE_API_BASE_URL=${{ vars.BACKEND_URL }}
+        cache-from: type=registry,ref=${{ vars.AZURE_CONTAINER_REGISTRY }}/${{ vars.FRONTEND_CONTAINER_NAME }}:buildcache
+        cache-to: type=registry,ref=${{ vars.AZURE_CONTAINER_REGISTRY }}/${{ vars.FRONTEND_CONTAINER_NAME }}:buildcache,mode=max
     
     - name: Azure Login
       uses: azure/login@v2
@@ -120,9 +120,9 @@ jobs:
     - name: Deploy to Azure Container Apps
       uses: azure/container-apps-deploy-action@v1
       with:
-        resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
-        containerAppName: ${{ secrets.FRONTEND_CONTAINER_APP_NAME }}
-        imageToDeploy: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ secrets.FRONTEND_CONTAINER_NAME }}:${{ steps.meta.outputs.version }}
-        registryUrl: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+        resourceGroup: ${{ vars.AZURE_RESOURCE_GROUP }}
+        containerAppName: ${{ vars.FRONTEND_CONTAINER_APP_NAME }}
+        imageToDeploy: ${{ vars.AZURE_CONTAINER_REGISTRY }}/${{ vars.FRONTEND_CONTAINER_NAME }}:${{ steps.meta.outputs.version }}
+        registryUrl: ${{ vars.AZURE_CONTAINER_REGISTRY }}
         registryUsername: ${{ secrets.REGISTRY_USERNAME }}
         registryPassword: ${{ secrets.REGISTRY_PASSWORD }}
