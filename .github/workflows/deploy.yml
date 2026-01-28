@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-  pull_request:
 
 env:
   AZURE_CONTAINER_REGISTRY: ${{ vars.AZURE_CONTAINER_REGISTRY }}
