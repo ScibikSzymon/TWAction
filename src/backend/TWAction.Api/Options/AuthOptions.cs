@@ -30,4 +30,9 @@ public sealed class AuthOptions
     /// Domain for which the cookie is valid.
     /// </summary>
     public string? CookieDomain { get; set; }
+
+    /// <summary>
+    /// URL of the frontend application for redirects after authentication.
+    /// </summary>
+    public string? FrontendUrl { get; set; }
 }

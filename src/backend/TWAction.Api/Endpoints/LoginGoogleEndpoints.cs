@@ -74,7 +74,8 @@ public static class LoginGoogleEndpoints
             }
 
             SetSessionCookie(response, authOptions, result.Value.SessionId);
-            return Results.Redirect("http://localhost:3001/");
+            var frontendUrl = authOptions.Value.FrontendUrl!;
+            return Results.Redirect(frontendUrl);
         });
 
         return app;
