@@ -1,0 +1,97 @@
+### Reconnaissance Settings API Tests
+
+### Variables
+@baseUrl = http://localhost:8000
+@scheduleId = 3a336a89-4279-4243-9d1d-6da5c432a7a6
+
+### ===== GET RECONNAISSANCE SETTINGS =====
+### Retrieve reconnaissance settings for a schedule (404 if not set)
+GET {{baseUrl}}/schedules/{{scheduleId}}/reconnaissance
+Accept: application/json
+
+### ===== SAVE (CREATE/UPDATE) RECONNAISSANCE SETTINGS =====
+### Create or update reconnaissance settings for a schedule
+### Note: Schedule must have ScheduleType = "Reconnaissance"
+PUT {{baseUrl}}/schedules/{{scheduleId}}/reconnaissance
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2025-01-26T06:00:00Z",
+  "minArrivalTime": "2025-01-26T08:00:00Z",
+  "maxArrivalTime": "2025-01-26T22:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 1,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true
+}
+
+### ===== UPDATE SETTINGS (same endpoint) =====
+PUT {{baseUrl}}/schedules/{{scheduleId}}/reconnaissance
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2025-01-26T07:00:00Z",
+  "minArrivalTime": "2025-01-26T09:00:00Z",
+  "maxArrivalTime": "2025-01-26T23:00:00Z",
+  "minDistanceToFront": 10,
+  "minSpyCount": 2,
+  "maxPopulationInSourceVillage": 10000,
+  "skipNightSendings": false
+}
+
+### ===== TEST VALIDATIONS =====
+
+### Invalid schedule type (should fail)
+PUT {{baseUrl}}/schedules/INVALID-SCHEDULE-ID/reconnaissance
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2025-01-26T06:00:00Z",
+  "minArrivalTime": "2025-01-26T08:00:00Z",
+  "maxArrivalTime": "2025-01-26T22:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 1,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true
+}
+
+### Invalid time order (MinArrivalTime before MinDepartureTime)
+PUT {{baseUrl}}/schedules/{{scheduleId}}/reconnaissance
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2025-01-26T10:00:00Z",
+  "minArrivalTime": "2025-01-26T08:00:00Z",
+  "maxArrivalTime": "2025-01-26T22:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 1,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true
+}
+
+### Invalid spy count (< 1)
+PUT {{baseUrl}}/schedules/{{scheduleId}}/reconnaissance
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2025-01-26T06:00:00Z",
+  "minArrivalTime": "2025-01-26T08:00:00Z",
+  "maxArrivalTime": "2025-01-26T22:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 0,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true
+}
+
+### INSTRUCTIONS:
+### 1. First, create a schedule with ScheduleType = "Reconnaissance"
+### 2. Use that schedule's ID in {{scheduleId}}
+### 3. PUT creates settings if they don't exist, updates if they do
+### 4. GET returns 404 if settings haven't been set yet
+### 5. DELETE schedule will cascade delete these settings
+
+### Response includes:
+### - id, scheduleId
+### - minDepartureTime, minArrivalTime, maxArrivalTime (ISO 8601 with timezone)
+### - minDistanceToFront, minSpyCount, maxPopulationInSourceVillage
+### - skipNightSendings (boolean)
