@@ -45,6 +45,28 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    
+    logger.LogInformation("=== Configuration Values ===");
+    logger.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
+    
+    // Log all configuration keys and values (from appsettings, env vars, etc.)
+    foreach (var config in builder.Configuration.AsEnumerable().OrderBy(c => c.Key))
+    {
+        // Mask sensitive values
+        var value = config.Key.Contains("Secret", StringComparison.OrdinalIgnoreCase) ||
+                    config.Key.Contains("Password", StringComparison.OrdinalIgnoreCase) ||
+                    config.Key.Contains("ConnectionString", StringComparison.OrdinalIgnoreCase)
+            ? "***MASKED***"
+            : config.Value;
+        
+        logger.LogInformation("{Key} = {Value}", config.Key, value);
+    }
+    logger.LogInformation("============================");
+}
+
 app.UseCors("AllowAll");
 
 // Apply EF Core migrations on startup in non-production environments
