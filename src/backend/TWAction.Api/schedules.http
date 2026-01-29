@@ -1,0 +1,129 @@
+### Schedule API Tests - Integrated Enemy Management
+### Enemies are now managed directly via POST and PUT /schedules endpoints
+
+### Variables
+@baseUrl = http://localhost:8000
+### Update with actual userId from database
+@userId = ea74963f-9c54-449c-b925-7508d2b96ece
+@scheduleId = 7bb24d4b-c9b5-44fd-8ce1-8f8ecf559ffe
+
+### ===== STEP 1: GET EXISTING USER_ID =====
+### Run this query to see what userIds exist in database
+GET {{baseUrl}}/users
+Accept: application/json
+
+### Copy ID of one user and replace @userId above
+
+### ===== STEP 2: CREATE SCHEDULES =====
+
+### CREATE Schedule without enemies
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "name": "Daily Farm Schedule",
+  "world": "pl218",
+  "scheduleType": "Main"
+}
+
+### CREATE Schedule with enemies (provide their TribalWars IDs)
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "name": "Reconnaissance Mission",
+  "world": "pl218",
+  "scheduleType": "Reconnaissance",
+  "enemyTribalWarsIds": [189, 197]
+}
+
+### CREATE Schedule with single enemy
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "name": "Fake Attack Training",
+  "world": "pl220",
+  "scheduleType": "Fake",
+  "enemyTribalWarsIds": [189]
+}
+
+### ===== STEP 3: FETCHING SCHEDULES =====
+
+### GET all schedules for user (includes enemyIds list)
+GET {{baseUrl}}/schedules/{{userId}}
+Accept: application/json
+
+### GET schedule by ID (includes enemyIds list)
+GET {{baseUrl}}/schedules/{{userId}}/{{scheduleId}}
+Accept: application/json
+
+### ===== STEP 4: GET TRIBES FOR WORLD =====
+### Fetch list of tribes/enemies for schedule's world (cached for 15 minutes)
+### Use the TribalWarsIds from response to set enemies
+GET {{baseUrl}}/worlds/pl218/tribes
+Accept: application/json
+
+### ===== STEP 5: UPDATE SCHEDULE WITH ENEMIES =====
+
+### UPDATE schedule and set enemies (replace entire enemy list)
+PUT {{baseUrl}}/schedules/{{scheduleId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Daily Farm Schedule",
+  "world": "pl218",
+  "scheduleType": "Main",
+  "enemyTribalWarsIds": [189, 197, 205, 210]
+}
+
+### UPDATE schedule and clear enemies (empty list)
+PUT {{baseUrl}}/schedules/{{scheduleId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Farm Schedule",
+  "world": "pl218",
+  "scheduleType": "Main",
+  "enemyTribalWarsIds": []
+}
+
+### UPDATE schedule without changing enemies (omit enemyTribalWarsIds)
+PUT {{baseUrl}}/schedules/{{scheduleId}}
+Content-Type: application/json
+
+{
+  "name": "Renamed Schedule",
+  "world": "pl218",
+  "scheduleType": "Main"
+}
+
+### ===== STEP 6: DELETE SCHEDULE =====
+
+### DELETE schedule (also deletes associated enemies)
+DELETE {{baseUrl}}/schedules/{{scheduleId}}
+
+### ===== INSTRUCTIONS =====
+### 1. Run GET /users - get list of existing users
+### 2. Copy user ID and replace @userId
+### 3. (Optional) Get tribes: GET /worlds/{world}/tribes
+### 4. Create schedule with or without enemies via POST /schedules
+### 5. Copy returned schedule ID and replace @scheduleId
+### 6. GET schedule to verify (response includes enemyIds)
+### 7. Update schedule enemies via PUT /schedules/{scheduleId}
+###    - If enemyTribalWarsIds is provided, it replaces the entire list
+###    - If enemyTribalWarsIds is omitted, enemies are NOT changed
+###    - Empty array [] clears all enemies
+### 8. Delete schedule when done
+
+### Response Format:
+### ScheduleDto includes:
+### - id, userId, name, creationDate, world, scheduleType
+### - enemyIds: List<int> - TribalWars IDs of enemy tribes (empty if none)
+
+### Available World values: pl218, pl219, pl220, pl221, pl222, pl223
+### Available ScheduleType values: Fake, Reconnaissance, Main
+### Note: All provided enemyTribalWarsIds must exist in the selected world

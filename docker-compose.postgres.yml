@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    container_name: twaction-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PASSWORD: postgres
+      POSTGRES_DB: twaction
+    ports:
+      - "5432:5432"
+    volumes:
+      - twaction-db-data:/var/lib/postgresql/data
+
+volumes:
+  twaction-db-data:

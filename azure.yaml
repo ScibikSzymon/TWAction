@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: twaction
+metadata:
+    template: azd-init@1.23.0
+services:
+    twaction-api:
+        project: src/backend/TWAction.Api
+        host: containerapp
+        language: dotnet
+        docker:
+            path: src/backend/TWAction.Api/Dockerfile
+            context: .
+    twaction-frontend:
+        project: ./src/frontend/TWActionFrontend
+        host: containerapp
+        language: ts
+        dist: dist
+        docker:
+            path: src/frontend/TWActionFrontend/Dockerfile
+            context: src/frontend/TWActionFrontend
+resources:
+    twaction-api:
+        type: host.containerapp
+        port: 8080
+    twaction-frontend:
+        type: host.containerapp
+        uses:
+            - twaction-api
+        port: 80
