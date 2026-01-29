@@ -6,12 +6,10 @@ import type {
   CreateScheduleRequest,
   UpdateScheduleRequest,
 } from "../types/schedule";
-import { ScheduleType } from "../types/schedule";
 import { scheduleService } from "../services/scheduleService";
 import { ScheduleList } from "../components/ScheduleList";
 import { ScheduleForm } from "../components/ScheduleForm";
-import { TroopsStateManager } from "../components/TroopsStateManager";
-import { ReconnaissanceSettings } from "../components/ReconnaissanceSettings";
+import { ScheduleTabs } from "../components/ScheduleTabs";
 import styles from "./HomePage.module.css";
 
 const HomePage = () => {
@@ -190,13 +188,13 @@ const HomePage = () => {
               />
               {activeScheduleId &&
                 schedules.some((s) => s.id === activeScheduleId) && (
-                  <>
-                    {schedules.find((s) => s.id === activeScheduleId)
-                      ?.scheduleType === ScheduleType.Reconnaissance && (
-                      <ReconnaissanceSettings scheduleId={activeScheduleId} />
-                    )}
-                    <TroopsStateManager scheduleId={activeScheduleId} />
-                  </>
+                  <ScheduleTabs
+                    scheduleId={activeScheduleId}
+                    scheduleType={
+                      schedules.find((s) => s.id === activeScheduleId)!
+                        .scheduleType
+                    }
+                  />
                 )}
             </>
           )}
