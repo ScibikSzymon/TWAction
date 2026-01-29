@@ -203,7 +203,7 @@ export const ReconnaissanceSettings = ({
       )}
 
       <div className={styles.formGroup}>
-        <label htmlFor="minDepartureTime">Minimalna data wyjazdu:</label>
+        <label htmlFor="minDepartureTime">Czas rozpoczęcia wysyłki:</label>
         <input
           id="minDepartureTime"
           type="datetime-local"
@@ -218,7 +218,7 @@ export const ReconnaissanceSettings = ({
       </div>
 
       <div className={styles.formGroup}>
-        <label htmlFor="minArrivalTime">Minimalna data przyjazdu:</label>
+        <label htmlFor="minArrivalTime">Minimalny czas dotarcia ataków:</label>
         <input
           id="minArrivalTime"
           type="datetime-local"
@@ -233,7 +233,7 @@ export const ReconnaissanceSettings = ({
       </div>
 
       <div className={styles.formGroup}>
-        <label htmlFor="maxArrivalTime">Maksymalna data przyjazdu:</label>
+        <label htmlFor="maxArrivalTime">Maksymalny czas dotarcia ataków:</label>
         <input
           id="maxArrivalTime"
           type="datetime-local"
@@ -279,9 +279,9 @@ export const ReconnaissanceSettings = ({
         <input
           id="minSpyCount"
           type="range"
-          min="1"
+          min="5"
           max="1000"
-          step="10"
+          step="5"
           value={settings.minSpyCount}
           onChange={(e) =>
             setSettings((prev) => ({
@@ -293,7 +293,7 @@ export const ReconnaissanceSettings = ({
           className={styles.slider}
         />
         <div className={styles.sliderLabels}>
-          <span>1</span>
+          <span>5</span>
           <span>1000</span>
         </div>
       </div>
