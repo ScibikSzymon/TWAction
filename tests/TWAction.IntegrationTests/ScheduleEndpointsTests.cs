@@ -146,8 +146,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
         var request = new CreateScheduleRequest(
             UserId: user.Id,
             Name: "New Schedule",
-            World: WorldType.pl220.ToString(),
-            ScheduleType: ScheduleType.Main.ToString(),
+            World: WorldType.pl220,
+            ScheduleType: ScheduleType.Main,
             []
         );
 
@@ -176,8 +176,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
         var request = new CreateScheduleRequest(
             UserId: user.Id,
             Name: "New Schedule",
-            World: WorldType.pl218.ToString(),
-            ScheduleType: ScheduleType.Fake.ToString(),
+            World: WorldType.pl218,
+            ScheduleType: ScheduleType.Fake,
             []
         );
 
@@ -197,8 +197,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
         var request = new CreateScheduleRequest(
             UserId: Guid.NewGuid(),
             Name: "New Schedule",
-            World: WorldType.pl218.ToString(),
-            ScheduleType: ScheduleType.Main.ToString(),
+            World: WorldType.pl218,
+            ScheduleType: ScheduleType.Main,
             []
         );
 
@@ -222,8 +222,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
 
         var updateRequest = new UpdateScheduleRequest(
             Name: "Updated Name",
-            World: WorldType.pl221.ToString(),
-            ScheduleType: ScheduleType.Main.ToString(),
+            World: WorldType.pl221,
+            ScheduleType: ScheduleType.Main,
             []
         );
 
@@ -245,8 +245,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
         var scheduleId = Guid.NewGuid();
         var updateRequest = new UpdateScheduleRequest(
             Name: "Updated Name",
-            World: WorldType.pl218.ToString(),
-            ScheduleType: ScheduleType.Main.ToString(),
+            World: WorldType.pl218,
+            ScheduleType: ScheduleType.Main,
             []
         );
 

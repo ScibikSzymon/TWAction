@@ -12,8 +12,8 @@ namespace TWAction.Application.Schedules.Commands;
 public sealed record CreateScheduleCommand(
     Guid UserId,
     string Name,
-    string World,
-    string ScheduleType,
+    WorldType World,
+    ScheduleType ScheduleType,
     IReadOnlyList<int> EnemyTribalWarsIds
 );
 
@@ -25,25 +25,10 @@ public class CreateScheduleHandler(
 {
     public async Task<Result<ScheduleDto>> Handle(CreateScheduleCommand command, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(command.Name))
-        {
-            return Result.Failure<ScheduleDto>("Schedule name cannot be empty.");
-        }
-
         var user = await userRepository.GetByIdAsync(command.UserId, cancellationToken);
         if (user is null)
         {
             return Result.Failure<ScheduleDto>($"User with ID '{command.UserId}' not found.");
-        }
-
-        if (!Enum.TryParse<WorldType>(command.World, ignoreCase: true, out var world))
-        {
-            return Result.Failure<ScheduleDto>($"Invalid world value '{command.World}'.");
-        }
-
-        if (!Enum.TryParse<ScheduleType>(command.ScheduleType, ignoreCase: true, out var scheduleType))
-        {
-            return Result.Failure<ScheduleDto>($"Invalid schedule type value '{command.ScheduleType}'.");
         }
 
         var schedule = new ScheduleEntity
@@ -52,8 +37,8 @@ public class CreateScheduleHandler(
             UserGuid = command.UserId,
             Name = command.Name,
             CreationDate = DateTimeOffset.UtcNow,
-            World = world,
-            ScheduleType = scheduleType,
+            World = command.World,
+            ScheduleType = command.ScheduleType,
             Enemies = new List<TribeInfo>()
         };
 
@@ -63,7 +48,7 @@ public class CreateScheduleHandler(
         {
             try
             {
-                var tribes = await tribesService.GetTribesAsync(world, cancellationToken);
+                var tribes = await tribesService.GetTribesAsync(command.World, cancellationToken);
 
                 var enemies = tribes
                     .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))

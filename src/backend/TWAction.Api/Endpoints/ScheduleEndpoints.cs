@@ -2,10 +2,12 @@ namespace TWAction.Api.Endpoints;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using TWAction.Api.Filters;
 using TWAction.Application.Common;
 using TWAction.Application.Schedules.Commands;
 using TWAction.Application.Schedules.DTOs;
 using TWAction.Application.Schedules.Queries;
+using TWAction.Domain.Schedules;
 using Wolverine;
 
 public static class ScheduleEndpoints
@@ -21,10 +23,12 @@ public static class ScheduleEndpoints
             .WithName("GetScheduleById");
 
         group.MapPost("", CreateSchedule)
-            .WithName("CreateSchedule");
+            .WithName("CreateSchedule")
+            .AddEndpointFilter<ValidationFilter<CreateScheduleRequest>>();
 
         group.MapPut("/{scheduleId}", UpdateSchedule)
-            .WithName("UpdateSchedule");
+            .WithName("UpdateSchedule")
+            .AddEndpointFilter<ValidationFilter<UpdateScheduleRequest>>();
 
         group.MapDelete("/{scheduleId}", DeleteSchedule)
             .WithName("DeleteSchedule");
@@ -75,7 +79,7 @@ public static class ScheduleEndpoints
             request.Name,
             request.World,
             request.ScheduleType,
-            request.EnemyTribalWarsIds ?? Array.Empty<int>()
+            request.EnemyTribalWarsIds ?? []
         );
 
 
@@ -131,15 +135,15 @@ public static class ScheduleEndpoints
 public sealed record CreateScheduleRequest(
     Guid UserId,
     string Name,
-    string World,
-    string ScheduleType,
+    WorldType World,
+    ScheduleType ScheduleType,
     IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
 
 public sealed record UpdateScheduleRequest(
     string Name,
-    string World,
-    string ScheduleType,
+    WorldType World,
+    ScheduleType ScheduleType,
     IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
 
