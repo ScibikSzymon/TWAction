@@ -10,9 +10,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
-builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection("Google"));
-builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection("Auth"));
-builder.Services.Configure<CorsOptions>(builder.Configuration.GetSection("Cors"));
+
+builder.Services.AddOptions<GoogleOptions>()
+    .BindConfiguration(GoogleOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddOptions<AuthOptions>()
+    .BindConfiguration(AuthOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddOptions<CorsOptions>()
+    .BindConfiguration(CorsOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

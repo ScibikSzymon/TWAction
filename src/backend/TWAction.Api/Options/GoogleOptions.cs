@@ -6,6 +6,8 @@ namespace TWAction.Api.Options;
 /// </summary>
 public sealed class GoogleOptions
 {
+    public static string SectionName = "Google";
+
     /// <summary>
     /// Google OAuth client id.
     /// </summary>

@@ -22,8 +22,8 @@ public static class LoginGoogleEndpoints
         app.MapGet("/auth/google", (HttpContext http, IOptions<GoogleOptions> googleOptions) =>
         {
             var opts = googleOptions.Value;
-            var clientId = opts?.ClientId ?? "";
-            var redirectUri = opts?.RedirectUri ?? "https://localhost:5001/auth/google/callback";
+            var clientId = opts?.ClientId;
+            var redirectUri = opts?.RedirectUri;
             var scope = "openid email profile";
             var state = Guid.NewGuid().ToString("N");
 
@@ -49,7 +49,7 @@ public static class LoginGoogleEndpoints
             var opts = googleOptions.Value;
             var clientId = opts?.ClientId ?? string.Empty;
             var clientSecret = opts?.ClientSecret ?? string.Empty;
-            var redirectUri = opts?.RedirectUri ?? "https://localhost:5001/auth/google/callback";
+            var redirectUri = opts?.RedirectUri;
 
             var idToken = await ExchangeCodeForIdTokenAsync(code, clientId, clientSecret, redirectUri);
             if (string.IsNullOrEmpty(idToken))

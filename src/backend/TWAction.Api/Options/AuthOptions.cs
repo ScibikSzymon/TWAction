@@ -6,6 +6,8 @@ namespace TWAction.Api.Options;
 /// </summary>
 public sealed class AuthOptions
 {
+    public static string SectionName = "Auth";
+
     /// <summary>
     /// Name of the cookie used to store the application session id.
     /// </summary>
