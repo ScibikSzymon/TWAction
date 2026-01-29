@@ -10,9 +10,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
-builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection("Google"));
-builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection("Auth"));
-builder.Services.Configure<CorsOptions>(builder.Configuration.GetSection("Cors"));
+
+builder.Services.AddOptions<GoogleOptions>()
+    .BindConfiguration(GoogleOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddOptions<AuthOptions>()
+    .BindConfiguration(AuthOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddOptions<CorsOptions>()
+    .BindConfiguration(CorsOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -44,6 +56,28 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    
+    logger.LogInformation("=== Configuration Values ===");
+    logger.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
+    
+    // Log all configuration keys and values (from appsettings, env vars, etc.)
+    foreach (var config in builder.Configuration.AsEnumerable().OrderBy(c => c.Key))
+    {
+        // Mask sensitive values
+        var value = config.Key.Contains("Secret", StringComparison.OrdinalIgnoreCase) ||
+                    config.Key.Contains("Password", StringComparison.OrdinalIgnoreCase) ||
+                    config.Key.Contains("ConnectionString", StringComparison.OrdinalIgnoreCase)
+            ? "***MASKED***"
+            : config.Value;
+        
+        logger.LogInformation("{Key} = {Value}", config.Key, value);
+    }
+    logger.LogInformation("============================");
+}
 
 app.UseCors("AllowAll");
 

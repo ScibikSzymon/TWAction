@@ -109,4 +109,36 @@ public static class TestDataSeeder
     {
         return await dbContext.Schedules.CountAsync(cancellationToken);
     }
+
+    public static async Task<UserSessionEntity> SeedSessionAsync(
+        TWActionDbContext dbContext,
+        Guid userId,
+        Guid? sessionId = null,
+        DateTimeOffset? expiresAt = null,
+        CancellationToken cancellationToken = default)
+    {
+        var session = new SessionEntityBuilder()
+            .WithId(sessionId ?? Guid.NewGuid())
+            .WithUserId(userId)
+            .WithExpiresAt(expiresAt ?? DateTimeOffset.UtcNow.AddHours(8))
+            .Build();
+
+        await dbContext.UserSessions.AddAsync(session, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return session;
+    }
+
+    public static async Task<(UserEntity User, UserSessionEntity Session)> SeedUserWithSessionAsync(
+        TWActionDbContext dbContext,
+        string email = "test@example.com",
+        string? displayName = "Test User",
+        string provider = "google",
+        CancellationToken cancellationToken = default)
+    {
+        var user = await SeedUserAsync(dbContext, email, displayName, provider, cancellationToken);
+        var session = await SeedSessionAsync(dbContext, user.Id, cancellationToken: cancellationToken);
+
+        return (user, session);
+    }
 }

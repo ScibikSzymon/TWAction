@@ -6,6 +6,8 @@ namespace TWAction.Api.Options;
 /// </summary>
 public sealed class AuthOptions
 {
+    public static string SectionName = "Auth";
+
     /// <summary>
     /// Name of the cookie used to store the application session id.
     /// </summary>
@@ -30,4 +32,9 @@ public sealed class AuthOptions
     /// Domain for which the cookie is valid.
     /// </summary>
     public string? CookieDomain { get; set; }
+
+    /// <summary>
+    /// URL of the frontend application for redirects after authentication.
+    /// </summary>
+    public string? FrontendUrl { get; set; }
 }
