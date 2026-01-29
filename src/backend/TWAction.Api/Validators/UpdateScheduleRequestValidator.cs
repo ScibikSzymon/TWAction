@@ -2,16 +2,9 @@ namespace TWAction.Api.Validators;
 
 using FluentValidation;
 using TWAction.Api.Endpoints;
-using TWAction.Domain.Schedules;
 
-/// <summary>
-/// Validator for <see cref="UpdateScheduleRequest"/>.
-/// </summary>
 public sealed class UpdateScheduleRequestValidator : AbstractValidator<UpdateScheduleRequest>
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UpdateScheduleRequestValidator"/> class.
-    /// </summary>
     public UpdateScheduleRequestValidator()
     {
         RuleFor(x => x.Name)

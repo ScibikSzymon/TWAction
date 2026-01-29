@@ -39,7 +39,7 @@ public class CreateScheduleHandler(
             CreationDate = DateTimeOffset.UtcNow,
             World = command.World,
             ScheduleType = command.ScheduleType,
-            Enemies = new List<TribeInfo>()
+            Enemies = []
         };
 
 
