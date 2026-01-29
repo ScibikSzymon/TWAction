@@ -17,8 +17,8 @@ services:
         language: ts
         dist: dist
         docker:
-            path: ./Dockerfile
-            context: ./
+            path: src/frontend/TWActionFrontend/Dockerfile
+            context: src/frontend/TWActionFrontend
 resources:
     twaction-api:
         type: host.containerapp
