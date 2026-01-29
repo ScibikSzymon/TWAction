@@ -47,9 +47,18 @@ export const ReconnaissanceSettings = ({
           skipNightSendings: data.skipNightSendings,
         });
       } catch (err: any) {
-        // Jeśli ustawienia nie istnieją, użyj domyślnych
+        // Jeśli ustawienia nie istnieją, resetuj do domyślnych
         if (err?.response?.status === 404) {
-          // Domyślne wartości już są ustawione
+          const defaults = getDefaultReconnaissanceSettings();
+          setSettings({
+            minDepartureTime: defaults.minDepartureTime.toISOString(),
+            minArrivalTime: defaults.minArrivalTime.toISOString(),
+            maxArrivalTime: defaults.maxArrivalTime.toISOString(),
+            minDistanceToFront: defaults.minDistanceToFront,
+            minSpyCount: defaults.minSpyCount,
+            maxPopulationInSourceVillage: defaults.maxPopulationInSourceVillage,
+            skipNightSendings: defaults.skipNightSendings,
+          });
         } else {
           setError("Nie udało się wczytać ustawień rozpiski zwiadowczej");
           console.error("Error loading reconnaissance settings:", err);
