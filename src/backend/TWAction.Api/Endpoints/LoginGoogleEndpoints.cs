@@ -74,7 +74,13 @@ public static class LoginGoogleEndpoints
             }
 
             SetSessionCookie(response, authOptions, result.Value.SessionId);
-            var frontendUrl = authOptions.Value.FrontendUrl!;
+            var frontendUrl = authOptions.Value.FrontendUrl;
+            if (string.IsNullOrWhiteSpace(frontendUrl))
+            {
+                return Results.Problem(
+                    detail: "FrontendUrl is not configured. Please set AuthOptions.FrontendUrl in configuration.",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
             return Results.Redirect(frontendUrl);
         });
 
