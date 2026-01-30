@@ -1,0 +1,142 @@
+### ActionGenerator API Tests
+
+### Variables
+@baseUrl = http://localhost:8001
+@apiKey = dev-key-12345
+
+### ===== HEALTH CHECK =====
+### No authentication required
+GET {{baseUrl}}/health
+Accept: application/json
+
+### ===== GENERATE RECONNAISSANCE ACTIONS =====
+### Requires API Key in X-API-Key header
+POST {{baseUrl}}/actions/reconnaissance
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2025-01-29T06:00:00Z",
+  "minArrivalTime": "2025-01-29T08:00:00Z",
+  "maxArrivalTime": "2025-01-29T22:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 1,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true,
+  "sourceVillages": [
+    "500|500",
+    "501|501",
+    "502|502"
+  ],
+  "targetVillages": [
+    "600|600",
+    "601|601",
+    "602|602"
+  ]
+}
+
+### ===== TEST WITHOUT API KEY (should fail with 401) =====
+POST {{baseUrl}}/actions/reconnaissance
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2025-01-29T06:00:00Z",
+  "minArrivalTime": "2025-01-29T08:00:00Z",
+  "maxArrivalTime": "2025-01-29T22:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 1,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true,
+  "sourceVillages": ["500|500"],
+  "targetVillages": ["600|600"]
+}
+
+### ===== TEST WITH INVALID API KEY (should fail with 401) =====
+POST {{baseUrl}}/actions/reconnaissance
+X-API-Key: invalid-key
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2025-01-29T06:00:00Z",
+  "minArrivalTime": "2025-01-29T08:00:00Z",
+  "maxArrivalTime": "2025-01-29T22:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 1,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true,
+  "sourceVillages": ["500|500"],
+  "targetVillages": ["600|600"]
+}
+
+### ===== TEST VALIDATION - Invalid Time Order =====
+POST {{baseUrl}}/actions/reconnaissance
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2025-01-29T10:00:00Z",
+  "minArrivalTime": "2025-01-29T08:00:00Z",
+  "maxArrivalTime": "2025-01-29T22:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 1,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true,
+  "sourceVillages": ["500|500"],
+  "targetVillages": ["600|600"]
+}
+
+### ===== TEST VALIDATION - No Source Villages =====
+POST {{baseUrl}}/actions/reconnaissance
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2025-01-29T06:00:00Z",
+  "minArrivalTime": "2025-01-29T08:00:00Z",
+  "maxArrivalTime": "2025-01-29T22:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 1,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true,
+  "sourceVillages": [],
+  "targetVillages": ["600|600"]
+}
+
+### ===== INSTRUCTIONS =====
+### 1. Start ActionGenerator API: dotnet run --project src/ActionGenerator/ActionGenerator.Api
+### 2. API will run on http://localhost:8001
+### 3. All endpoints (except /health) require X-API-Key header
+### 4. Valid API keys are configured in appsettings.Development.json
+### 5. Use this API from TWAction backend to generate actions
+
+### API Key Configuration:
+### - Development keys: dev-key-12345, test-key-67890
+### - Production: Configure in appsettings.json
+### - Header name: X-API-Key (configurable)
+
+### Response Format:
+### Success (200 OK):
+### [
+###   {
+###     "sourceVillage": "500|500",
+###     "targetVillage": "600|600",
+###     "spyCount": 1,
+###     "departureTime": "2025-01-29T07:00:00Z",
+###     "arrivalTime": "2025-01-29T09:00:00Z",
+###     "distance": 141
+###   }
+### ]
+
+### Error (400 Bad Request):
+### {
+###   "error": "MinArrivalTime must be after MinDepartureTime."
+### }
+
+### Unauthorized (401):
+### {
+###   "error": "API Key missing"
+### }
+### or
+### {
+###   "error": "Invalid API Key"
+### }

@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\backend\TWAction.Api\TWAction.Api.csproj" />
+    <ProjectReference Include="..\..\src\ActionGenerator\ActionGenerator.Api\ActionGenerator.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.2" />

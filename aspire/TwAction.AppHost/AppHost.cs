@@ -9,6 +9,10 @@ var api = builder.AddProject<Projects.TWAction_Api>("api")
     .WithReference(appDb)
     .WaitFor(appDb);
 
+// ActionGenerator API (.NET project)
+var actionGeneratorApi = builder.AddProject<Projects.ActionGenerator_Api>("action-generator-api")
+    .WithReference(api);
+
 // React frontend (npm)
 // Path is relative to AppHost project folder. Adjust as needed.
 builder.AddNpmApp("web", "../../src/frontend/TWActionFrontend", "dev")
@@ -17,3 +21,4 @@ builder.AddNpmApp("web", "../../src/frontend/TWActionFrontend", "dev")
     .WithReference(api);                 // gives the frontend info about the API
 
 builder.Build().Run();
+

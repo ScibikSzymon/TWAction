@@ -8,6 +8,8 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
 
@@ -102,6 +104,8 @@ app.MapScheduleEndpoints();
 app.MapTroopsStateEndpoints();
 app.MapTribesEndpoints();
 app.MapReconnaissanceSettingsEndpoints();
+
+app.MapDefaultEndpoints();
 
 app.Run();
 
