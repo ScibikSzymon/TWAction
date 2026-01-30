@@ -46,9 +46,11 @@ export const ReconnaissanceSettings = ({
           maxPopulationInSourceVillage: data.maxPopulationInSourceVillage,
           skipNightSendings: data.skipNightSendings,
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
         // Jeśli ustawienia nie istnieją, resetuj do domyślnych
-        if (err?.response?.status === 404) {
+        if (
+          (err as { response?: { status?: number } })?.response?.status === 404
+        ) {
           const defaults = getDefaultReconnaissanceSettings();
           setSettings({
             minDepartureTime: defaults.minDepartureTime.toISOString(),
@@ -133,7 +135,9 @@ export const ReconnaissanceSettings = ({
             departureTime >= maxArrivalTime ||
             maxArrivalTime <= newMinArrival.getTime()
           ) {
-            const newMaxArrival = new Date(departureTime + 2 * 24 * 60 * 60 * 1000);
+            const newMaxArrival = new Date(
+              departureTime + 2 * 24 * 60 * 60 * 1000,
+            );
             newSettings.maxArrivalTime = newMaxArrival.toISOString();
           }
         }
