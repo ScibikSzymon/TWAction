@@ -1,0 +1,95 @@
+### Users & Auth API Tests
+
+### Variables
+@baseUrl = http://localhost:8000
+@sessionCookie = YOUR_SESSION_COOKIE_VALUE_HERE
+
+### ===== USERS ENDPOINTS =====
+
+### GET all users
+### Returns list of all users in the system
+GET {{baseUrl}}/users
+Accept: application/json
+
+### ===== AUTH ENDPOINTS =====
+
+### GET current user (me)
+### Requires valid session cookie
+### Returns 401 if not authenticated
+GET {{baseUrl}}/auth/me
+Cookie: TWAction.Session={{sessionCookie}}
+Accept: application/json
+
+### GET current user (not authenticated)
+### Should return 401 Unauthorized
+GET {{baseUrl}}/auth/me
+Accept: application/json
+
+### POST logout
+### Deletes current session and clears cookie
+### Returns 204 No Content on success
+POST {{baseUrl}}/auth/logout
+Cookie: TWAction.Session={{sessionCookie}}
+
+### POST logout (not authenticated)
+### Should still return 204 No Content
+POST {{baseUrl}}/auth/logout
+
+### ===== GOOGLE LOGIN FLOW =====
+### Note: Google login flow requires browser interaction
+### 1. Navigate to http://localhost:8000/login/google in browser
+### 2. Complete Google OAuth flow
+### 3. Browser will receive session cookie automatically
+### 4. Copy cookie value from browser DevTools
+### 5. Replace {{sessionCookie}} above with actual value
+
+### To get session cookie from browser:
+### 1. Open DevTools (F12)
+### 2. Go to Application/Storage tab
+### 3. Click Cookies ? http://localhost:8000
+### 4. Copy value of "TWAction.Session" cookie
+### 5. Paste into {{sessionCookie}} variable above
+
+### ===== RESPONSE FORMATS =====
+
+### GET /users response:
+### [
+###   {
+###     "id": "550e8400-e29b-41d4-a716-446655440000",
+###     "email": "user@example.com",
+###     "name": "John Doe",
+###     "pictureUrl": "https://..."
+###   }
+### ]
+
+### GET /auth/me response (authenticated):
+### {
+###   "id": "550e8400-e29b-41d4-a716-446655440000",
+###   "email": "user@example.com",
+###   "name": "John Doe",
+###   "pictureUrl": "https://..."
+### }
+
+### GET /auth/me response (not authenticated):
+### Status: 401 Unauthorized
+### (no body)
+
+### POST /auth/logout response:
+### Status: 204 No Content
+### (no body)
+
+### ===== TESTING WORKFLOW =====
+### 1. First login via browser: http://localhost:8000/login/google
+### 2. Copy session cookie from browser DevTools
+### 3. Test GET /auth/me with valid cookie
+### 4. Test GET /users to see all users
+### 5. Use userId from response in schedules.http
+### 6. Test POST /auth/logout to end session
+### 7. Test GET /auth/me again (should return 401)
+
+### ===== NOTES =====
+### - Session cookies are httpOnly and secure in production
+### - Sessions expire based on Google OAuth token expiration
+### - Logout clears session from database and cookie
+### - /users endpoint doesn't require authentication (for now)
+### - Session cookie name: "TWAction.Session" (configurable in appsettings.json)

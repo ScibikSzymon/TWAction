@@ -16,6 +16,10 @@ using TWAction.Application.Users.Commands;
 using TWAction.Application.Schedules.Services;
 using TWAction.Application.Tribes.Interfaces;
 using TWAction.Application.Tribes.Queries;
+using TWAction.Application.Settings.Interfaces;
+using TWAction.Application.Settings.Queries;
+using TWAction.Application.Settings.Commands;
+
 
 namespace TWAction.Infrastructure;
 
@@ -47,6 +51,8 @@ public static class DependencyInjection
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ITroopsStateRepository, TroopsStateRepository>();
+        services.AddScoped<IReconnaissanceSettingsRepository, ReconnaissanceSettingsRepository>();
+
 
         services.AddSingleton<TroopsStateValidator>();
         services.AddSingleton<TroopsStateCompressionService>();
@@ -66,9 +72,10 @@ public static class DependencyInjection
         services.AddTransient<UploadTroopsStateHandler>();
         services.AddTransient<GetTroopsStateHandler>();
         services.AddTransient<GetTribesHandler>();
+        services.AddTransient<GetReconnaissanceSettingsHandler>();
+        services.AddTransient<SaveReconnaissanceSettingsHandler>();
 
         return services;
-
-
     }
 }
+

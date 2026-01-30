@@ -101,8 +101,10 @@ app.MapAuthEndpoints();
 app.MapScheduleEndpoints();
 app.MapTroopsStateEndpoints();
 app.MapTribesEndpoints();
+app.MapReconnaissanceSettingsEndpoints();
 
 app.Run();
+
 
 // Expose a `Program` type for integration testing with `WebApplicationFactory<TEntryPoint>`.
 // This keeps the top-level statements while providing a concrete type the test
