@@ -59,6 +59,13 @@ public static class ReconnaissanceSettingsEndpoints
 
         if (result.IsFailure)
         {
+            var errorMessage = result.Error ?? string.Empty;
+
+            // Return 404 for not-found schedule errors to be consistent with other endpoints.
+            if (errorMessage.Contains("not found", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return Results.NotFound(new { error = result.Error });
+            }
             return Results.BadRequest(new { error = result.Error });
         }
 
