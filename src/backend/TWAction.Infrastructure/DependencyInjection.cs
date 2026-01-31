@@ -1,8 +1,10 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Wolverine;
 using TWAction.Application.Interfaces;
+using TWAction.Infrastructure.Middleware;
 using TWAction.Persistence;
 using TWAction.Persistence.Repositories;
 using TWAction.Infrastructure.Services;
@@ -16,6 +18,7 @@ using TWAction.Application.Users.Commands;
 using TWAction.Application.Schedules.Services;
 using TWAction.Application.Tribes.Interfaces;
 using TWAction.Application.Tribes.Queries;
+using TWAction.Application.Schedules.Validators;
 
 namespace TWAction.Infrastructure;
 
@@ -37,7 +40,13 @@ public static class DependencyInjection
         {
             opts.Durability.Mode = DurabilityMode.MediatorOnly;
             opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
+            
+            // Register validation middleware to run before all handlers
+            opts.Policies.AddMiddleware(typeof(ValidationMiddleware));
         });
+
+        // Register FluentValidation validators from Application assembly
+        services.AddValidatorsFromAssemblyContaining<CreateScheduleCommandValidator>();
 
         // Register HttpClient factory and IMemoryCache for TribalWars API calls
         services.AddHttpClient<TribesHttpService>();

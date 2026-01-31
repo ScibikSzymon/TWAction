@@ -4,7 +4,6 @@ using TWAction.Infrastructure;
 using TWAction.Persistence;
 using TWAction.Api.Options;
 using TWAction.Api.Endpoints;
-using TWAction.Api.Validators;
 using FluentValidation;
 using System.Text.Json.Serialization;
 
@@ -30,8 +29,6 @@ builder.Services.AddOptions<CorsOptions>()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddValidatorsFromAssemblyContaining<CreateScheduleRequestValidator>();
 
 // Configure JSON serialization to use string values for enums
 builder.Services.ConfigureHttpJsonOptions(options =>

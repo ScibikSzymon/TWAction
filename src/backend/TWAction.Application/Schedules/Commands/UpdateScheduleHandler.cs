@@ -30,11 +30,6 @@ public class UpdateScheduleHandler(
             return Result.Failure<ScheduleDto>($"Schedule with ID '{command.ScheduleId}' not found.");
         }
 
-        if (string.IsNullOrWhiteSpace(command.Name))
-        {
-            return Result.Failure<ScheduleDto>("Schedule name cannot be empty.");
-        }
-
         schedule.Name = command.Name;
 
         // Clear enemies if world changed
