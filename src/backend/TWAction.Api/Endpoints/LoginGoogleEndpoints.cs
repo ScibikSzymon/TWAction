@@ -14,6 +14,7 @@ using TWAction.Application.Handlers;
 using Wolverine;
 using TWAction.Application.Common;
 using TWAction.Application.Users.DTOs;
+using TWAction.Infrastructure.Auth;
 
 public static class LoginGoogleEndpoints
 {

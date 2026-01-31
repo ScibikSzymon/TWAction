@@ -1,12 +1,12 @@
 using Wolverine;
 using Microsoft.Extensions.Options;
-using TWAction.Api.Options;
 using TWAction.Application.Handlers;
 using TWAction.Application.Common;
 using Microsoft.AspNetCore.Mvc;
 using TWAction.Application.Users.DTOs;
 using TWAction.Application.Users.Queries;
 using TWAction.Application.Users.Commands;
+using TWAction.Infrastructure.Auth;
 
 namespace TWAction.Api.Endpoints;
 

@@ -7,6 +7,7 @@ using TWAction.Api.Endpoints;
 using TWAction.Api.Validators;
 using FluentValidation;
 using System.Text.Json.Serialization;
+using TWAction.Infrastructure.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
