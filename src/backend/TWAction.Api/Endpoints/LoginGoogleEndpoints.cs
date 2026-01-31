@@ -46,9 +46,9 @@ public static class LoginGoogleEndpoints
         var code = codeVals.ToString();
 
         var opts = googleOptions.Value;
-        var clientId = opts?.ClientId ?? string.Empty;
-        var clientSecret = opts?.ClientSecret ?? string.Empty;
-        var redirectUri = opts?.RedirectUri;
+        var clientId = opts.ClientId;
+        var clientSecret = opts.ClientSecret;
+        var redirectUri = opts.RedirectUri;
 
         var idToken = await ExchangeCodeForIdTokenAsync(code, clientId, clientSecret, redirectUri);
         if (string.IsNullOrEmpty(idToken))
@@ -85,8 +85,8 @@ public static class LoginGoogleEndpoints
     private static async Task<IResult> GetGoogleRedirectUrl(IOptions<GoogleOptions> googleOptions)
     {
         var opts = googleOptions.Value;
-        var clientId = opts?.ClientId;
-        var redirectUri = opts?.RedirectUri;
+        var clientId = opts.ClientId;
+        var redirectUri = opts.RedirectUri;
         var scope = "openid email profile";
         var state = Guid.NewGuid().ToString("N");
 

@@ -17,27 +17,20 @@ public class UploadTroopsStateHandler(
 {
     public async Task<Result<TroopsStateDto>> Handle(UploadTroopsStateCommand command, CancellationToken cancellationToken = default)
     {
-        // Verify schedule exists
         var schedule = await scheduleRepository.GetByIdAsync(command.ScheduleId, cancellationToken);
         if (schedule is null)
         {
             return Result.Failure<TroopsStateDto>($"Schedule with ID '{command.ScheduleId}' not found.");
         }
 
-        // Validate and parse troops data
         var parseResult = validator.ValidateAndParse(command.RawData);
         if (parseResult.IsFailure)
         {
             return Result.Failure<TroopsStateDto>(parseResult.Error);
         }
 
-        // Extract stats
         var stats = statsExtractor.Extract(parseResult.Value);
-
-        // Compress data
         var compressedData = compressionService.Compress(command.RawData);
-
-        // Check if troops state already exists for this schedule
         var existingTroopsState = await troopsStateRepository.GetByScheduleIdAsync(command.ScheduleId, cancellationToken);
 
         TroopsStateEntity troopsState;
