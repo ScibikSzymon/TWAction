@@ -8,10 +8,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddSingleton<IDistanceCalculator, DistanceCalculator>();
+        // Technical services (pure calculations, no business logic)
         services.AddSingleton<INightTimeChecker, NightTimeChecker>();
         services.AddSingleton<IFrontDistanceCalculator, FrontDistanceCalculator>();
+        services.AddSingleton<ICommandGenerator, CommandGenerator>();
+        services.AddSingleton<IPopulationCalculator, PopulationCalculator>();
 
         return services;
     }
 }
+

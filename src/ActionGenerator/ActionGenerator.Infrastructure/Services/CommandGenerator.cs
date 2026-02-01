@@ -1,14 +1,10 @@
-﻿using ActionGenerator.Domain.Configuration;
+﻿using ActionGenerator.Application.Common.Interfaces;
+using ActionGenerator.Domain.Configuration;
 using ActionGenerator.Domain.Entities;
 
-namespace ActionGenerator.Application.Common.Services;
+namespace ActionGenerator.Infrastructure.Services;
 
-public interface ICommandGenerator
-{
-    AttackCommand Generate(Village source, Target target);
-}
-
-public class CommandGenerator : ICommandGenerator
+public sealed class CommandGenerator : ICommandGenerator
 {
     public AttackCommand Generate(Village source, Target target)
     {
@@ -20,7 +16,7 @@ public class CommandGenerator : ICommandGenerator
         var minTime = target.MinArrivalTime.Subtract(travelTimeSpan);
         var maxTime = target.MaxArrivalTime.Subtract(travelTimeSpan);
 
-        return new AttackCommand()
+        return new AttackCommand
         {
             Source = source,
             Target = target,
@@ -29,3 +25,4 @@ public class CommandGenerator : ICommandGenerator
         };
     }
 }
+

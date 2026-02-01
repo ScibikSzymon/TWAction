@@ -3,10 +3,8 @@ using ActionGenerator.Domain.Entities;
 
 namespace ActionGenerator.Infrastructure.Services;
 
-public sealed class FrontDistanceCalculator(IDistanceCalculator distanceCalculator) : IFrontDistanceCalculator
+public sealed class FrontDistanceCalculator : IFrontDistanceCalculator
 {
-    private readonly IDistanceCalculator _distanceCalculator = distanceCalculator;
-
     public void CalculateFrontDistances(
         IReadOnlyList<Village> allyVillages,
         IReadOnlyList<Village> enemyVillages)
@@ -19,12 +17,7 @@ public sealed class FrontDistanceCalculator(IDistanceCalculator distanceCalculat
 
         Parallel.ForEach(enemyVillages, enemyVillage =>
         {
-            var minDistance = allyVillages.Min(allyVillage =>
-                _distanceCalculator.CalculateDistance(
-                    enemyVillage.Coordinates.X,
-                    enemyVillage.Coordinates.Y,
-                    allyVillage.Coordinates.X,
-                    allyVillage.Coordinates.Y));
+            var minDistance = allyVillages.Min(allyVillage => allyVillage.Coordinates.CalculateDistance(enemyVillage.Coordinates));
 
             enemyVillage.DistanceToFront = (int)Math.Round(minDistance);
         });
@@ -32,11 +25,7 @@ public sealed class FrontDistanceCalculator(IDistanceCalculator distanceCalculat
         Parallel.ForEach(allyVillages, allyVillage =>
         {
             var minDistance = enemyVillages.Min(enemyVillage =>
-                _distanceCalculator.CalculateDistance(
-                    allyVillage.Coordinates.X,
-                    allyVillage.Coordinates.Y,
-                    enemyVillage.Coordinates.X,
-                    enemyVillage.Coordinates.Y));
+                enemyVillage.Coordinates.CalculateDistance(allyVillage.Coordinates));
 
             allyVillage.DistanceToFront = (int)Math.Round(minDistance);
         });

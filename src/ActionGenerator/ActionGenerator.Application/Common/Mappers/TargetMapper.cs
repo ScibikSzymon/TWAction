@@ -10,8 +10,7 @@ public static class TargetMapper
     public static Target ToEntity(
         VillageSmallDto dto, 
         DateTimeOffset minArrivalTime, 
-        DateTimeOffset maxArrivalTime,
-        CommandType commandType)
+        DateTimeOffset maxArrivalTime)
     {
         return new Target
         {
@@ -20,16 +19,16 @@ public static class TargetMapper
             Coordinates = new Coordinates { X = dto.X, Y = dto.Y },
             MinArrivalTime = minArrivalTime,
             MaxArrivalTime = maxArrivalTime,
-            CommandType = CommandType.Reconnaissance
+            CommandType = CommandType.Reconnaissance // Always Reconnaissance for now
         };
     }
 
     public static IReadOnlyList<Target> ToEntities(
         IReadOnlyList<VillageSmallDto> dtos, 
         DateTimeOffset minArrivalTime, 
-        DateTimeOffset maxArrivalTime,
-        CommandType commandType)
+        DateTimeOffset maxArrivalTime)
     {
-        return dtos.Select(dto => ToEntity(dto, minArrivalTime, maxArrivalTime, commandType)).ToList();
+        return dtos.Select(dto => ToEntity(dto, minArrivalTime, maxArrivalTime)).ToList();
     }
 }
+

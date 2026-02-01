@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Common\Services\" />
     <Folder Include="Features\ReconnaissanceActions\Mappers\" />
   </ItemGroup>
 

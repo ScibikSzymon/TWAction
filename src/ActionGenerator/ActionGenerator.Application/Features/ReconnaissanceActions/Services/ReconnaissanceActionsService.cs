@@ -1,12 +1,11 @@
 using ActionGenerator.Application.Common.DTOs;
 using ActionGenerator.Application.Common.Interfaces;
 using ActionGenerator.Application.Common.Mappers;
-using ActionGenerator.Application.Common.Services;
 using ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
 using ActionGenerator.Domain.Entities;
-using ActionGenerator.Domain.Enums;
 
 namespace ActionGenerator.Application.Features.ReconnaissanceActions.Services;
+
 
 public interface IReconnaissanceActionsService
 {
@@ -38,17 +37,20 @@ public sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
         GenerateReconnaissanceActionsRequest request, 
         CancellationToken cancellationToken = default)
     {
+        // Map DTOs to domain entities
         var allyVillages = SourceVillageMapper.ToEntities(request.AllyVillages);
         var enemyVillages = TargetMapper.ToEntities(
             request.EnemyVillages, 
             request.MinArrivalTime, 
-            request.MaxArrivalTime,
-            CommandType.Reconnaissance);
+            request.MaxArrivalTime);
 
+        // Calculate front distances
         _frontDistanceCalculator.CalculateFrontDistances(allyVillages, enemyVillages);
 
+        // Filter eligible ally villages
         var eligibleAllyVillages = FilterAllyVillages(
             allyVillages,
+
             request.MinDistanceToFront,
             request.MinSpyCount,
             request.MaxPopulationInSourceVillage);
