@@ -1,7 +1,7 @@
+using ActionGenerator.API.Filters;
 using ActionGenerator.Application.Common.DTOs;
 using ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
 using ActionGenerator.Application.Features.ReconnaissanceActions.Services;
-using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ActionGenerator.API.Endpoints;
@@ -14,20 +14,15 @@ public static class ReconnaissanceActionsEndpoints
 
         group.MapPost("/generate", GenerateReconnaissanceActionsAsync)
             .WithName("GenerateReconnaissanceActions");
+
+        group.AddEndpointFilter<ValidationFilter<GenerateReconnaissanceActionsRequest>>();
     }
 
     private static async Task<Results<Ok<IReadOnlyList<AttackCommandDto>>, ValidationProblem>> GenerateReconnaissanceActionsAsync(
         GenerateReconnaissanceActionsRequest request,
         IReconnaissanceActionsService service,
-        IValidator<GenerateReconnaissanceActionsRequest> validator,
         CancellationToken cancellationToken)
     {
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            return TypedResults.ValidationProblem(validationResult.ToDictionary());
-        }
-
         var commands = await service.GenerateAsync(request, cancellationToken);
         
         return TypedResults.Ok(commands);
