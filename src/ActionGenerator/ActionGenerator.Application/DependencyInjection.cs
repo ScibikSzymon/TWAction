@@ -1,5 +1,7 @@
-using ActionGenerator.Application.Common;
-using ActionGenerator.Application.Reconnaissance;
+using ActionGenerator.Application.Common.Interfaces;
+using ActionGenerator.Application.Common.Services;
+using ActionGenerator.Application.Features.ReconnaissanceActions.Services;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ActionGenerator.Application;
@@ -8,15 +10,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Register vertical slices
-        services.AddCommon();
-        services.AddReconnaissance();
+        services.AddValidatorsFromAssemblyContaining<IReconnaissanceActionsService>();
         
-        // Future vertical slices:
-        // services.AddFake();
-        // services.AddMain();
+        services.AddScoped<IReconnaissanceActionsService, ReconnaissanceActionsService>();
+        services.AddScoped<IPopulationCalculator, PopulationCalculator>();
+        services.AddScoped<ICommandGenerator, CommandGenerator>();
 
         return services;
     }
 }
-

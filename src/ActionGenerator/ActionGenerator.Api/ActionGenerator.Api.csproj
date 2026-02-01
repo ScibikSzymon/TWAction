@@ -4,19 +4,16 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>14.0</LangVersion>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ActionGenerator.Infrastructure\ActionGenerator.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\..\aspire\TwAction.ServiceDefaults\TwAction.ServiceDefaults.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.12.27" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    <ProjectReference Include="..\ActionGenerator.Application\ActionGenerator.Application.csproj" />
+    <ProjectReference Include="..\ActionGenerator.Infrastructure\ActionGenerator.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
-

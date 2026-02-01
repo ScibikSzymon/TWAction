@@ -10,7 +10,7 @@ var api = builder.AddProject<Projects.TWAction_Api>("api")
     .WaitFor(appDb);
 
 // ActionGenerator API (.NET project)
-var actionGeneratorApi = builder.AddProject<Projects.ActionGenerator_Api>("action-generator-api")
+var actionGeneratorApi = builder.AddProject<Projects.ActionGenerator_API>("action-generator-api")
     .WithReference(api);
 
 // React frontend (npm)

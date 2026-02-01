@@ -1,17 +1,17 @@
-using Microsoft.Extensions.Configuration;
+using ActionGenerator.Application.Common.Interfaces;
+using ActionGenerator.Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ActionGenerator.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        // Infrastructure services only
-        // No application handlers here - they belong to Application layer
+        services.AddSingleton<IDistanceCalculator, DistanceCalculator>();
+        services.AddSingleton<INightTimeChecker, NightTimeChecker>();
+        services.AddSingleton<IFrontDistanceCalculator, FrontDistanceCalculator>();
 
         return services;
     }
 }
-
-

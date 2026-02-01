@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+﻿<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\ActionGenerator\ActionGenerator.API\ActionGenerator.API.csproj" />
     <ProjectReference Include="..\..\src\backend\TWAction.Api\TWAction.Api.csproj" />
-    <ProjectReference Include="..\..\src\ActionGenerator\ActionGenerator.Api\ActionGenerator.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
