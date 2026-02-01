@@ -31,7 +31,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwAction.ServiceDefaults", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "actionGenerator", "actionGenerator", "{629928A5-41E9-4ACF-84D7-A4E3ACD8152E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionGenerator.API", "src\ActionGenerator\ActionGenerator.API\ActionGenerator.API.csproj", "{1C8033BF-9809-F48C-3471-77471A73C8A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionGenerator.Api", "src\ActionGenerator\ActionGenerator.API\ActionGenerator.Api.csproj", "{1C8033BF-9809-F48C-3471-77471A73C8A2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionGenerator.Application", "src\ActionGenerator\ActionGenerator.Application\ActionGenerator.Application.csproj", "{D1D0CADD-68A4-EE57-5C2E-026BACEC50A0}"
 EndProject
