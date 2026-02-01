@@ -1,9 +1,8 @@
 using ActionGenerator.Application.Common.DTOs;
 using ActionGenerator.Application.Common.Interfaces;
+using ActionGenerator.Application.Common.Mappers;
 using ActionGenerator.Application.Common.Services;
 using ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
-using ActionGenerator.Domain.Common.ValueObjects;
-using ActionGenerator.Domain.Configuration;
 using ActionGenerator.Domain.Entities;
 using ActionGenerator.Domain.Enums;
 
@@ -39,8 +38,12 @@ public sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
         GenerateReconnaissanceActionsRequest request, 
         CancellationToken cancellationToken = default)
     {
-        var allyVillages = MapToSourceVillages(request.AllyVillages);
-        var enemyVillages = MapToTargets(request.EnemyVillages, request.MinArrivalTime, request.MaxArrivalTime);
+        var allyVillages = SourceVillageMapper.ToEntities(request.AllyVillages);
+        var enemyVillages = TargetMapper.ToEntities(
+            request.EnemyVillages, 
+            request.MinArrivalTime, 
+            request.MaxArrivalTime,
+            CommandType.Reconnaissance);
 
         _frontDistanceCalculator.CalculateFrontDistances(allyVillages, enemyVillages);
 
@@ -60,40 +63,13 @@ public sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
             request,
             cancellationToken);
 
-        var commandDtos = commands.Select(MapToDto).ToList();
+        var commandDtos = AttackCommandMapper.ToDtos(commands);
 
         return await Task.FromResult(commandDtos);
     }
 
-    private static List<SourceVillage> MapToSourceVillages(IReadOnlyList<VillageDto> dtos)
-    {
-        return dtos.Select(dto => new SourceVillage
-        {
-            Id = dto.Id,
-            PlayerId = dto.PlayerId,
-            Coordinates = new Coordinates { X = dto.X, Y = dto.Y },
-            Army = new Army
-            {
-                Spy = dto.Army.Spy,
-                Spear = dto.Army.Spear,
-                //dopisz chacie
-            }
-        }).ToList();
-    }
-    private static List<Target> MapToTargets(IReadOnlyList<VillageSmallDto> dtos, DateTimeOffset minArrivalTime, DateTimeOffset maxArrivalTime)
-    {
-        return dtos.Select(dto => new Target
-        {
-            Id = dto.Id,
-            PlayerId = dto.PlayerId,
-            Coordinates = new Coordinates { X = dto.X, Y = dto.Y },
-            MinArrivalTime = minArrivalTime,
-            MaxArrivalTime = maxArrivalTime,
-            CommandType = CommandType.Reconnaissance
-        }).ToList();
-    }
     private List<SourceVillage> FilterAllyVillages(
-        List<SourceVillage> allyVillages,
+        IReadOnlyList<SourceVillage> allyVillages,
         int minDistanceToFront,
         int minSpyCount,
         int maxPopulation)
@@ -125,9 +101,7 @@ public sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
                 if (usedAllyVillages.Contains(allyVillage.Id))
                     continue;
 
-                var command = _commandGenerator.Generate(
-                    allyVillage,
-                    enemyVillage);
+                var command = _commandGenerator.Generate(allyVillage, enemyVillage);
 
                 if (request.SkipNightSendings && _nightTimeChecker.IsNightTime(command.MinimalDepartureTime))
                     continue;
@@ -143,31 +117,5 @@ public sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
 
         return commands;
     }
-
-    private static AttackCommandDto MapToDto(AttackCommand command)
-    {
-        return new AttackCommandDto
-        {
-            TimeWindow = new TimeWindow()
-            {
-                MinDepartureTime = command.MinimalDepartureTime,
-                MaxDepartureTime = command.MaximalDepartureTime,
-                MinArrivalTime = command.Target.MinArrivalTime,
-                MaxArrivalTime = command.Target.MaxArrivalTime
-            },
-            Source = MapToSmallVillageDto(command.Source),
-            Destination = MapToSmallVillageDto(command.Target),
-        };
-    }
-
-    private static VillageSmallDto MapToSmallVillageDto(Village village)
-    {
-        return new VillageSmallDto
-        {
-            Id = village.Id,
-            PlayerId = village.PlayerId,
-            X = village.Coordinates.X,
-            Y = village.Coordinates.Y
-        };
-    }
 }
+
