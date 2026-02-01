@@ -2,15 +2,15 @@ namespace ActionGenerator.Application.Common.DTOs;
 
 public sealed record ArmyDto
 {
-    public int Spear { get; init; }
-    public int Sword { get; init; }
-    public int Axe { get; init; }
-    public int Archer { get; init; }
-    public int Spy { get; init; }
-    public int Light { get; init; }
-    public int HorseArcher { get; init; }
-    public int Heavy { get; init; }
-    public int Ram { get; init; }
-    public int Catapult { get; init; }
-    public int Noble { get; init; }
+    public  required int Spear { get; init; }
+    public  required int Sword { get; init; }
+    public  required int Axe { get; init; }
+    public  required int Archer { get; init; }
+    public  required int Spy { get; init; }
+    public  required int Light { get; init; }
+    public  required int HorseArcher { get; init; }
+    public  required int Heavy { get; init; }
+    public  required int Ram { get; init; }
+    public  required int Catapult { get; init; }
+    public  required int Noble { get; init; }
 }

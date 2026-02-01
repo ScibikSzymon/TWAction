@@ -10,20 +10,10 @@ public static class ReconnaissanceActionsEndpoints
 {
     public static void MapReconnaissanceActionsEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/reconnaissance-actions")
-            .WithTags("Reconnaissance Actions")
-            .WithDescription("Generate reconnaissance attack commands for Tribal Wars")
-            .WithOpenApi();
+        var group = app.MapGroup("/api/reconnaissance-actions");
 
         group.MapPost("/generate", GenerateReconnaissanceActionsAsync)
-            .WithName("GenerateReconnaissanceActions")
-            .WithSummary("Generate reconnaissance attack commands")
-            .WithDescription(
-                "Generates optimal reconnaissance (spy) attack commands based on ally and enemy village data. " +
-                "The algorithm calculates travel times, respects time windows, and can skip night-time sendings (22:00-08:00).")
-            .Produces<IReadOnlyList<AttackCommandDto>>(StatusCodes.Status200OK)
-            .ProducesValidationProblem(StatusCodes.Status400BadRequest)
-            .WithOpenApi();
+            .WithName("GenerateReconnaissanceActions");
     }
 
     private static async Task<Results<Ok<IReadOnlyList<AttackCommandDto>>, ValidationProblem>> GenerateReconnaissanceActionsAsync(
@@ -32,14 +22,12 @@ public static class ReconnaissanceActionsEndpoints
         IValidator<GenerateReconnaissanceActionsRequest> validator,
         CancellationToken cancellationToken)
     {
-        // Validate request
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
         }
 
-        // Generate reconnaissance commands
         var commands = await service.GenerateAsync(request, cancellationToken);
         
         return TypedResults.Ok(commands);
