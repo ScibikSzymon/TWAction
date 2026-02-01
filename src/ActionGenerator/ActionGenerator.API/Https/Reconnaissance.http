@@ -26,15 +26,12 @@ Content-Type: {{contentType}}
   "minSpyCount": 60,
   "maxPopulationInSourceVillage": 21000,
   "skipNightSendings": true,
-  "northRegionYThreshold": 460,
-  "northRegionDistanceModifier": -3,
   "allyVillages": [
     {
       "id": 1,
       "playerId": 100,
       "x": 500,
       "y": 500,
-      "distanceToFront": 10,
       "army": {
         "spear": 0,
         "sword": 0,
@@ -54,7 +51,6 @@ Content-Type: {{contentType}}
       "playerId": 100,
       "x": 505,
       "y": 505,
-      "distanceToFront": 8,
       "army": {
         "spear": 0,
         "sword": 0,
@@ -74,7 +70,6 @@ Content-Type: {{contentType}}
       "playerId": 101,
       "x": 502,
       "y": 498,
-      "distanceToFront": 12,
       "army": {
         "spear": 0,
         "sword": 0,
@@ -95,61 +90,19 @@ Content-Type: {{contentType}}
       "id": 1001,
       "playerId": 200,
       "x": 510,
-      "y": 510,
-      "distanceToFront": 0,
-      "army": {
-        "spear": 1000,
-        "sword": 500,
-        "axe": 200,
-        "archer": 0,
-        "spy": 0,
-        "light": 0,
-        "horseArcher": 0,
-        "heavy": 0,
-        "ram": 0,
-        "catapult": 0,
-        "noble": 0
-      }
+      "y": 510
     },
     {
       "id": 1002,
       "playerId": 200,
       "x": 515,
-      "y": 515,
-      "distanceToFront": 0,
-      "army": {
-        "spear": 800,
-        "sword": 600,
-        "axe": 100,
-        "archer": 0,
-        "spy": 0,
-        "light": 0,
-        "horseArcher": 0,
-        "heavy": 0,
-        "ram": 0,
-        "catapult": 0,
-        "noble": 0
-      }
+      "y": 515
     },
     {
       "id": 1003,
       "playerId": 201,
       "x": 508,
-      "y": 512,
-      "distanceToFront": 0,
-      "army": {
-        "spear": 500,
-        "sword": 300,
-        "axe": 0,
-        "archer": 0,
-        "spy": 0,
-        "light": 0,
-        "horseArcher": 0,
-        "heavy": 0,
-        "ram": 0,
-        "catapult": 0,
-        "noble": 0
-      }
+      "y": 512
     }
   ]
 }
@@ -187,12 +140,7 @@ Content-Type: {{contentType}}
       "id": 1001,
       "playerId": 200,
       "x": 510,
-      "y": 510,
-      "army": {
-        "spear": 0, "sword": 0, "axe": 0, "archer": 0,
-        "spy": 0, "light": 0, "horseArcher": 0, "heavy": 0,
-        "ram": 0, "catapult": 0, "noble": 0
-      }
+      "y": 510
     }
   ]
 }
@@ -230,12 +178,7 @@ Content-Type: {{contentType}}
       "id": 1001,
       "playerId": 200,
       "x": 510,
-      "y": 510,
-      "army": {
-        "spear": 0, "sword": 0, "axe": 0, "archer": 0,
-        "spy": 0, "light": 0, "horseArcher": 0, "heavy": 0,
-        "ram": 0, "catapult": 0, "noble": 0
-      }
+      "y": 510
     }
   ]
 }
@@ -311,14 +254,10 @@ Content-Type: {{contentType}}
       "id": 1001,
       "playerId": 200,
       "x": 510,
-      "y": 510,
-      "army": {
-        "spear": 0, "sword": 0, "axe": 0, "archer": 0,
-        "spy": 0, "light": 0, "horseArcher": 0, "heavy": 0,
-        "ram": 0, "catapult": 0, "noble": 0
-      }
+      "y": 510
     }
   ]
 }
 
 ###
+
