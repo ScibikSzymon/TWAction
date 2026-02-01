@@ -1,6 +1,9 @@
-using ActionGenerator.Application.Common.Interfaces;
+namespace ActionGenerator.Application.Common.Services;
 
-namespace ActionGenerator.Infrastructure.Services;
+public interface INightTimeChecker
+{
+    bool IsNightTime(DateTimeOffset time);
+}
 
 public sealed class NightTimeChecker : INightTimeChecker
 {

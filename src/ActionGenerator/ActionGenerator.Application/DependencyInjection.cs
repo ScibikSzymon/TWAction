@@ -1,3 +1,4 @@
+using ActionGenerator.Application.Common.Services;
 using ActionGenerator.Application.Features.ReconnaissanceActions.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,10 @@ public static class DependencyInjection
         
         // Application services (use cases / orchestration)
         services.AddScoped<IReconnaissanceActionsService, ReconnaissanceActionsService>();
+
+        services.AddScoped<INightTimeChecker, NightTimeChecker>();
+        services.AddScoped<IFrontDistanceCalculator, FrontDistanceCalculator>();
+        services.AddScoped<ICommandGenerator, CommandGenerator>();
 
         return services;
     }

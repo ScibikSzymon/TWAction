@@ -1,4 +1,4 @@
-using ActionGenerator.Domain.Common.ValueObjects;
+using ActionGenerator.Domain.Entities;
 
 namespace ActionGenerator.Application.Common.DTOs;
 

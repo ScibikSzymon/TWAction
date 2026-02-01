@@ -1,9 +1,8 @@
-using ActionGenerator.Application.Common.Interfaces;
 using ActionGenerator.Domain.Entities;
 
 namespace ActionGenerator.Infrastructure.Services;
 
-public sealed class PopulationCalculator : IPopulationCalculator
+public static class PopulationCalculator
 {
     private const int SpearPopulation = 1;
     private const int SwordPopulation = 1;
@@ -17,7 +16,7 @@ public sealed class PopulationCalculator : IPopulationCalculator
     private const int CatapultPopulation = 8;
     private const int NoblePopulation = 100;
 
-    public int CalculatePopulation(Army army)
+    public static int CalculatePopulation(Army army)
     {
         return army.Spear * SpearPopulation
             + army.Sword * SwordPopulation

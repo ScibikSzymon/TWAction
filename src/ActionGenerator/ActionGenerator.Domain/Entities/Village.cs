@@ -1,5 +1,3 @@
-using ActionGenerator.Domain.Common.ValueObjects;
-
 namespace ActionGenerator.Domain.Entities;
 
 public class Village

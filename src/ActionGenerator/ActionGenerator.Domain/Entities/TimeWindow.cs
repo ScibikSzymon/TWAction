@@ -1,4 +1,4 @@
-namespace ActionGenerator.Domain.Common.ValueObjects;
+namespace ActionGenerator.Domain.Entities;
 
 public sealed record TimeWindow
 {
@@ -6,11 +6,4 @@ public sealed record TimeWindow
     public DateTimeOffset MaxDepartureTime { get; init; }
     public DateTimeOffset MinArrivalTime { get; init; }
     public DateTimeOffset MaxArrivalTime { get; init; }
-
-    public bool IsValid()
-    {
-        return MinDepartureTime <= MaxDepartureTime 
-            && MinArrivalTime <= MaxArrivalTime
-            && MinDepartureTime < MinArrivalTime;
-    }
 }

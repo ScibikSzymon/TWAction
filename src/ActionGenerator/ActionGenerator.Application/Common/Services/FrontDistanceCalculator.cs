@@ -1,7 +1,13 @@
-using ActionGenerator.Application.Common.Interfaces;
 using ActionGenerator.Domain.Entities;
 
-namespace ActionGenerator.Infrastructure.Services;
+namespace ActionGenerator.Application.Common.Services;
+
+public interface IFrontDistanceCalculator
+{
+    void CalculateFrontDistances(
+        IReadOnlyList<Village> allyVillages,
+        IReadOnlyList<Village> enemyVillages);
+}
 
 public sealed class FrontDistanceCalculator : IFrontDistanceCalculator
 {

@@ -1,8 +1,12 @@
-﻿using ActionGenerator.Application.Common.Interfaces;
-using ActionGenerator.Domain.Configuration;
+﻿using ActionGenerator.Domain.Configuration;
 using ActionGenerator.Domain.Entities;
 
-namespace ActionGenerator.Infrastructure.Services;
+namespace ActionGenerator.Application.Common.Services;
+
+public interface ICommandGenerator
+{
+    AttackCommand Generate(Village source, Target target);
+}
 
 public sealed class CommandGenerator : ICommandGenerator
 {

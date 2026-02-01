@@ -1,4 +1,4 @@
-namespace ActionGenerator.Domain.Common.ValueObjects;
+namespace ActionGenerator.Domain.Entities;
 
 public sealed record Coordinates
 {

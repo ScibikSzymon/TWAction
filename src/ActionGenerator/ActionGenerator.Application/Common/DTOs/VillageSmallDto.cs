@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ActionGenerator.Application.Common.DTOs;
+﻿namespace ActionGenerator.Application.Common.DTOs;
 
 public sealed class VillageSmallDto
 {
