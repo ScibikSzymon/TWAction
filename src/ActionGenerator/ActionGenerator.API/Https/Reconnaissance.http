@@ -2,21 +2,13 @@
 @port = 7255
 @baseUrl = https://{{hostname}}:{{port}}
 @contentType = application/json
-
-### Open Scalar API Documentation (Open in browser)
-# @name openScalar
-GET {{baseUrl}}/scalar/v1
-
-### Get OpenAPI Schema
-# @name getOpenApiSchema
-GET {{baseUrl}}/openapi/v1.json
-
-###
+@apiKey = RmgcH1KVJNyU9WxArXlfdx03tXFBz0MW
 
 ### Generate Reconnaissance Actions - Full Example
 # @name generateReconnaissanceFull
 POST {{baseUrl}}/api/reconnaissance-actions/generate
 Content-Type: {{contentType}}
+X-API-KEY: {{apiKey}}
 
 {
   "minDepartureTime": "2026-02-02T10:00:00Z",
@@ -113,6 +105,7 @@ Content-Type: {{contentType}}
 # @name generateReconnaissanceMinimal
 POST {{baseUrl}}/api/reconnaissance-actions/generate
 Content-Type: {{contentType}}
+X-API-KEY: {{apiKey}}
 
 {
   "minDepartureTime": "2026-02-02T10:00:00Z",
@@ -151,6 +144,7 @@ Content-Type: {{contentType}}
 # @name generateReconnaissanceNoNight
 POST {{baseUrl}}/api/reconnaissance-actions/generate
 Content-Type: {{contentType}}
+X-API-KEY: {{apiKey}}
 
 {
   "minDepartureTime": "2026-02-02T21:00:00Z",
@@ -189,6 +183,7 @@ Content-Type: {{contentType}}
 # @name validationErrorTimeWindow
 POST {{baseUrl}}/api/reconnaissance-actions/generate
 Content-Type: {{contentType}}
+X-API-KEY: {{apiKey}}
 
 {
   "minDepartureTime": "2026-02-02T16:00:00Z",
@@ -208,6 +203,7 @@ Content-Type: {{contentType}}
 # @name validationErrorEmptyLists
 POST {{baseUrl}}/api/reconnaissance-actions/generate
 Content-Type: {{contentType}}
+X-API-KEY: {{apiKey}}
 
 {
   "minDepartureTime": "2026-02-02T10:00:00Z",
@@ -227,6 +223,7 @@ Content-Type: {{contentType}}
 # @name validationErrorNegativeValues
 POST {{baseUrl}}/api/reconnaissance-actions/generate
 Content-Type: {{contentType}}
+X-API-KEY: {{apiKey}}
 
 {
   "minDepartureTime": "2026-02-02T10:00:00Z",
