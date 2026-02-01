@@ -15,10 +15,10 @@ internal sealed class FrontDistanceCalculator : IFrontDistanceCalculator
         IReadOnlyList<Village> allyVillages,
         IReadOnlyList<Village> enemyVillages)
     {
-        if (!enemyVillages.Any())
+        if (enemyVillages.Count == 0)
             return;
 
-        if (!allyVillages.Any())
+        if (allyVillages.Count == 0)
             return;
 
         Parallel.ForEach(enemyVillages, enemyVillage =>
