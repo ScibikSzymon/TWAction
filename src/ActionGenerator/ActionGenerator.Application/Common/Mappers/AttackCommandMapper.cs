@@ -9,7 +9,7 @@ internal static class AttackCommandMapper
     {
         return new AttackCommandDto
         {
-            TimeWindow = new TimeWindow
+            TimeWindow = new TimeWindowDto
             {
                 MinDepartureTime = command.MinimalDepartureTime,
                 MaxDepartureTime = command.MaximalDepartureTime,

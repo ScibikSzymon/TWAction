@@ -1,6 +1,6 @@
 namespace ActionGenerator.Domain.Entities;
 
-public sealed record TimeWindow
+public sealed record TimeWindowDto
 {
     public DateTimeOffset MinDepartureTime { get; init; }
     public DateTimeOffset MaxDepartureTime { get; init; }
