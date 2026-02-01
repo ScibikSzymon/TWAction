@@ -12,18 +12,18 @@ public static class ReconnaissanceActionsEndpoints
     {
         var group = app.MapGroup("/api/reconnaissance-actions");
 
-        group.MapPost("/generate", GenerateReconnaissanceActionsAsync)
+        group.MapPost("/generate", GenerateReconnaissanceActions)
             .WithName("GenerateReconnaissanceActions");
 
         group.AddEndpointFilter<ValidationFilter<GenerateReconnaissanceActionsRequest>>();
     }
 
-    private static async Task<Results<Ok<IReadOnlyList<AttackCommandDto>>, ValidationProblem>> GenerateReconnaissanceActionsAsync(
+    private static Results<Ok<IReadOnlyList<AttackCommandDto>>, ValidationProblem> GenerateReconnaissanceActions(
         GenerateReconnaissanceActionsRequest request,
         IReconnaissanceActionsService service,
         CancellationToken cancellationToken)
     {
-        var commands = await service.GenerateAsync(request, cancellationToken);
+        var commands = service.Generate(request, cancellationToken);
         
         return TypedResults.Ok(commands);
     }

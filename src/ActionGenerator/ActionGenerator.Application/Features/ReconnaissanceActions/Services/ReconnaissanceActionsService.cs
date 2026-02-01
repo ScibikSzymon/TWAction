@@ -10,7 +10,7 @@ namespace ActionGenerator.Application.Features.ReconnaissanceActions.Services;
 
 public interface IReconnaissanceActionsService
 {
-    Task<IReadOnlyList<AttackCommandDto>> GenerateAsync(
+    IReadOnlyList<AttackCommandDto> Generate(
         GenerateReconnaissanceActionsRequest request, 
         CancellationToken cancellationToken = default);
 }
@@ -30,7 +30,7 @@ internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsServi
         _commandGenerator = commandGenerator;
     }
 
-    public async Task<IReadOnlyList<AttackCommandDto>> GenerateAsync(
+    public IReadOnlyList<AttackCommandDto> Generate(
         GenerateReconnaissanceActionsRequest request, 
         CancellationToken cancellationToken = default)
     {
@@ -62,7 +62,7 @@ internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsServi
 
         var commandDtos = AttackCommandMapper.ToDtos(commands);
 
-        return await Task.FromResult(commandDtos);
+        return commandDtos;
     }
 
     private List<SourceVillage> FilterAllyVillages(
