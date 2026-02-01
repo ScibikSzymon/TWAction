@@ -1,7 +1,5 @@
-﻿using ActionGenerator.Domain.Common.ValueObjects;
-using ActionGenerator.Domain.Configuration;
+﻿using ActionGenerator.Domain.Configuration;
 using ActionGenerator.Domain.Entities;
-using ActionGenerator.Domain.Enums;
 
 namespace ActionGenerator.Application.Common.Services;
 
@@ -25,15 +23,9 @@ public class CommandGenerator : ICommandGenerator
         return new AttackCommand()
         {
             Source = source,
-            Destination = target,
-            CommandType = target.CommandType,
-            TimeWindow = new TimeWindow()
-            {
-                MinDepartureTime = minTime,
-                MaxDepartureTime = maxTime,
-                MinArrivalTime = target.MinArrivalTime,
-                MaxArrivalTime = target.MaxArrivalTime
-            }
+            Target = target,
+            MinimalDepartureTime = minTime,
+            MaximalDepartureTime = maxTime
         };
     }
 }

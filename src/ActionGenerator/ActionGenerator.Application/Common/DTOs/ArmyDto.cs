@@ -1,4 +1,4 @@
-namespace ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
+namespace ActionGenerator.Application.Common.DTOs;
 
 public sealed record ArmyDto
 {

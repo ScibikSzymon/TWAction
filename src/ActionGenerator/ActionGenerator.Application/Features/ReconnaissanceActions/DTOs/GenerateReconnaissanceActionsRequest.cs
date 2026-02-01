@@ -1,3 +1,5 @@
+using ActionGenerator.Application.Common.DTOs;
+
 namespace ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
 
 public sealed record GenerateReconnaissanceActionsRequest

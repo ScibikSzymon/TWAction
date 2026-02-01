@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
+namespace ActionGenerator.Application.Common.DTOs;
 
 public sealed class VillageSmallDto
 {

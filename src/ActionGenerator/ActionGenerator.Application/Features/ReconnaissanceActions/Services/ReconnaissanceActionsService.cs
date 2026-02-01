@@ -1,3 +1,4 @@
+using ActionGenerator.Application.Common.DTOs;
 using ActionGenerator.Application.Common.Interfaces;
 using ActionGenerator.Application.Common.Services;
 using ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
@@ -10,34 +11,31 @@ namespace ActionGenerator.Application.Features.ReconnaissanceActions.Services;
 
 public interface IReconnaissanceActionsService
 {
-    Task<GenerateReconnaissanceActionsResponse> GenerateAsync(
+    Task<IReadOnlyList<AttackCommandDto>> GenerateAsync(
         GenerateReconnaissanceActionsRequest request, 
         CancellationToken cancellationToken = default);
 }
 
 public sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
 {
-    private readonly IDistanceCalculator _distanceCalculator;
     private readonly INightTimeChecker _nightTimeChecker;
     private readonly IFrontDistanceCalculator _frontDistanceCalculator;
     private readonly ICommandGenerator _commandGenerator;
     private readonly IPopulationCalculator _populationCalculator;
 
     public ReconnaissanceActionsService(
-        IDistanceCalculator distanceCalculator,
         INightTimeChecker nightTimeChecker,
         IFrontDistanceCalculator frontDistanceCalculator,
         IPopulationCalculator populationCalculator,
         ICommandGenerator commandGenerator)
     {
-        _distanceCalculator = distanceCalculator;
         _nightTimeChecker = nightTimeChecker;
         _frontDistanceCalculator = frontDistanceCalculator;
         _populationCalculator = populationCalculator;
         _commandGenerator = commandGenerator;
     }
 
-    public Task<GenerateReconnaissanceActionsResponse> GenerateAsync(
+    public async Task<IReadOnlyList<AttackCommandDto>> GenerateAsync(
         GenerateReconnaissanceActionsRequest request, 
         CancellationToken cancellationToken = default)
     {
@@ -64,10 +62,7 @@ public sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
 
         var commandDtos = commands.Select(MapToDto).ToList();
 
-        return Task.FromResult(new GenerateReconnaissanceActionsResponse
-        {
-            Commands = commandDtos
-        });
+        return await Task.FromResult(commandDtos);
     }
 
     private static List<SourceVillage> MapToSourceVillages(IReadOnlyList<VillageDto> dtos)
@@ -134,10 +129,10 @@ public sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
                     allyVillage,
                     enemyVillage);
 
-                if (request.SkipNightSendings && _nightTimeChecker.IsNightTime(command.TimeWindow.MinDepartureTime))
+                if (request.SkipNightSendings && _nightTimeChecker.IsNightTime(command.MinimalDepartureTime))
                     continue;
 
-                if (command.TimeWindow.MinDepartureTime < request.MinDepartureTime)
+                if (command.MinimalDepartureTime < request.MinDepartureTime)
                     continue;
 
                 commands.Add(command);
@@ -153,9 +148,15 @@ public sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
     {
         return new AttackCommandDto
         {
-            TimeWindow = command.TimeWindow,
+            TimeWindow = new TimeWindow()
+            {
+                MinDepartureTime = command.MinimalDepartureTime,
+                MaxDepartureTime = command.MaximalDepartureTime,
+                MinArrivalTime = command.Target.MinArrivalTime,
+                MaxArrivalTime = command.Target.MaxArrivalTime
+            },
             Source = MapToSmallVillageDto(command.Source),
-            Destination = MapToSmallVillageDto(command.Destination),
+            Destination = MapToSmallVillageDto(command.Target),
         };
     }
 
