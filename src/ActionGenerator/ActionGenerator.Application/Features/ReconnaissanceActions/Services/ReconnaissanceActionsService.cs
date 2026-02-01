@@ -3,7 +3,7 @@ using ActionGenerator.Application.Common.Mappers;
 using ActionGenerator.Application.Common.Services;
 using ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
 using ActionGenerator.Domain.Entities;
-using ActionGenerator.Infrastructure.Services;
+using ActionGenerator.Domain.Utilities;
 
 namespace ActionGenerator.Application.Features.ReconnaissanceActions.Services;
 
@@ -15,7 +15,7 @@ public interface IReconnaissanceActionsService
         CancellationToken cancellationToken = default);
 }
 
-public sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
+internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
 {
     private readonly INightTimeChecker _nightTimeChecker;
     private readonly IFrontDistanceCalculator _frontDistanceCalculator;

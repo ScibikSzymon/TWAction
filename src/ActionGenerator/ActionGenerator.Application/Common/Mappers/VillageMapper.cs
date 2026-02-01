@@ -3,7 +3,7 @@ using ActionGenerator.Domain.Entities;
 
 namespace ActionGenerator.Application.Common.Mappers;
 
-public static class VillageMapper
+internal static class VillageMapper
 {
     public static VillageSmallDto ToSmallDto(Village village)
     {

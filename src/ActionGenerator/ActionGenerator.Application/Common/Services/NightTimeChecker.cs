@@ -5,7 +5,7 @@ public interface INightTimeChecker
     bool IsNightTime(DateTimeOffset time);
 }
 
-public sealed class NightTimeChecker : INightTimeChecker
+internal sealed class NightTimeChecker : INightTimeChecker
 {
     private readonly TimeSpan _nightStart = new(22, 0, 0);
     private readonly TimeSpan _nightEnd = new(8, 0, 0);

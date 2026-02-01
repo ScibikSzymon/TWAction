@@ -8,7 +8,7 @@ public interface ICommandGenerator
     AttackCommand Generate(Village source, Target target);
 }
 
-public sealed class CommandGenerator : ICommandGenerator
+internal sealed class CommandGenerator : ICommandGenerator
 {
     public AttackCommand Generate(Village source, Target target)
     {

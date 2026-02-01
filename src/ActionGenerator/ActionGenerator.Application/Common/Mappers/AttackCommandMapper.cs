@@ -3,7 +3,7 @@ using ActionGenerator.Domain.Entities;
 
 namespace ActionGenerator.Application.Common.Mappers;
 
-public static class AttackCommandMapper
+internal static class AttackCommandMapper
 {
     public static AttackCommandDto ToDto(AttackCommand command)
     {

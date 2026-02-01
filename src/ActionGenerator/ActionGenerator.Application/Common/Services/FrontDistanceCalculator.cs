@@ -9,7 +9,7 @@ public interface IFrontDistanceCalculator
         IReadOnlyList<Village> enemyVillages);
 }
 
-public sealed class FrontDistanceCalculator : IFrontDistanceCalculator
+internal sealed class FrontDistanceCalculator : IFrontDistanceCalculator
 {
     public void CalculateFrontDistances(
         IReadOnlyList<Village> allyVillages,

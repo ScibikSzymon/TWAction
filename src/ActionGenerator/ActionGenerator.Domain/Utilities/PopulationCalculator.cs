@@ -1,6 +1,6 @@
 using ActionGenerator.Domain.Entities;
 
-namespace ActionGenerator.Infrastructure.Services;
+namespace ActionGenerator.Domain.Utilities;
 
 public static class PopulationCalculator
 {

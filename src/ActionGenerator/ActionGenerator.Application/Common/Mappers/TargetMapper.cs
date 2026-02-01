@@ -4,7 +4,7 @@ using ActionGenerator.Domain.Enums;
 
 namespace ActionGenerator.Application.Common.Mappers;
 
-public static class TargetMapper
+internal static class TargetMapper
 {
     public static Target ToEntity(
         VillageSmallDto dto, 
