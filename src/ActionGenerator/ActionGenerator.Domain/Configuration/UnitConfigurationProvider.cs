@@ -36,14 +36,14 @@ public static class UnitConfigurationProvider
             CommandType = CommandType.Catapults,
             TimePerFieldInMinutes = 30
         },
-        [CommandType.NobleWithFullOffensive] = new UnitConfiguration
+        [CommandType.NobleWithFullOff] = new UnitConfiguration
         {
-            CommandType = CommandType.NobleWithFullOffensive,
+            CommandType = CommandType.NobleWithFullOff,
             TimePerFieldInMinutes = 35
         },
-        [CommandType.NobleWithHalfOffensive] = new UnitConfiguration
+        [CommandType.NobleWithHalfOff] = new UnitConfiguration
         {
-            CommandType = CommandType.NobleWithHalfOffensive,
+            CommandType = CommandType.NobleWithHalfOff,
             TimePerFieldInMinutes = 35
         },
         [CommandType.NobleWithQuarterOffensive] = new UnitConfiguration
