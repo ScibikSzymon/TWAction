@@ -2,15 +2,15 @@ namespace ActionGenerator.Domain.Entities;
 
 public sealed class Army
 {
-    public int Spear { get; init; }
-    public int Sword { get; init; }
-    public int Axe { get; init; }
-    public int Archer { get; init; }
-    public int Spy { get; init; }
-    public int Light { get; init; }
-    public int HorseArcher { get; init; }
-    public int Heavy { get; init; }
-    public int Ram { get; init; }
-    public int Catapult { get; init; }
-    public int Noble { get; init; }
+    public uint Spear { get; init; }
+    public uint Sword { get; init; }
+    public uint Axe { get; init; }
+    public uint Archer { get; init; }
+    public uint Spy { get; init; }
+    public uint Light { get; init; }
+    public uint HorseArcher { get; init; }
+    public uint Heavy { get; init; }
+    public uint Ram { get; init; }
+    public uint Catapult { get; init; }
+    public uint Noble { get; init; }
 }

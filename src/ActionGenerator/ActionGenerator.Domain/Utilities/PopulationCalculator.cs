@@ -4,19 +4,19 @@ namespace ActionGenerator.Domain.Utilities;
 
 public static class PopulationCalculator
 {
-    private const int SpearPopulation = 1;
-    private const int SwordPopulation = 1;
-    private const int AxePopulation = 1;
-    private const int ArcherPopulation = 1;
-    private const int SpyPopulation = 2;
-    private const int LightPopulation = 4;
-    private const int HorseArcherPopulation = 5;
-    private const int HeavyPopulation = 6;
-    private const int RamPopulation = 5;
-    private const int CatapultPopulation = 8;
-    private const int NoblePopulation = 100;
+    private const uint SpearPopulation = 1;
+    private const uint SwordPopulation = 1;
+    private const uint AxePopulation = 1;
+    private const uint ArcherPopulation = 1;
+    private const uint SpyPopulation = 2;
+    private const uint LightPopulation = 4;
+    private const uint HorseArcherPopulation = 5;
+    private const uint HeavyPopulation = 6;
+    private const uint RamPopulation = 5;
+    private const uint CatapultPopulation = 8;
+    private const uint NoblePopulation = 100;
 
-    public static int CalculatePopulation(Army army)
+    public static uint CalculatePopulation(Army army)
     {
         return army.Spear * SpearPopulation
             + army.Sword * SwordPopulation

@@ -26,11 +26,5 @@ public sealed class VillageDtoValidator : AbstractValidator<VillageDto>
         RuleFor(x => x.Army)
             .NotNull()
             .WithMessage("Army cannot be null");
-
-        When(x => x.Army is not null, () =>
-        {
-            RuleFor(x => x.Army)
-                .SetValidator(new ArmyDtoValidator());
-        });
     } 
 }
