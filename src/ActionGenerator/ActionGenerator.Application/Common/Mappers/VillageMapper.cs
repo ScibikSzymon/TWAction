@@ -5,7 +5,7 @@ namespace ActionGenerator.Application.Common.Mappers;
 
 internal static class VillageMapper
 {
-    public static VillageSmallDto ToSmallDto(Village village)
+    public static VillageSmallDto ToSmallDto(this Village village)
     {
         return new VillageSmallDto
         {
@@ -16,7 +16,7 @@ internal static class VillageMapper
         };
     }
 
-    public static IReadOnlyList<VillageSmallDto> ToSmallDtos(IEnumerable<Village> villages)
+    public static IReadOnlyList<VillageSmallDto> ToSmallDtos(this IEnumerable<Village> villages)
     {
         return villages.Select(ToSmallDto).ToList();
     }

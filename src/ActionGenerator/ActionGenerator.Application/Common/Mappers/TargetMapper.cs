@@ -7,7 +7,7 @@ namespace ActionGenerator.Application.Common.Mappers;
 internal static class TargetMapper
 {
     public static Target ToEntity(
-        VillageSmallDto dto, 
+        this VillageSmallDto dto, 
         DateTimeOffset minArrivalTime, 
         DateTimeOffset maxArrivalTime)
     {
@@ -23,11 +23,11 @@ internal static class TargetMapper
     }
 
     public static IReadOnlyList<Target> ToEntities(
-        IReadOnlyList<VillageSmallDto> dtos, 
+        this IReadOnlyList<VillageSmallDto> dtos, 
         DateTimeOffset minArrivalTime, 
         DateTimeOffset maxArrivalTime)
     {
-        return dtos.Select(dto => ToEntity(dto, minArrivalTime, maxArrivalTime)).ToList();
+        return dtos.Select(dto => dto.ToEntity(minArrivalTime, maxArrivalTime)).ToList();
     }
 }
 

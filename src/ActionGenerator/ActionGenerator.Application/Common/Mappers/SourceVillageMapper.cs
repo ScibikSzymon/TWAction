@@ -5,7 +5,7 @@ namespace ActionGenerator.Application.Common.Mappers;
 
 internal static class SourceVillageMapper
 {
-    public static SourceVillage ToEntity(VillageDto dto)
+    public static SourceVillage ToEntity(this VillageDto dto)
     {
         return new SourceVillage
         {
@@ -29,7 +29,7 @@ internal static class SourceVillageMapper
         };
     }
 
-    public static IReadOnlyList<SourceVillage> ToEntities(IReadOnlyList<VillageDto> dtos)
+    public static IReadOnlyList<SourceVillage> ToEntities(this IReadOnlyList<VillageDto> dtos)
     {
         return dtos.Select(ToEntity).ToList();
     }

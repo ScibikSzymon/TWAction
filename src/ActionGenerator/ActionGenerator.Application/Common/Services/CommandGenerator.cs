@@ -12,10 +12,10 @@ internal sealed class CommandGenerator : ICommandGenerator
 {
     public AttackCommand Generate(Village source, Target target)
     {
-        var speedMinutesPerField = UnitConfigurationProvider.GetSpeedMinutesPerField(target.CommandType);
+        var timePerField = UnitConfigurationProvider.GetTimePerFieldInMinutes(target.CommandType);
         var distance = source.Coordinates.CalculateDistance(target.Coordinates);
 
-        var travelTimeMinutes = distance * speedMinutesPerField;
+        var travelTimeMinutes = distance * timePerField;
         var travelTimeSpan = TimeSpan.FromMinutes(travelTimeMinutes);
         var minTime = target.MinArrivalTime.Subtract(travelTimeSpan);
         var maxTime = target.MaxArrivalTime.Subtract(travelTimeSpan);

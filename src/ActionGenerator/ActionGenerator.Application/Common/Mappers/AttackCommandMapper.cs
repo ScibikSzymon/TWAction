@@ -5,7 +5,7 @@ namespace ActionGenerator.Application.Common.Mappers;
 
 internal static class AttackCommandMapper
 {
-    public static AttackCommandDto ToDto(AttackCommand command)
+    public static AttackCommandDto ToDto(this AttackCommand command)
     {
         return new AttackCommandDto
         {
@@ -16,12 +16,12 @@ internal static class AttackCommandMapper
                 MinArrivalTime = command.Target.MinArrivalTime,
                 MaxArrivalTime = command.Target.MaxArrivalTime
             },
-            Source = VillageMapper.ToSmallDto(command.Source),
-            Destination = VillageMapper.ToSmallDto(command.Target)
+            Source = command.Source.ToSmallDto(),
+            Destination = command.Target.ToSmallDto()
         };
     }
 
-    public static IReadOnlyList<AttackCommandDto> ToDtos(IEnumerable<AttackCommand> commands)
+    public static IReadOnlyList<AttackCommandDto> ToDtos(this IEnumerable<AttackCommand> commands)
     {
         return commands.Select(ToDto).ToList();
     }

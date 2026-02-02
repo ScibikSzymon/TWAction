@@ -9,10 +9,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Validators
         services.AddValidatorsFromAssemblyContaining<IReconnaissanceActionsService>();
         
-        // Application services (use cases / orchestration)
         services.AddScoped<IReconnaissanceActionsService, ReconnaissanceActionsService>();
 
         services.AddScoped<INightTimeChecker, NightTimeChecker>();

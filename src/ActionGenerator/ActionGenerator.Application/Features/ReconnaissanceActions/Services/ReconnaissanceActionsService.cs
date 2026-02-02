@@ -34,9 +34,8 @@ internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsServi
         GenerateReconnaissanceActionsRequest request, 
         CancellationToken cancellationToken = default)
     {
-        var allyVillages = SourceVillageMapper.ToEntities(request.AllyVillages);
-        var enemyVillages = TargetMapper.ToEntities(
-            request.EnemyVillages, 
+        var allyVillages = request.AllyVillages.ToEntities();
+        var enemyVillages = request.EnemyVillages.ToEntities(
             request.MinArrivalTime, 
             request.MaxArrivalTime);
 
@@ -60,7 +59,7 @@ internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsServi
             request,
             cancellationToken);
 
-        var commandDtos = AttackCommandMapper.ToDtos(commands);
+        var commandDtos = commands.ToDtos();
 
         return commandDtos;
     }
