@@ -4,38 +4,41 @@ using Scalar.AspNetCore;
 using ActionGenerator.Application;
 using ActionGenerator.Infrastructure;
 
-public partial class Program
+namespace ActionGenerator.Api
 {
-    private static void Main(string[] args)
+    public partial class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
-
-        builder.Services.AddProblemDetails();
-        builder.Services.AddAuthentication(ApiKeyAuthenticationDefaults.Scheme)
-            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
-                ApiKeyAuthenticationDefaults.Scheme,
-                options => options.ApiKey = builder.Configuration["Authentication:ApiKey"] ?? string.Empty);
-        builder.Services.AddAuthorization();
-        builder.Services.AddOpenApi();
-        builder.Services.AddApplication();
-        builder.Services.AddInfrastructure();
-
-        var app = builder.Build();
-
-        app.UseExceptionHandler();
-        app.UseAuthentication();
-        app.UseAuthorization();
-
-        if (app.Environment.IsDevelopment())
+        private static void Main(string[] args)
         {
-            app.MapOpenApi();
-            app.MapScalarApiReference();
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddProblemDetails();
+            builder.Services.AddAuthentication(ApiKeyAuthenticationDefaults.Scheme)
+                .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
+                    ApiKeyAuthenticationDefaults.Scheme,
+                    options => options.ApiKey = builder.Configuration["Authentication:ApiKey"] ?? string.Empty);
+            builder.Services.AddAuthorization();
+            builder.Services.AddOpenApi();
+            builder.Services.AddApplication();
+            builder.Services.AddInfrastructure();
+
+            var app = builder.Build();
+
+            app.UseExceptionHandler();
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.MapOpenApi();
+                app.MapScalarApiReference();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.MapReconnaissanceActionsEndpoints();
+
+            app.Run();
         }
-
-        app.UseHttpsRedirection();
-
-        app.MapReconnaissanceActionsEndpoints();
-
-        app.Run();
     }
 }
