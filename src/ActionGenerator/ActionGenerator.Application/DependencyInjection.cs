@@ -15,7 +15,7 @@ public static class DependencyInjection
 
         services.AddScoped<INightTimeChecker, NightTimeChecker>();
         services.AddScoped<IFrontDistanceCalculator, FrontDistanceCalculator>();
-        services.AddScoped<ICommandGenerator, CommandGenerator>();
+        services.AddScoped<ICommandFactory, CommandFactory>();
 
         return services;
     }

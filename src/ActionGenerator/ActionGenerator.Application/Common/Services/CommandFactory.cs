@@ -3,12 +3,12 @@ using ActionGenerator.Domain.Entities;
 
 namespace ActionGenerator.Application.Common.Services;
 
-public interface ICommandGenerator
+public interface ICommandFactory
 {
     AttackCommand Generate(Village source, Target target);
 }
 
-internal sealed class CommandGenerator : ICommandGenerator
+internal sealed class CommandFactory : ICommandFactory
 {
     public AttackCommand Generate(Village source, Target target)
     {

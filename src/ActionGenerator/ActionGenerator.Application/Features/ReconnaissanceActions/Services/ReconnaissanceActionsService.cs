@@ -19,15 +19,15 @@ internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsServi
 {
     private readonly INightTimeChecker _nightTimeChecker;
     private readonly IFrontDistanceCalculator _frontDistanceCalculator;
-    private readonly ICommandGenerator _commandGenerator;
+    private readonly ICommandFactory _commandGenerator;
     public ReconnaissanceActionsService(
         INightTimeChecker nightTimeChecker,
         IFrontDistanceCalculator frontDistanceCalculator,
-        ICommandGenerator commandGenerator)
+        ICommandFactory commandFactory)
     {
         _nightTimeChecker = nightTimeChecker;
         _frontDistanceCalculator = frontDistanceCalculator;
-        _commandGenerator = commandGenerator;
+        _commandGenerator = commandFactory;
     }
 
     public IReadOnlyList<AttackCommandDto> Generate(

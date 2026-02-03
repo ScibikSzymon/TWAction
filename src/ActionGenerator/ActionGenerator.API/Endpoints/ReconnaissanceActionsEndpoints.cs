@@ -13,7 +13,7 @@ public static class ReconnaissanceActionsEndpoints
         var group = app.MapGroup("/api/reconnaissance-actions");
         group.RequireAuthorization();
 
-        group.MapPost("/generate", GenerateReconnaissanceActions)
+        group.MapPost("", GenerateReconnaissanceActions)
             .WithName("GenerateReconnaissanceActions");
 
         group.AddEndpointFilter<ValidationFilter<GenerateReconnaissanceActionsRequest>>();
