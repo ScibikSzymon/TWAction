@@ -1,14 +1,14 @@
 @hostname = localhost
-@port = 7255
-@baseUrl = https://{{hostname}}:{{port}}
+@port = 5277
+@baseUrl = http://{{hostname}}:{{port}}
 @contentType = application/json
-@apiKey = RmgcH1KVJNyU9WxArXlfdx03tXFBz0MW
+@ApiKey = RmgcH1KVJNyU9WxArXlfdx03tXFBz0MW
 
 ### Generate Reconnaissance Actions - Full Example
 # @name generateReconnaissanceFull
-POST {{baseUrl}}/api/reconnaissance-actions/generate
+POST {{baseUrl}}/Api/reconnaissance-actions
 Content-Type: {{contentType}}
-X-API-KEY: {{apiKey}}
+X-Api-KEY: {{ApiKey}}
 
 {
   "minDepartureTime": "2026-02-02T10:00:00Z",
@@ -103,9 +103,9 @@ X-API-KEY: {{apiKey}}
 
 ### Generate Reconnaissance Actions - Minimal Example
 # @name generateReconnaissanceMinimal
-POST {{baseUrl}}/api/reconnaissance-actions/generate
+POST {{baseUrl}}/Api/reconnaissance-actions
 Content-Type: {{contentType}}
-X-API-KEY: {{apiKey}}
+X-Api-KEY: {{ApiKey}}
 
 {
   "minDepartureTime": "2026-02-02T10:00:00Z",
@@ -142,9 +142,9 @@ X-API-KEY: {{apiKey}}
 
 ### Generate Reconnaissance Actions - No Night Sendings
 # @name generateReconnaissanceNoNight
-POST {{baseUrl}}/api/reconnaissance-actions/generate
+POST {{baseUrl}}/Api/reconnaissance-actions
 Content-Type: {{contentType}}
-X-API-KEY: {{apiKey}}
+X-Api-KEY: {{ApiKey}}
 
 {
   "minDepartureTime": "2026-02-02T21:00:00Z",
@@ -181,9 +181,9 @@ X-API-KEY: {{apiKey}}
 
 ### Validation Error - Invalid Time Window (MinDeparture after MinArrival)
 # @name validationErrorTimeWindow
-POST {{baseUrl}}/api/reconnaissance-actions/generate
+POST {{baseUrl}}/Api/reconnaissance-actions
 Content-Type: {{contentType}}
-X-API-KEY: {{apiKey}}
+X-Api-KEY: {{ApiKey}}
 
 {
   "minDepartureTime": "2026-02-02T16:00:00Z",
@@ -201,9 +201,9 @@ X-API-KEY: {{apiKey}}
 
 ### Validation Error - Empty Villages Lists
 # @name validationErrorEmptyLists
-POST {{baseUrl}}/api/reconnaissance-actions/generate
+POST {{baseUrl}}/Api/reconnaissance-actions
 Content-Type: {{contentType}}
-X-API-KEY: {{apiKey}}
+X-Api-KEY: {{ApiKey}}
 
 {
   "minDepartureTime": "2026-02-02T10:00:00Z",
@@ -221,9 +221,9 @@ X-API-KEY: {{apiKey}}
 
 ### Validation Error - Negative Values
 # @name validationErrorNegativeValues
-POST {{baseUrl}}/api/reconnaissance-actions/generate
+POST {{baseUrl}}/Api/reconnaissance-actions
 Content-Type: {{contentType}}
-X-API-KEY: {{apiKey}}
+X-Api-KEY: {{ApiKey}}
 
 {
   "minDepartureTime": "2026-02-02T10:00:00Z",

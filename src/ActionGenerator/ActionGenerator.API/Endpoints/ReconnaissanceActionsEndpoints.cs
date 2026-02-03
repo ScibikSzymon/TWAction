@@ -1,16 +1,16 @@
-using ActionGenerator.API.Filters;
+using ActionGenerator.Api.Filters;
 using ActionGenerator.Application.Common.DTOs;
 using ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
 using ActionGenerator.Application.Features.ReconnaissanceActions.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace ActionGenerator.API.Endpoints;
+namespace ActionGenerator.Api.Endpoints;
 
 public static class ReconnaissanceActionsEndpoints
 {
     public static void MapReconnaissanceActionsEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/reconnaissance-actions");
+        var group = app.MapGroup("/Api/reconnaissance-actions");
         group.RequireAuthorization();
 
         group.MapPost("", GenerateReconnaissanceActions)

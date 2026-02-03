@@ -90,7 +90,7 @@ public static class LoginGoogleEndpoints
     private static async Task<string?> ExchangeCodeForIdTokenAsync(string code, string clientId, string clientSecret, string redirectUri)
     {
         using var http = new HttpClient();
-        using var tokenRequest = new HttpRequestMessage(HttpMethod.Post, "https://oauth2.googleapis.com/token")
+        using var tokenRequest = new HttpRequestMessage(HttpMethod.Post, "https://oauth2.googleApis.com/token")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {

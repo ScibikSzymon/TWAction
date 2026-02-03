@@ -3,12 +3,12 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
-namespace ActionGenerator.API.Security;
+namespace ActionGenerator.Api.Security;
 
 public static class ApiKeyAuthenticationDefaults
 {
     public const string Scheme = "ApiKey";
-    public const string HeaderName = "X-API-KEY";
+    public const string HeaderName = "X-Api-KEY";
 }
 
 public sealed class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions
@@ -35,12 +35,12 @@ public sealed class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAu
 
         if (string.IsNullOrWhiteSpace(Options.ApiKey))
         {
-            return Task.FromResult(AuthenticateResult.Fail("API key not configured."));
+            return Task.FromResult(AuthenticateResult.Fail("Api key not configured."));
         }
 
         if (!string.Equals(providedKey, Options.ApiKey, StringComparison.Ordinal))
         {
-            return Task.FromResult(AuthenticateResult.Fail("Invalid API key."));
+            return Task.FromResult(AuthenticateResult.Fail("Invalid Api key."));
         }
 
         var claims = new[] { new Claim(ClaimTypes.Name, "ApiKeyUser") };
