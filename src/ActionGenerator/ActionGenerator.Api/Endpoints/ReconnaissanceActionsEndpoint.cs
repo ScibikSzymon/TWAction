@@ -9,7 +9,7 @@ namespace ActionGenerator.Api;
 /// <summary>
 /// Provides API endpoints for reconnaissance action generation.
 /// </summary>
-public static class ReconnaissanceActionsEndpoints
+public static class ReconnaissanceActionsEndpoint
 {
     /// <summary>
     /// Maps reconnaissance action endpoints onto the route builder.
