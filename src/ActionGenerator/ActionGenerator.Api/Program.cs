@@ -13,11 +13,18 @@ public partial class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        var apiKey = builder.Configuration["Authentication:ApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            throw new InvalidOperationException(
+                "API key is not configured. Please set 'Authentication:ApiKey' in appsettings.json or environment variables.");
+        }
+
         builder.Services.AddProblemDetails();
         builder.Services.AddAuthentication(ApiKeyAuthenticationDefaults.Scheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
                 ApiKeyAuthenticationDefaults.Scheme,
-                options => options.ApiKey = builder.Configuration["Authentication:ApiKey"] ?? string.Empty);
+                options => options.ApiKey = apiKey);
         builder.Services.AddAuthorization();
         builder.Services.AddOpenApi();
         builder.Services.AddApplication();
