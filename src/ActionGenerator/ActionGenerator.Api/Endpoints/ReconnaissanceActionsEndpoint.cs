@@ -22,7 +22,7 @@ public static class ReconnaissanceActionsEndpoint
         group.MapPost("", GenerateReconnaissanceActions)
             .WithName("GenerateReconnaissanceActions");
 
-        group.AddEndpointFilter<ValidationFilter<GenerateReconnaissanceActionsRequest>>();
+        group.AddEndpointFilter<FilterForValidation<GenerateReconnaissanceActionsRequest>>();
     }
 
     // Generates reconnaissance actions using the application service.

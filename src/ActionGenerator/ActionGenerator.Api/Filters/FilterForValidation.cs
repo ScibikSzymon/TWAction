@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace ActionGenerator.Api;
 
-public sealed class ValidationFilter<TRequest> : IEndpointFilter where TRequest : class
+public sealed class FilterForValidation<TRequest> : IEndpointFilter where TRequest : class
 {
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
