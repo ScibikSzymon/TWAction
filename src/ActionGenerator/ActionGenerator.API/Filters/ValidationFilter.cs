@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace ActionGenerator.Api.Filters;
+namespace ActionGenerator.Api;
 
 public sealed class ValidationFilter<TRequest> : IEndpointFilter where TRequest : class
 {
