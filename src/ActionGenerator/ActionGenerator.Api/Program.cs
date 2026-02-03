@@ -1,6 +1,8 @@
 using Scalar.AspNetCore;
 using ActionGenerator.Application;
 using ActionGenerator.Infrastructure;
+using ActionGenerator.Api.Endpoints;
+using ActionGenerator.Api.Security;
 
 namespace ActionGenerator.Api;
 

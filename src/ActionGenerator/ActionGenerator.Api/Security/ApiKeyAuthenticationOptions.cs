@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 
-namespace ActionGenerator.Api;
+namespace ActionGenerator.Api.Security;
 
 /// <summary>
 /// Provides configuration for API key authentication.

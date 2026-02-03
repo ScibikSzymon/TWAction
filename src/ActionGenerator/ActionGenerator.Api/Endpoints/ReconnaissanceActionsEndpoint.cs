@@ -1,9 +1,10 @@
+using ActionGenerator.Api.Filters;
 using ActionGenerator.Application.Common.DTOs;
 using ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
 using ActionGenerator.Application.Features.ReconnaissanceActions.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace ActionGenerator.Api;
+namespace ActionGenerator.Api.Endpoints;
 
 /// <summary>
 /// Provides API endpoints for reconnaissance action generation.
