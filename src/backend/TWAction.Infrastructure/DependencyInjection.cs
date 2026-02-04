@@ -43,7 +43,7 @@ public static class DependencyInjection
             opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
         });
 
-        // Register HttpClient factory and IMemoryCache for TribalWars API calls
+        // Register HttpClient factory and IMemoryCache for TribalWars Api calls
         services.AddHttpClient<TribesHttpService>();
         services.AddMemoryCache();
 
