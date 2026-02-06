@@ -46,7 +46,7 @@ public static class AuthEndpoints
             }
 
             return Results.Ok(user.Value);
-        });
+        }).RequireAuthorization();
 
         group.MapPost("/logout", async (HttpContext http, IOptions<AuthOptions> options, IMessageBus bus) =>
         {

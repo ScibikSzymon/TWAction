@@ -12,6 +12,9 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Email).IsRequired();
         builder.Property(x => x.Provider).IsRequired();
+        builder.Property(x => x.Role)
+            .IsRequired()
+            .HasConversion<string>();
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.HasIndex(x => new { x.Email, x.Provider }).IsUnique();
     }

@@ -141,4 +141,11 @@ public static class TestDataSeeder
 
         return (user, session);
     }
+
+    public static HttpRequestMessage CreateAuthenticatedRequest(HttpMethod method, string uri, Guid sessionId, string cookieName = "TWAction.Session")
+    {
+        var request = new HttpRequestMessage(method, uri);
+        request.Headers.Add("Cookie", $"{cookieName}={sessionId}");
+        return request;
+    }
 }

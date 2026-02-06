@@ -32,6 +32,8 @@ builder.Services.AddOptions<CorsOptions>()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAuthorization();
+
 builder.Services.AddValidatorsFromAssemblyContaining<CreateScheduleRequestValidator>();
 
 // Configure JSON serialization to use string values for enums
@@ -99,6 +101,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapLoginGoogleEndpoints();
 app.MapUsersEndpoints();

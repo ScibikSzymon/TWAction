@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication;
 using Wolverine;
 using TWAction.Application.Interfaces;
 using TWAction.Persistence;
 using TWAction.Persistence.Repositories;
 using TWAction.Infrastructure.Services;
+using TWAction.Infrastructure.Auth;
 using TWAction.Application.Handlers;
 using TWAction.Application.Users.Queries;
 using TWAction.Application.Users.Interfaces;
@@ -66,6 +68,12 @@ public static class DependencyInjection
         services.AddTransient<UploadTroopsStateHandler>();
         services.AddTransient<GetTroopsStateHandler>();
         services.AddTransient<GetTribesHandler>();
+
+        // Register authentication with session-based authentication handler
+        services.AddAuthentication(SessionAuthenticationHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
+                SessionAuthenticationHandler.SchemeName, 
+                options => { });
 
         return services;
 

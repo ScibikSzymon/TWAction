@@ -20,7 +20,7 @@ public static class TribesEndpoints
 {
     public static IEndpointRouteBuilder MapTribesEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/worlds/{world}/tribes");
+        var group = app.MapGroup("/worlds/{world}/tribes").RequireAuthorization();
 
         group.MapGet("", GetTribes)
             .WithName("GetTribes")

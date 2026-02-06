@@ -12,6 +12,8 @@ public sealed class UserEntity
 
     public string Provider { get; set; } = "google";
 
+    public UserRole Role { get; set; } = UserRole.User;
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public ICollection<UserSessionEntity> Sessions { get; set; } = [];

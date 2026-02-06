@@ -12,7 +12,7 @@ public static class TroopsStateEndpoints
 {
     public static IEndpointRouteBuilder MapTroopsStateEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/schedules/{scheduleId}/troops");
+        var group = app.MapGroup("/schedules/{scheduleId}/troops").RequireAuthorization();
 
         group.MapPost("", UploadTroopsState)
             .WithName("UploadTroopsState");

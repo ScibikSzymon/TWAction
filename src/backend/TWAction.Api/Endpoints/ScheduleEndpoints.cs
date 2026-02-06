@@ -14,7 +14,7 @@ public static class ScheduleEndpoints
 {
     public static IEndpointRouteBuilder MapScheduleEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/schedules");
+        var group = app.MapGroup("/schedules").RequireAuthorization();
 
         group.MapGet("/{userId}", GetSchedulesByUser)
             .WithName("GetSchedulesByUser");
