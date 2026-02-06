@@ -1,4 +1,4 @@
-### Schedule API Tests - Integrated Enemy Management
+### Schedule Api Tests - Integrated Enemy Management
 ### Enemies are now managed directly via POST and PUT /schedules endpoints
 
 ### Variables

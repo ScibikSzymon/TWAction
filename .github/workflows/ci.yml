@@ -3,77 +3,80 @@ name: CIBUILD
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
 
 jobs:
   backend:
     name: Build and Test Backend
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup .NET 10
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
-    
-    - name: Restore dependencies
-      run: dotnet restore TWAction.sln
-    
-    - name: Build
-      run: dotnet build TWAction.sln --configuration Release --no-restore
-    
-    - name: Run Unit Tests
-      run: dotnet test tests/TWAction.UnitTests/TWAction.UnitTests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=unit-tests.trx"
-    
-    - name: Run Integration Tests
-      run: dotnet test tests/TWAction.IntegrationTests/TWAction.IntegrationTests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=integration-tests.trx"
-      env:
-        # Integration tests use Testcontainers which requires Docker
-        TESTCONTAINERS_RYUK_DISABLED: false
-    
-    - name: Upload Test Results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: backend-test-results
-        path: |
-          tests/TWAction.UnitTests/TestResults/*.trx
-          tests/TWAction.IntegrationTests/TestResults/*.trx
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Clean
+        run: dotnet clean TWAction.sln
+
+      - name: Restore dependencies
+        run: dotnet restore TWAction.sln
+
+      - name: Build
+        run: dotnet build TWAction.sln --configuration Release --no-restore
+
+      - name: Run Unit Tests
+        run: dotnet test tests/TWAction.UnitTests/TWAction.UnitTests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=unit-tests.trx"
+
+      - name: Run Integration Tests
+        run: dotnet test tests/TWAction.IntegrationTests/TWAction.IntegrationTests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=integration-tests.trx"
+        env:
+          # Integration tests use Testcontainers which requires Docker
+          TESTCONTAINERS_RYUK_DISABLED: false
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: |
+            tests/TWAction.UnitTests/TestResults/*.trx
+            tests/TWAction.IntegrationTests/TestResults/*.trx
 
   frontend:
     name: Build and Lint Frontend
     runs-on: ubuntu-latest
-    
+
     defaults:
       run:
         working-directory: src/frontend/TWActionFrontend
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: src/frontend/TWActionFrontend/package-lock.json
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Lint
-      run: npm run lint
-    
-    - name: Build
-      run: npm run build
-    
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-build
-        path: src/frontend/TWActionFrontend/dist
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: src/frontend/TWActionFrontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: src/frontend/TWActionFrontend/dist

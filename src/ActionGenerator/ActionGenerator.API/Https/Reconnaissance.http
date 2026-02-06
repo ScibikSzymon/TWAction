@@ -1,0 +1,260 @@
+@hostname = localhost
+@port = 5277
+@baseUrl = http://{{hostname}}:{{port}}
+@contentType = application/json
+@ApiKey = RmgcH1KVJNyU9WxArXlfdx03tXFBz0MW
+
+### Generate Reconnaissance Actions - Full Example
+# @name generateReconnaissanceFull
+POST {{baseUrl}}/Api/reconnaissance-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-02-02T10:00:00Z",
+  "minArrivalTime": "2026-02-02T14:00:00Z",
+  "maxArrivalTime": "2026-02-02T16:00:00Z",
+  "minDistanceToFront": 6,
+  "minSpyCount": 60,
+  "maxPopulationInSourceVillage": 21000,
+  "skipNightSendings": true,
+  "allyVillages": [
+    {
+      "id": 1,
+      "playerId": 100,
+      "x": 500,
+      "y": 500,
+      "army": {
+        "spear": 0,
+        "sword": 0,
+        "axe": 0,
+        "archer": 0,
+        "spy": 100,
+        "light": 0,
+        "horseArcher": 0,
+        "heavy": 0,
+        "ram": 0,
+        "catapult": 0,
+        "noble": 0
+      }
+    },
+    {
+      "id": 2,
+      "playerId": 100,
+      "x": 505,
+      "y": 505,
+      "army": {
+        "spear": 0,
+        "sword": 0,
+        "axe": 0,
+        "archer": 0,
+        "spy": 150,
+        "light": 0,
+        "horseArcher": 0,
+        "heavy": 0,
+        "ram": 0,
+        "catapult": 0,
+        "noble": 0
+      }
+    },
+    {
+      "id": 3,
+      "playerId": 101,
+      "x": 502,
+      "y": 498,
+      "army": {
+        "spear": 0,
+        "sword": 0,
+        "axe": 0,
+        "archer": 0,
+        "spy": 80,
+        "light": 0,
+        "horseArcher": 0,
+        "heavy": 0,
+        "ram": 0,
+        "catapult": 0,
+        "noble": 0
+      }
+    }
+  ],
+  "enemyVillages": [
+    {
+      "id": 1001,
+      "playerId": 200,
+      "x": 510,
+      "y": 510
+    },
+    {
+      "id": 1002,
+      "playerId": 200,
+      "x": 515,
+      "y": 515
+    },
+    {
+      "id": 1003,
+      "playerId": 201,
+      "x": 508,
+      "y": 512
+    }
+  ]
+}
+
+###
+
+### Generate Reconnaissance Actions - Minimal Example
+# @name generateReconnaissanceMinimal
+POST {{baseUrl}}/Api/reconnaissance-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-02-02T10:00:00Z",
+  "minArrivalTime": "2026-02-02T14:00:00Z",
+  "maxArrivalTime": "2026-02-02T16:00:00Z",
+  "minDistanceToFront": 0,
+  "minSpyCount": 10,
+  "maxPopulationInSourceVillage": 30000,
+  "skipNightSendings": false,
+  "allyVillages": [
+    {
+      "id": 1,
+      "playerId": 100,
+      "x": 500,
+      "y": 500,
+      "army": {
+        "spear": 0, "sword": 0, "axe": 0, "archer": 0,
+        "spy": 50, "light": 0, "horseArcher": 0, "heavy": 0,
+        "ram": 0, "catapult": 0, "noble": 0
+      }
+    }
+  ],
+  "enemyVillages": [
+    {
+      "id": 1001,
+      "playerId": 200,
+      "x": 510,
+      "y": 510
+    }
+  ]
+}
+
+###
+
+### Generate Reconnaissance Actions - No Night Sendings
+# @name generateReconnaissanceNoNight
+POST {{baseUrl}}/Api/reconnaissance-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-02-02T21:00:00Z",
+  "minArrivalTime": "2026-02-03T02:00:00Z",
+  "maxArrivalTime": "2026-02-03T04:00:00Z",
+  "minDistanceToFront": 0,
+  "minSpyCount": 10,
+  "maxPopulationInSourceVillage": 30000,
+  "skipNightSendings": true,
+  "allyVillages": [
+    {
+      "id": 1,
+      "playerId": 100,
+      "x": 500,
+      "y": 500,
+      "army": {
+        "spear": 0, "sword": 0, "axe": 0, "archer": 0,
+        "spy": 100, "light": 0, "horseArcher": 0, "heavy": 0,
+        "ram": 0, "catapult": 0, "noble": 0
+      }
+    }
+  ],
+  "enemyVillages": [
+    {
+      "id": 1001,
+      "playerId": 200,
+      "x": 510,
+      "y": 510
+    }
+  ]
+}
+
+###
+
+### Validation Error - Invalid Time Window (MinDeparture after MinArrival)
+# @name validationErrorTimeWindow
+POST {{baseUrl}}/Api/reconnaissance-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-02-02T16:00:00Z",
+  "minArrivalTime": "2026-02-02T14:00:00Z",
+  "maxArrivalTime": "2026-02-02T16:00:00Z",
+  "minDistanceToFront": 0,
+  "minSpyCount": 10,
+  "maxPopulationInSourceVillage": 30000,
+  "skipNightSendings": false,
+  "allyVillages": [],
+  "enemyVillages": []
+}
+
+###
+
+### Validation Error - Empty Villages Lists
+# @name validationErrorEmptyLists
+POST {{baseUrl}}/Api/reconnaissance-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-02-02T10:00:00Z",
+  "minArrivalTime": "2026-02-02T14:00:00Z",
+  "maxArrivalTime": "2026-02-02T16:00:00Z",
+  "minDistanceToFront": 0,
+  "minSpyCount": 10,
+  "maxPopulationInSourceVillage": 30000,
+  "skipNightSendings": false,
+  "allyVillages": [],
+  "enemyVillages": []
+}
+
+###
+
+### Validation Error - Negative Values
+# @name validationErrorNegativeValues
+POST {{baseUrl}}/Api/reconnaissance-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-02-02T10:00:00Z",
+  "minArrivalTime": "2026-02-02T14:00:00Z",
+  "maxArrivalTime": "2026-02-02T16:00:00Z",
+  "minDistanceToFront": -5,
+  "minSpyCount": -10,
+  "maxPopulationInSourceVillage": -1000,
+  "skipNightSendings": false,
+  "allyVillages": [
+    {
+      "id": 1,
+      "playerId": 100,
+      "x": 500,
+      "y": 500,
+      "army": {
+        "spear": 0, "sword": 0, "axe": 0, "archer": 0,
+        "spy": 50, "light": 0, "horseArcher": 0, "heavy": 0,
+        "ram": 0, "catapult": 0, "noble": 0
+      }
+    }
+  ],
+  "enemyVillages": [
+    {
+      "id": 1001,
+      "playerId": 200,
+      "x": 510,
+      "y": 510
+    }
+  ]
+}
+
+###
+

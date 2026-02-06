@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TWAction.Domain.Users;
 using TWAction.Domain.Schedules;
+using TWAction.Domain.Settings;
 using TWAction.Persistence.Configurations;
 
 namespace TWAction.Persistence;
@@ -15,12 +16,16 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
 
     public DbSet<TroopsStateEntity> TroopsStates { get; set; } = null!;
 
+    public DbSet<ReconnaissanceSettings> ReconnaissanceSettings { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
         modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
         modelBuilder.ApplyConfiguration(new TroopsStateConfiguration());
+        modelBuilder.ApplyConfiguration(new ReconnaissanceSettingsConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }
+

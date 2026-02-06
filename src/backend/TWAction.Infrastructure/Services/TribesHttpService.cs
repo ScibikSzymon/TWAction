@@ -17,7 +17,7 @@ public sealed class TribesHttpService(
     private const int CacheDurationMinutes = 15;
 
     /// <summary>
-    /// Fetches tribes from TribalWars API with 15-minute caching (gzip compressed)
+    /// Fetches tribes from TribalWars Api with 15-minute caching (gzip compressed)
     /// </summary>
     public async Task<IReadOnlyList<TribeInfo>> GetTribesAsync(WorldType world, CancellationToken cancellationToken = default)
     {

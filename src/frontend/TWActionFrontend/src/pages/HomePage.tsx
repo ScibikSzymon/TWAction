@@ -9,7 +9,7 @@ import type {
 import { scheduleService } from "../services/scheduleService";
 import { ScheduleList } from "../components/ScheduleList";
 import { ScheduleForm } from "../components/ScheduleForm";
-import { TroopsStateManager } from "../components/TroopsStateManager";
+import { ScheduleTabs } from "../components/ScheduleTabs";
 import styles from "./HomePage.module.css";
 
 const HomePage = () => {
@@ -188,7 +188,13 @@ const HomePage = () => {
               />
               {activeScheduleId &&
                 schedules.some((s) => s.id === activeScheduleId) && (
-                  <TroopsStateManager scheduleId={activeScheduleId} />
+                  <ScheduleTabs
+                    scheduleId={activeScheduleId}
+                    scheduleType={
+                      schedules.find((s) => s.id === activeScheduleId)!
+                        .scheduleType
+                    }
+                  />
                 )}
             </>
           )}

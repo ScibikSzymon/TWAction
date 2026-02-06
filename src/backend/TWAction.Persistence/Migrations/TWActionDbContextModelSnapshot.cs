@@ -82,6 +82,44 @@ namespace TWAction.Persistence.Migrations
                     b.ToTable("TroopsStates", (string)null);
                 });
 
+            modelBuilder.Entity("TWAction.Domain.Settings.ReconnaissanceSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("MaxArrivalTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MaxPopulationInSourceVillage")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("MinArrivalTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("MinDepartureTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MinDistanceToFront")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MinSpyCount")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("SkipNightSendings")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduleId")
+                        .IsUnique();
+
+                    b.ToTable("ReconnaissanceSettings", (string)null);
+                });
+
             modelBuilder.Entity("TWAction.Domain.Users.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -149,6 +187,15 @@ namespace TWAction.Persistence.Migrations
                 });
 
             modelBuilder.Entity("TWAction.Domain.Schedules.TroopsStateEntity", b =>
+                {
+                    b.HasOne("TWAction.Domain.Schedules.ScheduleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TWAction.Domain.Settings.ReconnaissanceSettings", b =>
                 {
                     b.HasOne("TWAction.Domain.Schedules.ScheduleEntity", null)
                         .WithMany()
