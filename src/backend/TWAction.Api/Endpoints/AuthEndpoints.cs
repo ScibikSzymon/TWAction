@@ -7,6 +7,7 @@ using TWAction.Application.Users.DTOs;
 using TWAction.Application.Users.Queries;
 using TWAction.Application.Users.Commands;
 using TWAction.Infrastructure.Auth;
+using TWAction.Api.Extensions;
 
 namespace TWAction.Api.Endpoints;
 
@@ -46,7 +47,7 @@ public static class AuthEndpoints
             }
 
             return Results.Ok(user.Value);
-        }).RequireAuthorization();
+        }).RequireAuthorization(AuthorizationPolicies.UserOrAbove);
 
         group.MapPost("/logout", async (HttpContext http, IOptions<AuthOptions> options, IMessageBus bus) =>
         {

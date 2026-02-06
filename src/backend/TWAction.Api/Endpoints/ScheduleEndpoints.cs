@@ -2,6 +2,7 @@ namespace TWAction.Api.Endpoints;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using TWAction.Api.Extensions;
 using TWAction.Api.Filters;
 using TWAction.Application.Common;
 using TWAction.Application.Schedules.Commands;
@@ -14,7 +15,8 @@ public static class ScheduleEndpoints
 {
     public static IEndpointRouteBuilder MapScheduleEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/schedules").RequireAuthorization();
+        var group = app.MapGroup("/schedules")
+            .RequireAuthorization(AuthorizationPolicies.UserOrAbove);
 
         group.MapGet("/{userId}", GetSchedulesByUser)
             .WithName("GetSchedulesByUser");

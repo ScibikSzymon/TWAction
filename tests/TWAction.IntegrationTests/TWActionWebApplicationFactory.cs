@@ -47,6 +47,8 @@ public sealed class TWActionWebApplicationFactory : WebApplicationFactory<Progra
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Test");
+
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<DbContextOptions<TWActionDbContext>>();

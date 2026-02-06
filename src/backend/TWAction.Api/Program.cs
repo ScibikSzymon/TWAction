@@ -17,7 +17,7 @@ builder.Services.AddApiOptions(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthorization();
+builder.Services.AddApiAuthorizationPolicies();
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateScheduleRequestValidator>();
 
@@ -39,7 +39,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(AddCorsExtensions.AllowAllPolicy);
 
 // Apply EF Core migrations on startup in non-production environments
-if (!app.Environment.IsProduction())
+if (!app.Environment.IsProduction() && !app.Environment.IsEnvironment("Test"))
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();

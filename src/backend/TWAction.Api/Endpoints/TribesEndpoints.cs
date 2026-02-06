@@ -3,6 +3,7 @@ namespace TWAction.Api.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TWAction.Api.Extensions;
 using TWAction.Api.Filters;
 using TWAction.Application.Common;
 using TWAction.Application.Tribes.DTOs;
@@ -10,17 +11,14 @@ using TWAction.Application.Tribes.Queries;
 using TWAction.Domain.Schedules;
 using Wolverine;
 
-/// <summary>
-/// Request record for retrieving tribes by world.
-/// </summary>
-/// <param name="World">The world type to retrieve tribes from.</param>
 public sealed record GetTribesRequest([FromRoute] WorldType World);
 
 public static class TribesEndpoints
 {
     public static IEndpointRouteBuilder MapTribesEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/worlds/{world}/tribes").RequireAuthorization();
+        var group = app.MapGroup("/worlds/{world}/tribes")
+            .RequireAuthorization(AuthorizationPolicies.UserOrAbove);
 
         group.MapGet("", GetTribes)
             .WithName("GetTribes")
