@@ -5,7 +5,7 @@ namespace TWAction.Api.Extensions;
 
 public static class AddCorsExtensions
 {
-    public static string AllowAllPolicy = "AllowAll";
+    public const string AllowAllPolicy = "AllowAll";
     public static IServiceCollection AddCorsPolicy(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddCors(options =>
