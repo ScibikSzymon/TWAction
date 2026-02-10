@@ -60,6 +60,8 @@ public static class DependencyInjection
         services.AddSingleton<TroopsStateCompressionService>();
         services.AddSingleton<TroopsStateStatsExtractor>();
         services.AddSingleton<TribesCsvParser>();
+        services.AddSingleton<PlayersCsvParser>();
+        services.AddSingleton<VillagesCsvParser>();
         services.AddScoped<ITribesService, TribesHttpService>();
 
         services.AddTransient<SignInWithGoogleHandler>();
