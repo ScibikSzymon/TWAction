@@ -26,7 +26,7 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     }
 
     [Fact]
-    public async Task GetUsers_WhenNoUsers_ReturnsEmptyList()
+    public async Task GetUsers_WhenAuthenticatedUserExists_ReturnsSingleUser()
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
