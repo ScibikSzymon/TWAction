@@ -2,6 +2,7 @@ namespace TWAction.Api.Endpoints;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using TWAction.Api.Extensions;
 using TWAction.Application.Common;
 using TWAction.Application.Settings.Commands;
 using TWAction.Application.Settings.DTOs;
@@ -12,7 +13,8 @@ public static class ReconnaissanceSettingsEndpoints
 {
     public static IEndpointRouteBuilder MapReconnaissanceSettingsEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/schedules/{scheduleId}/reconnaissance");
+        var group = app.MapGroup("/schedules/{scheduleId}/reconnaissance")
+            .RequireAuthorization(AuthorizationPolicies.UserOrAbove);;
 
         group.MapGet("", GetReconnaissanceSettings)
             .WithName("GetReconnaissanceSettings");
