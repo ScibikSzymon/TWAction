@@ -16,7 +16,7 @@ public static class UsersEndpoints
         {
             var users = await bus.InvokeAsync<Result<IEnumerable<UserDto>>>(new GetAllUsersQuery());
             return Results.Json(users.Value);
-        }).RequireAuthorization(AuthorizationPolicies.UserOrAbove);
+        }).RequireAuthorization(AuthorizationPolicies.AdminOnly);
 
         return app;
     }
