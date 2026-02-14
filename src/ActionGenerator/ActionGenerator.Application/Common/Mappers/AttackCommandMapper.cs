@@ -17,7 +17,8 @@ internal static class AttackCommandMapper
                 MaxArrivalTime = command.Target.MaxArrivalTime
             },
             Source = command.Source.ToSmallDto(),
-            Destination = command.Target.ToSmallDto()
+            Destination = command.Target.ToSmallDto(),
+            CommandType = command.Target.CommandType
         };
     }
 

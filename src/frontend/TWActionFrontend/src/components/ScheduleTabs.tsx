@@ -1,20 +1,18 @@
 import { useState } from "react";
+import type { Schedule } from "../types/schedule";
 import { ScheduleType } from "../types/schedule";
 import { TroopsStateManager } from "./TroopsStateManager";
 import { ReconnaissanceSettings } from "./ReconnaissanceSettings";
+import { ReconnaissanceActionsGenerator } from "./ReconnaissanceActionsGenerator";
 import styles from "./ScheduleTabs.module.css";
 
 interface ScheduleTabsProps {
-  scheduleId: string;
-  scheduleType: ScheduleType;
+  schedule: Schedule;
 }
 
-type TabType = "troops" | "reconnaissance";
+type TabType = "troops" | "reconnaissance" | "generate";
 
-export const ScheduleTabs = ({
-  scheduleId,
-  scheduleType,
-}: ScheduleTabsProps) => {
+export const ScheduleTabs = ({ schedule }: ScheduleTabsProps) => {
   const [activeTab, setActiveTab] = useState<TabType>("troops");
 
   const tabs: { id: TabType; label: string; visible: boolean }[] = [
@@ -22,7 +20,12 @@ export const ScheduleTabs = ({
     {
       id: "reconnaissance",
       label: "Ustawienia Zwiadowcze",
-      visible: scheduleType === ScheduleType.Reconnaissance,
+      visible: schedule.scheduleType === ScheduleType.Reconnaissance,
+    },
+    {
+      id: "generate",
+      label: "Generuj Akcje",
+      visible: schedule.scheduleType === ScheduleType.Reconnaissance,
     },
   ];
 
@@ -44,11 +47,18 @@ export const ScheduleTabs = ({
 
       <div className={styles.tabContent}>
         {activeTab === "troops" && (
-          <TroopsStateManager scheduleId={scheduleId} />
+          <TroopsStateManager scheduleId={schedule.id} />
         )}
         {activeTab === "reconnaissance" &&
-          scheduleType === ScheduleType.Reconnaissance && (
-            <ReconnaissanceSettings scheduleId={scheduleId} />
+          schedule.scheduleType === ScheduleType.Reconnaissance && (
+            <ReconnaissanceSettings scheduleId={schedule.id} />
+          )}
+        {activeTab === "generate" &&
+          schedule.scheduleType === ScheduleType.Reconnaissance && (
+            <ReconnaissanceActionsGenerator
+              scheduleId={schedule.id}
+              schedule={schedule}
+            />
           )}
       </div>
     </div>

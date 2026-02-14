@@ -1,0 +1,76 @@
+@baseUrl = https://localhost:8000
+@scheduleId = 550e8400-e29b-41d4-a716-446655440000
+@userId = 550e8400-e29b-41d4-a716-446655440001
+
+###
+# SCHEDULE MANAGEMENT
+###
+
+### Create a new schedule
+# @name createSchedule
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "name": "Spring 2026 Reconnaissance",
+  "world": "pl244",
+  "scheduleType": "Reconnaissance",
+  "enemyTribalWarsIds": [123, 456, 789]
+}
+
+###
+@newScheduleId = {{createSchedule.response.body.$.id}}
+
+### Get all schedules for current user
+GET {{baseUrl}}/schedules
+
+### Get specific schedule by ID
+GET {{baseUrl}}/schedules/{{newScheduleId}}
+
+### Update schedule
+PUT {{baseUrl}}/schedules/{{newScheduleId}}
+Content-Type: application/json
+
+{
+  "name": "Spring 2026 Recon - Updated",
+  "world": "pl244",
+  "scheduleType": "Reconnaissance",
+  "enemyTribalWarsIds": [123, 456, 789, 999, 888]
+}
+
+### Delete schedule
+DELETE {{baseUrl}}/schedules/{{newScheduleId}}
+
+###
+# VALIDATION TESTS
+###
+
+### Create schedule without name (should fail validation)
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "name": "",
+  "world": "pl244",
+  "scheduleType": "Reconnaissance"
+}
+
+### Create schedule with invalid world (should fail validation)
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "name": "Test",
+  "world": "InvalidWorld",
+  "scheduleType": "Reconnaissance"
+}
+
+### Update non-existent schedule (should return 404)
+PUT {{baseUrl}}/schedules/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "name": "Test",
+  "world": "pl244",
+  "scheduleType": "Reconnaissance"
+}

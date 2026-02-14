@@ -21,6 +21,8 @@ using TWAction.Application.Tribes.Queries;
 using TWAction.Application.Settings.Interfaces;
 using TWAction.Application.Settings.Queries;
 using TWAction.Application.Settings.Commands;
+using TWAction.Application.ReconnaissanceActions.Interfaces;
+using TWAction.Application.ReconnaissanceActions.Handlers;
 
 
 namespace TWAction.Infrastructure;
@@ -54,6 +56,7 @@ public static class DependencyInjection
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ITroopsStateRepository, TroopsStateRepository>();
         services.AddScoped<IReconnaissanceSettingsRepository, ReconnaissanceSettingsRepository>();
+        services.AddScoped<IAttackCommandRepository, AttackCommandRepository>();
 
 
         services.AddSingleton<TroopsStateValidator>();
@@ -78,6 +81,8 @@ public static class DependencyInjection
         services.AddTransient<GetTribesHandler>();
         services.AddTransient<GetReconnaissanceSettingsHandler>();
         services.AddTransient<SaveReconnaissanceSettingsHandler>();
+        services.AddTransient<GenerateReconnaissanceActionsHandler>();
+        services.AddTransient<GetAttackCommandsHandler>();
 
         // Register authentication with session-based authentication handler
         services.AddAuthentication(SessionAuthenticationHandler.SchemeName)

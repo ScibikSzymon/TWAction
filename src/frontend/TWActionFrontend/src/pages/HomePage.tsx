@@ -189,11 +189,7 @@ const HomePage = () => {
               {activeScheduleId &&
                 schedules.some((s) => s.id === activeScheduleId) && (
                   <ScheduleTabs
-                    scheduleId={activeScheduleId}
-                    scheduleType={
-                      schedules.find((s) => s.id === activeScheduleId)!
-                        .scheduleType
-                    }
+                    schedule={schedules.find((s) => s.id === activeScheduleId)!}
                   />
                 )}
             </>
