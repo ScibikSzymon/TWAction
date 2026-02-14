@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TWAction.Api.Options;
 using TWAction.Infrastructure.Auth;
+using TWAction.Infrastructure.Options;
 
 namespace TWAction.Api.Extensions;
 
@@ -21,6 +22,11 @@ public static class OptionsExtensions
 
         services.AddOptions<CorsOptions>()
             .BindConfiguration(CorsOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddOptions<GeneratorApiOptions>()
+            .BindConfiguration(GeneratorApiOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
 

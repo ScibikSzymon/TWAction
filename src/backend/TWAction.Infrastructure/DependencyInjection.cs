@@ -2,12 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
 using Wolverine;
 using TWAction.Application.Interfaces;
 using TWAction.Persistence;
 using TWAction.Persistence.Repositories;
 using TWAction.Infrastructure.Services;
 using TWAction.Infrastructure.Auth;
+using TWAction.Infrastructure.Options;
 using TWAction.Application.Handlers;
 using TWAction.Application.Users.Queries;
 using TWAction.Application.Users.Interfaces;
@@ -50,6 +52,13 @@ public static class DependencyInjection
         // Register HttpClient factory and IMemoryCache for TribalWars Api calls
         services.AddHttpClient<TribesHttpService>();
         services.AddMemoryCache();
+
+        // Register Generator.Api HTTP client
+        services.AddHttpClient<IGeneratorApiClient, GeneratorApiClient>((serviceProvider, client) =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<GeneratorApiOptions>>();
+            client.BaseAddress = new Uri(options.Value.BaseUrl);
+        });
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();

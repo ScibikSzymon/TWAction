@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { reconnaissanceActionsService } from "../services/reconnaissanceActionsService";
+import { reconnaissanceSettingsService } from "../services/reconnaissanceSettingsService";
+import { troopsStateService } from "../services/troopsStateService";
 import type { Schedule } from "../types/schedule";
 import styles from "./TroopsStateManager.module.css";
 
@@ -15,6 +17,40 @@ export const ReconnaissanceActionsGenerator = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [hasSettings, setHasSettings] = useState(false);
+  const [hasTroopsState, setHasTroopsState] = useState(false);
+  const [isCheckingPrerequisites, setIsCheckingPrerequisites] = useState(true);
+
+  // Check prerequisites on component mount
+  useEffect(() => {
+    const checkPrerequisites = async () => {
+      setIsCheckingPrerequisites(true);
+
+      try {
+        // Check if reconnaissance settings exist
+        try {
+          await reconnaissanceSettingsService.getReconnaissanceSettings(
+            scheduleId,
+          );
+          setHasSettings(true);
+        } catch {
+          setHasSettings(false);
+        }
+
+        // Check if troops state exists
+        try {
+          await troopsStateService.getTroopsState(scheduleId);
+          setHasTroopsState(true);
+        } catch {
+          setHasTroopsState(false);
+        }
+      } finally {
+        setIsCheckingPrerequisites(false);
+      }
+    };
+
+    checkPrerequisites();
+  }, [scheduleId]);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -70,15 +106,40 @@ export const ReconnaissanceActionsGenerator = ({
   };
 
   // Check if all prerequisites are met
-  const canGenerate = schedule?.enemyIds && schedule.enemyIds.length > 0;
+  const hasEnemies = schedule?.enemyIds && schedule.enemyIds.length > 0;
+  const canGenerate =
+    hasEnemies && hasSettings && hasTroopsState && !isCheckingPrerequisites;
 
   const getWarningMessage = (): string | null => {
     if (!schedule) {
       return "Ładowanie rozpiski...";
     }
 
-    if (!schedule.enemyIds || schedule.enemyIds.length === 0) {
-      return "Wybierz wrogów w ustawieniach rozpiski, aby wygenerować akcje zwiadowcze.";
+    if (isCheckingPrerequisites) {
+      return "Sprawdzanie wymaganych danych...";
+    }
+
+    const missingItems: string[] = [];
+
+    if (!hasEnemies) {
+      missingItems.push("Wybierz wrogów w ustawieniach rozpiski");
+    }
+
+    if (!hasTroopsState) {
+      missingItems.push('Wgraj stan wojsk w zakładce "Stan Armii"');
+    }
+
+    if (!hasSettings) {
+      missingItems.push(
+        'Zapisz ustawienia zwiadowcze w zakładce "Ustawienia Zwiadowcze"',
+      );
+    }
+
+    if (missingItems.length > 0) {
+      return (
+        "Aby wygenerować akcje zwiadowcze, musisz:\n" +
+        missingItems.map((item) => `• ${item}`).join("\n")
+      );
     }
 
     return null;
@@ -95,16 +156,16 @@ export const ReconnaissanceActionsGenerator = ({
 
       {warningMessage && (
         <div className={styles.info}>
-          <p>{warningMessage}</p>
+          <p style={{ whiteSpace: "pre-line" }}>{warningMessage}</p>
         </div>
       )}
 
       {!warningMessage && (
         <div className={styles.info}>
-          <p>Przed wygenerowaniem akcji zwiadowczych upewnij się, że:</p>
+          <p>Wszystkie wymagane dane zostały wprowadzone:</p>
           <ul>
             <li>✓ Wybrani są wrogowie (plemię lub gracze)</li>
-            <li>✓ Wgrany jest stan wojsk (zakładka "Stan Armii")</li>
+            <li>✓ Wgrany jest stan wojsk</li>
             <li>✓ Zapisane są ustawienia zwiadowcze</li>
           </ul>
           <p>
@@ -123,7 +184,7 @@ export const ReconnaissanceActionsGenerator = ({
           {isGenerating ? "Generowanie..." : "Generuj Akcje Zwiadowcze"}
         </button>
 
-        {!canGenerate && (
+        {!canGenerate && !isCheckingPrerequisites && (
           <p className={styles.hint}>
             Wypełnij wszystkie wymagane dane, aby móc wygenerować akcje.
           </p>
