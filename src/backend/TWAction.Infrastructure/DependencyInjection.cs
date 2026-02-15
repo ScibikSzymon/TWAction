@@ -21,6 +21,7 @@ using TWAction.Application.Tribes.Queries;
 using TWAction.Application.Settings.Interfaces;
 using TWAction.Application.Settings.Queries;
 using TWAction.Application.Settings.Commands;
+using TWAction.Application.Interfaces;
 
 
 namespace TWAction.Infrastructure;
@@ -48,12 +49,14 @@ public static class DependencyInjection
         // Register HttpClient factory and IMemoryCache for TribalWars Api calls
         services.AddHttpClient<TribesHttpService>();
         services.AddMemoryCache();
+        services.AddHttpContextAccessor();
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ITroopsStateRepository, TroopsStateRepository>();
         services.AddScoped<IReconnaissanceSettingsRepository, ReconnaissanceSettingsRepository>();
+        services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
 
 
         services.AddSingleton<TroopsStateValidator>();

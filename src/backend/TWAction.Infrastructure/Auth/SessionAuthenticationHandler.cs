@@ -3,12 +3,11 @@ namespace TWAction.Infrastructure.Auth;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TWAction.Application.Common;
 using TWAction.Application.Users.DTOs;
 using TWAction.Application.Users.Queries;
-using TWAction.Domain.Users;
 using Wolverine;
 
 public sealed class SessionAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
@@ -23,9 +22,8 @@ public sealed class SessionAuthenticationHandler : AuthenticationHandler<Authent
         ILoggerFactory logger,
         UrlEncoder encoder,
         IMessageBus bus,
-        IOptions<AuthOptions> authOptions,
-        ISystemClock clock)
-        : base(options, logger, encoder, clock)
+        IOptions<AuthOptions> authOptions)
+        : base(options, logger, encoder)
     {
         _bus = bus;
         _authOptions = authOptions.Value;
@@ -42,7 +40,7 @@ public sealed class SessionAuthenticationHandler : AuthenticationHandler<Authent
             return AuthenticateResult.NoResult();
         }
 
-        var userResult = await _bus.InvokeAsync<Application.Common.Result<UserDto>>(new GetUserBySessionQuery(sessionGuid));
+        var userResult = await _bus.InvokeAsync<Result<UserDto>>(new GetUserBySessionQuery(sessionGuid));
 
         if (userResult is null || userResult.IsFailure)
         {
