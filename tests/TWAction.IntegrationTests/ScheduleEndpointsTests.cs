@@ -224,7 +224,6 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     }
 
     [Fact]
-    [Fact]
     public async Task UpdateSchedule_WithValidData_UpdatesSchedule()
     {
         await using var scope = _factory.Services.CreateAsyncScope();
