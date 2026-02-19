@@ -68,9 +68,6 @@ public class GetTroopsStateHandler(
     TroopsStateStatsExtractor statsExtractor,
     IValidator<GetTroopsStateQuery> fluentValidator)
 {
-    /// <summary>
-    /// Handles the query — runs FluentValidation first, then business logic.
-    /// </summary>
     public async Task<Result<TroopsStateDto>> Handle(GetTroopsStateQuery query, CancellationToken cancellationToken = default)
     {
         var validationFailure = await FluentValidationBefore.ValidateAsync<GetTroopsStateQuery, TroopsStateDto>(
