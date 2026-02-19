@@ -152,4 +152,42 @@ public static class TestDataSeeder
         request.Headers.Add("Cookie", $"{cookieName}={sessionId}");
         return request;
     }
+
+    public static async Task<TroopsStateEntity> SeedTroopsStateAsync(
+        TWActionDbContext dbContext,
+        Guid scheduleId,
+        string? compressedData = null,
+        CancellationToken cancellationToken = default)
+    {
+        compressedData ??= CreateValidCompressedTroopsData();
+
+        var troopsState = new TroopsStateEntity
+        {
+            Id = Guid.NewGuid(),
+            ScheduleId = scheduleId,
+            CompressedData = compressedData,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        await dbContext.TroopsStates.AddAsync(troopsState, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return troopsState;
+    }
+
+    /// <summary>
+    /// Creates valid compressed troops data with 2 players and 3 villages.
+    /// </summary>
+    public static string CreateValidCompressedTroopsData()
+    {
+        const string rawData =
+            "PlayerName,Village,Spear,Sword,Archer,Marcher,Catapult,Axe,Polearm,Ram,Trebuchet\n" +
+            "Player1,500|500,100,200,50,30,10,150,80,20,5\n" +
+            "Player1,501|501,80,150,40,20,8,120,60,15,3\n" +
+            "Player2,502|502,200,300,100,50,20,250,100,30,10";
+
+        var compressionService = new TWAction.Application.Schedules.Services.TroopsStateCompressionService();
+        return compressionService.Compress(rawData);
+    }
 }
