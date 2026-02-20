@@ -1,4 +1,6 @@
 using AwesomeAssertions;
+using FluentValidation;
+using FluentValidation.Results;
 using NSubstitute;
 using TWAction.Application.Users.Interfaces;
 using TWAction.Application.Users.Queries;
@@ -9,12 +11,16 @@ namespace TWAction.UnitTests.Handlers;
 public sealed class GetAllUsersHandlerTests
 {
     private readonly IUserRepository _userRepository;
+    private readonly IValidator<GetAllUsersQuery> _fluentValidator;
     private readonly GetAllUsersHandler _handler;
 
     public GetAllUsersHandlerTests()
     {
         _userRepository = Substitute.For<IUserRepository>();
-        _handler = new GetAllUsersHandler(_userRepository);
+        _fluentValidator = Substitute.For<IValidator<GetAllUsersQuery>>();
+        _fluentValidator.ValidateAsync(Arg.Any<GetAllUsersQuery>(), Arg.Any<CancellationToken>())
+            .Returns(new ValidationResult());
+        _handler = new GetAllUsersHandler(_userRepository, _fluentValidator);
     }
 
     [Fact]

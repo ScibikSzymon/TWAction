@@ -1,4 +1,6 @@
 using AwesomeAssertions;
+using FluentValidation;
+using FluentValidation.Results;
 using NSubstitute;
 using TWAction.Application.Handlers;
 using TWAction.Application.Users.Interfaces;
@@ -10,13 +12,17 @@ public sealed class SignInWithGoogleHandlerTests
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserSessionRepository _sessionRepository;
+    private readonly IValidator<SignInWithGoogleCommand> _fluentValidator;
     private readonly SignInWithGoogleHandler _handler;
 
     public SignInWithGoogleHandlerTests()
     {
         _userRepository = Substitute.For<IUserRepository>();
         _sessionRepository = Substitute.For<IUserSessionRepository>();
-        _handler = new SignInWithGoogleHandler(_userRepository, _sessionRepository);
+        _fluentValidator = Substitute.For<IValidator<SignInWithGoogleCommand>>();
+        _fluentValidator.ValidateAsync(Arg.Any<SignInWithGoogleCommand>(), Arg.Any<CancellationToken>())
+            .Returns(new ValidationResult());
+        _handler = new SignInWithGoogleHandler(_userRepository, _sessionRepository, _fluentValidator);
     }
 
     [Fact]
