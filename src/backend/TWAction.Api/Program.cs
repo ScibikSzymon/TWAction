@@ -14,7 +14,7 @@ builder.AddServiceDefaults();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
 
-builder.Services.AddApiOptions(builder.Configuration);
+builder.Services.AddApiOptions();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
