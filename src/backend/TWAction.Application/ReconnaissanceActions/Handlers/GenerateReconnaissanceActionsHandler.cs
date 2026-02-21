@@ -61,11 +61,11 @@ public sealed class GenerateReconnaissanceActionsHandler(
 
         var rawTroopsData = decompressResult.Value;
 
-        // 5. Parse troops data to get ally villages with armies
-        var allyVillages = ParseTroopsDataToVillages(rawTroopsData);
+        // 5. Fetch all villages from Tribes API (needed for ID lookup and enemy filtering)
+        var (villagesById, villagesByCoordinates) = await tribesService.GetVillagesAsync(schedule.World, cancellationToken);
 
-        // 6. Fetch enemy villages from Tribes API
-        var (villagesById, _) = await tribesService.GetVillagesAsync(schedule.World, cancellationToken);
+        // 6. Parse troops data and resolve VillageId/PlayerId via coordinate lookup
+        var allyVillages = ParseTroopsDataToVillages(rawTroopsData, villagesByCoordinates);
 
         // Get enemy tribe IDs from schedule.Enemies
         var enemyTribeIds = schedule.Enemies.Select(e => e.TribalWarsId).ToList();
@@ -105,6 +105,15 @@ public sealed class GenerateReconnaissanceActionsHandler(
             return Result.Failure<GenerateReconnaissanceActionsResponse>(
                 $"Failed to call Generator.Api: {ex.Message}");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (OperationCanceledException ex)
+        {
+            return Result.Failure<GenerateReconnaissanceActionsResponse>(
+                $"Generator.Api request timed out: {ex.Message}");
+        }
 
         // 9. Convert DTOs to entities
         var commandEntities = generatedCommands.Select(dto => new AttackCommandEntity
@@ -140,41 +149,44 @@ public sealed class GenerateReconnaissanceActionsHandler(
         });
     }
 
-    private List<VillageDto> ParseTroopsDataToVillages(string rawData)
+    private static List<VillageDto> ParseTroopsDataToVillages(string rawData, Dictionary<int, VillageInfo> villagesByCoordinates)
     {
         var villages = new List<VillageDto>();
         var lines = rawData.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
         {
-            var parts = line.Split('\t');
-            if (parts.Length < 14) continue;
+            // Format: PlayerName,X|Y,Spear,Sword,Spy,Heavy,Catapult,Axe,Light,Ram,Noble
+            var parts = line.Split(',');
+            if (parts.Length < 11) continue;
 
-            // Format: VillageId PlayerId X Y Spear Sword Axe Archer Spy Light HorseArcher Heavy Ram Catapult (no Noble in reconnaissance)
-            if (!int.TryParse(parts[0], out var villageId)) continue;
-            if (!int.TryParse(parts[1], out var playerId)) continue;
-            if (!int.TryParse(parts[2], out var x)) continue;
-            if (!int.TryParse(parts[3], out var y)) continue;
+            var coordParts = parts[1].Trim().Split('|');
+            if (coordParts.Length != 2) continue;
+            if (!int.TryParse(coordParts[0], out var x)) continue;
+            if (!int.TryParse(coordParts[1], out var y)) continue;
+
+            var coordinateKey = x * 1000 + y;
+            if (!villagesByCoordinates.TryGetValue(coordinateKey, out var villageInfo)) continue;
 
             var army = new ArmyDto
             {
-                Spear = uint.TryParse(parts[4], out var spear) ? spear : 0,
-                Sword = uint.TryParse(parts[5], out var sword) ? sword : 0,
-                Axe = uint.TryParse(parts[6], out var axe) ? axe : 0,
-                Archer = uint.TryParse(parts[7], out var archer) ? archer : 0,
-                Spy = uint.TryParse(parts[8], out var spy) ? spy : 0,
-                Light = uint.TryParse(parts[9], out var light) ? light : 0,
-                HorseArcher = uint.TryParse(parts[10], out var horseArcher) ? horseArcher : 0,
-                Heavy = uint.TryParse(parts[11], out var heavy) ? heavy : 0,
-                Ram = uint.TryParse(parts[12], out var ram) ? ram : 0,
-                Catapult = uint.TryParse(parts[13], out var catapult) ? catapult : 0,
-                Noble = 0 // Reconnaissance doesn't use nobles
+                Spear = uint.TryParse(parts[2].Trim(), out var spear) ? spear : 0,
+                Sword = uint.TryParse(parts[3].Trim(), out var sword) ? sword : 0,
+                Axe = uint.TryParse(parts[7].Trim(), out var axe) ? axe : 0,
+                Archer = 0,
+                Spy = uint.TryParse(parts[4].Trim(), out var spy) ? spy : 0,
+                Light = uint.TryParse(parts[8].Trim(), out var light) ? light : 0,
+                HorseArcher = 0,
+                Heavy = uint.TryParse(parts[5].Trim(), out var heavy) ? heavy : 0,
+                Ram = uint.TryParse(parts[9].Trim(), out var ram) ? ram : 0,
+                Catapult = uint.TryParse(parts[6].Trim(), out var catapult) ? catapult : 0,
+                Noble = 0
             };
 
             villages.Add(new VillageDto
             {
-                Id = villageId,
-                PlayerId = playerId,
+                Id = villageInfo.Id,
+                PlayerId = villageInfo.PlayerId,
                 X = x,
                 Y = y,
                 Army = army

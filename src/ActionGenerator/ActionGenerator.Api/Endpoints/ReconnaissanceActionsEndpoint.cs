@@ -18,7 +18,7 @@ public static class ReconnaissanceActionsEndpoint
     public static void MapReconnaissanceActionsEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/Api/reconnaissance-actions");
-        group.RequireAuthorization();
+        //group.RequireAuthorization();
 
         group.MapPost("", GenerateReconnaissanceActions)
             .WithName("GenerateReconnaissanceActions");

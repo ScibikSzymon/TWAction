@@ -58,6 +58,7 @@ public static class DependencyInjection
         {
             var options = serviceProvider.GetRequiredService<IOptions<GeneratorApiOptions>>();
             client.BaseAddress = new Uri(options.Value.BaseUrl);
+            client.DefaultRequestHeaders.Add("X-Api-KEY", options.Value.ApiKey);
         });
 
         services.AddScoped<IUserRepository, UserRepository>();
