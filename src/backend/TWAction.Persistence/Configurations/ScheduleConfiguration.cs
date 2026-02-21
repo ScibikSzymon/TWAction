@@ -19,7 +19,7 @@ public sealed class ScheduleConfiguration : IEntityTypeConfiguration<ScheduleEnt
         builder.Property(x => x.CreationDate).IsRequired();
         builder.Property(x => x.World).IsRequired();
         builder.Property(x => x.ScheduleType).IsRequired();
-        
+
         // Store enemies as JSON
         var options = new JsonSerializerOptions();
         var enemiesComparer = new ValueComparer<List<TribeInfo>>(
@@ -43,6 +43,7 @@ public sealed class ScheduleConfiguration : IEntityTypeConfiguration<ScheduleEnt
                    v => JsonSerializer.Deserialize<List<TribeInfo>>(v, options) ?? new List<TribeInfo>())
                .Metadata.SetValueComparer(enemiesComparer);
 
+
         builder.HasOne<UserEntity>()
                .WithMany(u => u.Schedules)
                .HasForeignKey(s => s.UserGuid)
@@ -53,16 +54,8 @@ public sealed class ScheduleConfiguration : IEntityTypeConfiguration<ScheduleEnt
     {
         public bool Equals(TribeInfo? x, TribeInfo? y)
         {
-            if (ReferenceEquals(x, y))
-            {
-                return true;
-            }
-
-            if (x is null || y is null)
-            {
-                return false;
-            }
-
+            if (ReferenceEquals(x, y)) return true;
+            if (x is null || y is null) return false;
             return x.TribalWarsId == y.TribalWarsId &&
                    x.Name == y.Name &&
                    x.Short == y.Short &&
