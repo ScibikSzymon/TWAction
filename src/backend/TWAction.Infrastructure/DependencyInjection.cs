@@ -94,7 +94,6 @@ public static class DependencyInjection
         services.AddTransient<GetReconnaissanceSettingsHandler>();
         services.AddTransient<SaveReconnaissanceSettingsHandler>();
         services.AddTransient<GenerateReconnaissanceActionsHandler>();
-        services.AddTransient<GetAttackCommandsHandler>();
         services.AddTransient<GetAttackCommandsSummaryHandler>();
 
         // Register authentication with session-based authentication handler

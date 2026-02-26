@@ -15,40 +15,12 @@ public static class AttackCommandsEndpoints
         var group = app.MapGroup("/schedules/{scheduleId}/attack-commands")
             .RequireAuthorization(AuthorizationPolicies.UserOrAbove);
 
-        group.MapGet("", GetAttackCommands)
-            .WithName("GetAttackCommands")
-            .Produces<IReadOnlyList<AttackCommandResponseDto>>();
-
         group.MapGet("summary", GetAttackCommandsSummary)
             .WithName("GetAttackCommandsSummary")
             .Produces<AttackCommandsSummaryDto>()
             .Produces(StatusCodes.Status404NotFound);
 
         return app;
-    }
-
-    private static async Task<IResult> GetAttackCommands(
-        Guid scheduleId,
-        HttpContext httpContext,
-        GetAttackCommandsHandler handler,
-        IMessageBus bus,
-        CancellationToken cancellationToken)
-    {
-        var ownershipResult = await ScheduleOwnershipHelper.ValidateOwnershipAsync(scheduleId, httpContext, bus);
-        if (ownershipResult is not null)
-        {
-            return ownershipResult;
-        }
-
-        var query = new GetAttackCommandsQuery(scheduleId);
-        var result = await handler.Handle(query, cancellationToken);
-
-        if (result.IsFailure)
-        {
-            return Results.NotFound(new { error = result.Error });
-        }
-
-        return Results.Ok(result.Value);
     }
 
     private static async Task<IResult> GetAttackCommandsSummary(
