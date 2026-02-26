@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using TWAction.Application.ReconnaissanceActions.Interfaces;
-using TWAction.Domain.ReconnaissanceActions;
+using TWAction.Application.AttackCommands.Interfaces;
+using TWAction.Domain.AttackCommands;
 
 namespace TWAction.Persistence.Repositories;
 

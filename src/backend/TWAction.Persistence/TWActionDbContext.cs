@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TWAction.Domain.Users;
 using TWAction.Domain.Schedules;
 using TWAction.Domain.Settings;
-using TWAction.Domain.ReconnaissanceActions;
+using TWAction.Domain.AttackCommands;
 using TWAction.Persistence.Configurations;
 
 namespace TWAction.Persistence;

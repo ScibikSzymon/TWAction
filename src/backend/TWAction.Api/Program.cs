@@ -64,6 +64,7 @@ app.MapScheduleEndpoints();
 app.MapTroopsStateEndpoints();
 app.MapTribesEndpoints();
 app.MapReconnaissanceSettingsEndpoints();
+app.MapAttackCommandsEndpoints();
 app.MapReconnaissanceActionsEndpoints();
 
 app.MapDefaultEndpoints();

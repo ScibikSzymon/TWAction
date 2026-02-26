@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TWAction.Domain.ReconnaissanceActions;
+using TWAction.Domain.AttackCommands;
 
 namespace TWAction.Persistence.Configurations;
 

@@ -23,6 +23,8 @@ using TWAction.Application.Tribes.Queries;
 using TWAction.Application.Settings.Interfaces;
 using TWAction.Application.Settings.Queries;
 using TWAction.Application.Settings.Commands;
+using TWAction.Application.AttackCommands.Interfaces;
+using TWAction.Application.AttackCommands.Handlers;
 using TWAction.Application.ReconnaissanceActions.Interfaces;
 using TWAction.Application.ReconnaissanceActions.Handlers;
 

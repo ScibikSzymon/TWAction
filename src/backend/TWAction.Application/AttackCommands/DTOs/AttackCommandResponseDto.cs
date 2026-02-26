@@ -1,7 +1,9 @@
-namespace TWAction.Application.ReconnaissanceActions.DTOs;
+using TWAction.Application.ReconnaissanceActions.DTOs;
+
+namespace TWAction.Application.AttackCommands.DTOs;
 
 /// <summary>
-/// DTO for returning attack command to the client.
+/// DTO for returning an attack command to the client.
 /// </summary>
 public sealed record AttackCommandResponseDto
 {

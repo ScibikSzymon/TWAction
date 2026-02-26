@@ -1,3 +1,4 @@
+using TWAction.Application.AttackCommands.Interfaces;
 using TWAction.Application.Common;
 using TWAction.Application.ReconnaissanceActions.Commands;
 using TWAction.Application.ReconnaissanceActions.DTOs;
@@ -6,7 +7,7 @@ using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Schedules.Services;
 using TWAction.Application.Settings.Interfaces;
 using TWAction.Application.Tribes.Interfaces;
-using TWAction.Domain.ReconnaissanceActions;
+using TWAction.Domain.AttackCommands;
 using TWAction.Domain.Tribes;
 
 namespace TWAction.Application.ReconnaissanceActions.Handlers;

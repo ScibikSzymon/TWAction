@@ -1,6 +1,6 @@
-using TWAction.Domain.ReconnaissanceActions;
+using TWAction.Domain.AttackCommands;
 
-namespace TWAction.Application.ReconnaissanceActions.Interfaces;
+namespace TWAction.Application.AttackCommands.Interfaces;
 
 public interface IAttackCommandRepository
 {

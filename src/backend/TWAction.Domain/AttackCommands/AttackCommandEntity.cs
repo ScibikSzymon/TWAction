@@ -1,7 +1,7 @@
-namespace TWAction.Domain.ReconnaissanceActions;
+namespace TWAction.Domain.AttackCommands;
 
 /// <summary>
-/// Represents a reconnaissance attack command generated for a schedule.
+/// Represents an attack command generated for a schedule.
 /// </summary>
 public sealed class AttackCommandEntity
 {
@@ -26,7 +26,7 @@ public sealed class AttackCommandEntity
     public int DestinationY { get; set; }
     public int DestinationPlayerId { get; set; }
 
-    public string CommandType { get; set; } = "Reconnaissance";
+    public string CommandType { get; set; } = string.Empty;
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

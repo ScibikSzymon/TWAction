@@ -1,6 +1,4 @@
-using TWAction.Application.ReconnaissanceActions.DTOs;
-
-namespace TWAction.Application.ReconnaissanceActions.Commands;
+namespace TWAction.Application.AttackCommands.Queries;
 
 /// <summary>
 /// Query to get all attack commands for a schedule.
