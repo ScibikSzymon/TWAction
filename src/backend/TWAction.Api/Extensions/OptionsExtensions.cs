@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using TWAction.Api.Options;
 using TWAction.Infrastructure.Auth;
 
@@ -7,7 +5,7 @@ namespace TWAction.Api.Extensions;
 
 public static class OptionsExtensions
 {
-    public static IServiceCollection AddApiOptions(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApiOptions(this IServiceCollection services)
     {
         services.AddOptions<GoogleOptions>()
             .BindConfiguration(GoogleOptions.SectionName)

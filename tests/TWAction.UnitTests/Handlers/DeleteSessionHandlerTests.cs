@@ -1,4 +1,6 @@
 using AwesomeAssertions;
+using FluentValidation;
+using FluentValidation.Results;
 using NSubstitute;
 using TWAction.Application.Users.Commands;
 using TWAction.Application.Users.Interfaces;
@@ -9,28 +11,23 @@ namespace TWAction.UnitTests.Handlers;
 public sealed class DeleteSessionHandlerTests
 {
     private readonly IUserSessionRepository _sessionRepository;
+    private readonly IValidator<DeleteSessionCommand> _fluentValidator;
     private readonly DeleteSessionHandler _handler;
 
     public DeleteSessionHandlerTests()
     {
         _sessionRepository = Substitute.For<IUserSessionRepository>();
-        _handler = new DeleteSessionHandler(_sessionRepository);
+        _fluentValidator = Substitute.For<IValidator<DeleteSessionCommand>>();
+        _fluentValidator.ValidateAsync(Arg.Any<DeleteSessionCommand>(), Arg.Any<CancellationToken>())
+            .Returns(new ValidationResult());
+        _handler = new DeleteSessionHandler(_sessionRepository, _fluentValidator);
     }
 
     [Fact]
     public async Task Handle_WithValidSessionId_ReturnsSuccessResult()
     {
         var sessionId = Guid.NewGuid();
-        var session = new UserSessionEntity
-        {
-            Id = sessionId,
-            UserId = Guid.NewGuid(),
-            ExpiresAt = DateTimeOffset.UtcNow.AddHours(1)
-        };
         var command = new DeleteSessionCommand(sessionId);
-
-        _sessionRepository.GetByIdAsync(sessionId, Arg.Any<CancellationToken>())
-            .Returns(session);
 
         var result = await _handler.Handle(command);
 
@@ -44,8 +41,12 @@ public sealed class DeleteSessionHandlerTests
         var sessionId = Guid.NewGuid();
         var command = new DeleteSessionCommand(sessionId);
 
-        _sessionRepository.GetByIdAsync(sessionId, Arg.Any<CancellationToken>())
-            .Returns((UserSessionEntity?)null);
+        var failures = new List<ValidationFailure>
+        {
+            new("SessionId", $"Session with ID '{sessionId}' not found.")
+        };
+        _fluentValidator.ValidateAsync(command, Arg.Any<CancellationToken>())
+            .Returns(new ValidationResult(failures));
 
         var result = await _handler.Handle(command);
 
@@ -58,21 +59,11 @@ public sealed class DeleteSessionHandlerTests
     public async Task Handle_WithCancellationToken_PropagatesCancellationToken()
     {
         var sessionId = Guid.NewGuid();
-        var session = new UserSessionEntity
-        {
-            Id = sessionId,
-            UserId = Guid.NewGuid(),
-            ExpiresAt = DateTimeOffset.UtcNow.AddHours(1)
-        };
         var command = new DeleteSessionCommand(sessionId);
         var cancellationToken = new CancellationToken();
 
-        _sessionRepository.GetByIdAsync(sessionId, cancellationToken)
-            .Returns(session);
-
         await _handler.Handle(command, cancellationToken);
 
-        await _sessionRepository.Received(1).GetByIdAsync(sessionId, cancellationToken);
         await _sessionRepository.Received(1).DeleteByIdAsync(sessionId, cancellationToken);
     }
 }

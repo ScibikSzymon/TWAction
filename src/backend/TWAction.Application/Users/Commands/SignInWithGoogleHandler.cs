@@ -1,3 +1,4 @@
+using FluentValidation;
 using TWAction.Application.Common;
 using TWAction.Application.Mappers;
 using TWAction.Application.Users.DTOs;
@@ -8,20 +9,37 @@ namespace TWAction.Application.Handlers;
 
 public sealed record SignInWithGoogleCommand(string Email, string? DisplayName, string Provider = "google");
 
-/// <summary>
-/// Handles sign-in operations using Google authentication.
-/// Creates new users if they don't exist and manages session creation.
-/// </summary>
-public class SignInWithGoogleHandler(IUserRepository userRepository, IUserSessionRepository sessionRepository)
+public sealed class SignInWithGoogleCommandValidator : AbstractValidator<SignInWithGoogleCommand>
 {
-    /// <summary>
-    /// Processes a Google sign-in command and returns a result containing session information.
-    /// </summary>
-    /// <param name="command">The sign-in command containing user email and display name.</param>
-    /// <param name="cancellationToken">Cancellation token for async operations.</param>
-    /// <returns>A Result containing SignInResult on success, or error information on failure.</returns>
+    public SignInWithGoogleCommandValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .WithMessage("Email must not be empty.")
+            .EmailAddress()
+            .WithMessage("Email must be a valid email address.");
+
+        RuleFor(x => x.Provider)
+            .NotEmpty()
+            .WithMessage("Provider must not be empty.");
+    }
+}
+
+public class SignInWithGoogleHandler(
+    IUserRepository userRepository,
+    IUserSessionRepository sessionRepository,
+    IValidator<SignInWithGoogleCommand> fluentValidator)
+{
     public async Task<Result<SignInResultDto>> Handle(SignInWithGoogleCommand command, CancellationToken cancellationToken = default)
     {
+        var validationFailure = await FluentValidationBefore.ValidateAsync<SignInWithGoogleCommand, SignInResultDto>(
+            fluentValidator, command, cancellationToken);
+
+        if (validationFailure is not null)
+        {
+            return validationFailure;
+        }
+
         var user = await userRepository.FindByEmailAsync(command.Email, command.Provider, cancellationToken);
         if (user is null)
         {
