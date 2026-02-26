@@ -1,6 +1,4 @@
-using FluentValidation;
 using TWAction.Application.Common;
-using TWAction.Application.Interfaces;
 using TWAction.Application.Mappers;
 using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Settings.DTOs;
@@ -21,83 +19,59 @@ public sealed record SaveReconnaissanceSettingsCommand(
     bool SkipNightSendings
 );
 
-public sealed class SaveReconnaissanceSettingsCommandValidator : AbstractValidator<SaveReconnaissanceSettingsCommand>
-{
-    public SaveReconnaissanceSettingsCommandValidator(
-        ICurrentUserAccessor currentUser,
-        IScheduleRepository scheduleRepository)
-    {
-        RuleFor(x => x.ScheduleId)
-            .NotEmpty()
-            .WithMessage("Schedule ID must not be empty.");
-
-        RuleFor(x => x.ScheduleId)
-            .MustAsync(async (scheduleId, cancellationToken) =>
-            {
-                var schedule = await scheduleRepository.GetByIdAsync(scheduleId, cancellationToken);
-                return schedule is not null;
-            })
-            .WithMessage(command => $"Schedule with ID '{command.ScheduleId}' not found.")
-            .When(command => currentUser.TryGetUserId(out _));
-
-        RuleFor(x => x.ScheduleId)
-            .MustAsync(async (scheduleId, cancellationToken) =>
-            {
-                var schedule = await scheduleRepository.GetByIdAsync(scheduleId, cancellationToken);
-                if (schedule is null) return true;
-                if (currentUser.IsAdmin) return true;
-                currentUser.TryGetUserId(out var userId);
-                return schedule.UserGuid == userId;
-            })
-            .WithMessage("Schedule not found for specified user.")
-            .When(command => currentUser.TryGetUserId(out _));
-
-        RuleFor(x => x.ScheduleId)
-            .MustAsync(async (scheduleId, cancellationToken) =>
-            {
-                var schedule = await scheduleRepository.GetByIdAsync(scheduleId, cancellationToken);
-                if (schedule is null) return true;
-                return schedule.ScheduleType == ScheduleType.Reconnaissance;
-            })
-            .WithMessage("Reconnaissance settings can only be set for schedules with type 'Reconnaissance'.")
-            .When(command => currentUser.TryGetUserId(out _));
-
-        RuleFor(x => x.MinArrivalTime)
-            .Must((command, minArrival) => minArrival > command.MinDepartureTime)
-            .WithMessage("MinArrivalTime must be after MinDepartureTime.");
-
-        RuleFor(x => x.MaxArrivalTime)
-            .Must((command, maxArrival) => maxArrival > command.MinArrivalTime)
-            .WithMessage("MaxArrivalTime must be after MinArrivalTime.");
-
-        RuleFor(x => x.MinSpyCount)
-            .GreaterThanOrEqualTo(1)
-            .WithMessage("MinSpyCount must be at least 1.");
-
-        RuleFor(x => x.MinDistanceToFront)
-            .GreaterThanOrEqualTo(0)
-            .WithMessage("MinDistanceToFront cannot be negative.");
-
-        RuleFor(x => x.MaxPopulationInSourceVillage)
-            .GreaterThanOrEqualTo(0)
-            .WithMessage("MaxPopulationInSourceVillage cannot be negative.");
-    }
-}
-
 public class SaveReconnaissanceSettingsHandler(
     IReconnaissanceSettingsRepository settingsRepository,
-    IValidator<SaveReconnaissanceSettingsCommand> fluentValidator)
+    IScheduleRepository scheduleRepository)
 {
     public async Task<Result<ReconnaissanceSettingsDto>> Handle(
         SaveReconnaissanceSettingsCommand command,
         CancellationToken cancellationToken = default)
     {
-        var validationFailure = await FluentValidationBefore.ValidateAsync<SaveReconnaissanceSettingsCommand, ReconnaissanceSettingsDto>(
-            fluentValidator, command, cancellationToken);
-
-        if (validationFailure is not null)
+        // Validate schedule exists
+        var schedule = await scheduleRepository.GetByIdAsync(command.ScheduleId, cancellationToken);
+        if (schedule is null)
         {
-            return validationFailure;
+            return Result.Failure<ReconnaissanceSettingsDto>(
+                $"Schedule with ID '{command.ScheduleId}' not found.");
+        }
+
+        // Validate schedule type is Reconnaissance
+        if (schedule.ScheduleType != ScheduleType.Reconnaissance)
+        {
+            return Result.Failure<ReconnaissanceSettingsDto>(
+                $"Reconnaissance settings can only be set for schedules with type 'Reconnaissance'. Current type: '{schedule.ScheduleType}'.");
+        }
+
+        // Validate time constraints
+        if (command.MinArrivalTime <= command.MinDepartureTime)
+        {
+            return Result.Failure<ReconnaissanceSettingsDto>(
+                "MinArrivalTime must be after MinDepartureTime.");
+        }
+
+        if (command.MaxArrivalTime <= command.MinArrivalTime)
+        {
+            return Result.Failure<ReconnaissanceSettingsDto>(
+                "MaxArrivalTime must be after MinArrivalTime.");
+        }
+
+        // Validate numeric constraints
+        if (command.MinSpyCount < 1)
+        {
+            return Result.Failure<ReconnaissanceSettingsDto>(
+                "MinSpyCount must be at least 1.");
+        }
+
+        if (command.MinDistanceToFront < 0)
+        {
+            return Result.Failure<ReconnaissanceSettingsDto>(
+                "MinDistanceToFront cannot be negative.");
+        }
+
+        if (command.MaxPopulationInSourceVillage < 0)
+        {
+            return Result.Failure<ReconnaissanceSettingsDto>(
+                "MaxPopulationInSourceVillage cannot be negative.");
         }
 
         // Check if settings already exist (upsert)

@@ -1,37 +1,46 @@
 using AwesomeAssertions;
-using FluentValidation;
-using FluentValidation.Results;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using TWAction.Application.Schedules.Commands;
 using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Tribes.Interfaces;
+using TWAction.Application.Users.Interfaces;
 using TWAction.Domain.Schedules;
 using TWAction.Domain.Tribes;
+using TWAction.Domain.Users;
 
 namespace TWAction.UnitTests.Handlers;
 
 public sealed class CreateScheduleHandlerTests
 {
     private readonly IScheduleRepository _scheduleRepository;
+    private readonly IUserRepository _userRepository;
     private readonly ITribesService _tribesService;
-    private readonly IValidator<CreateScheduleCommand> _fluentValidator;
     private readonly CreateScheduleHandler _handler;
 
     public CreateScheduleHandlerTests()
     {
         _scheduleRepository = Substitute.For<IScheduleRepository>();
+        _userRepository = Substitute.For<IUserRepository>();
         _tribesService = Substitute.For<ITribesService>();
-        _fluentValidator = Substitute.For<IValidator<CreateScheduleCommand>>();
-        _fluentValidator.ValidateAsync(Arg.Any<CreateScheduleCommand>(), Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult());
-        _handler = new CreateScheduleHandler(_scheduleRepository, _tribesService, _fluentValidator);
+        _handler = new CreateScheduleHandler(_scheduleRepository, _userRepository, _tribesService);
     }
 
     [Fact]
     public async Task Handle_WithValidCommand_CreatesScheduleSuccessfully()
     {
         var userId = Guid.NewGuid();
+        var user = new UserEntity
+        {
+            Id = userId,
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            Provider = "google",
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
@@ -66,6 +75,9 @@ public sealed class CreateScheduleHandlerTests
     {
         var userId = Guid.NewGuid();
 
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns((UserEntity?)null);
+
         var command = new CreateScheduleCommand(
             UserId: userId,
             Name: "Test Schedule",
@@ -73,13 +85,6 @@ public sealed class CreateScheduleHandlerTests
             ScheduleType: ScheduleType.Fake,
             EnemyTribalWarsIds: []
         );
-
-        var failures = new List<ValidationFailure>
-        {
-            new("UserId", $"User with ID '{userId}' not found.")
-        };
-        _fluentValidator.ValidateAsync(command, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
 
         var result = await _handler.Handle(command);
 
@@ -96,6 +101,14 @@ public sealed class CreateScheduleHandlerTests
     public async Task Handle_WithValidEnemyTribes_AddsEnemiesToSchedule()
     {
         var userId = Guid.NewGuid();
+        var user = new UserEntity
+        {
+            Id = userId,
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            Provider = "google",
+            CreatedAt = DateTimeOffset.UtcNow
+        };
 
         var tribes = new List<TribeInfo>
         {
@@ -103,6 +116,9 @@ public sealed class CreateScheduleHandlerTests
             new() { TribalWarsId = 2, Name = "Tribe Two", Short = "T2", VillagesCount = 200 },
             new() { TribalWarsId = 3, Name = "Tribe Three", Short = "T3", VillagesCount = 300 }
         };
+
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns(user);
 
         _tribesService.GetTribesAsync(WorldType.pl219, Arg.Any<CancellationToken>())
             .Returns(tribes);
@@ -132,12 +148,23 @@ public sealed class CreateScheduleHandlerTests
     public async Task Handle_WithNonExistentEnemyTribes_ReturnsFailure()
     {
         var userId = Guid.NewGuid();
+        var user = new UserEntity
+        {
+            Id = userId,
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            Provider = "google",
+            CreatedAt = DateTimeOffset.UtcNow
+        };
 
         var tribes = new List<TribeInfo>
         {
             new() { TribalWarsId = 1, Name = "Tribe One", Short = "T1", VillagesCount = 100 },
             new() { TribalWarsId = 2, Name = "Tribe Two", Short = "T2", VillagesCount = 200 }
         };
+
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns(user);
 
         _tribesService.GetTribesAsync(WorldType.pl218, Arg.Any<CancellationToken>())
             .Returns(tribes);
@@ -166,6 +193,17 @@ public sealed class CreateScheduleHandlerTests
     public async Task Handle_WhenTribesServiceThrowsException_ReturnsFailure()
     {
         var userId = Guid.NewGuid();
+        var user = new UserEntity
+        {
+            Id = userId,
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            Provider = "google",
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns(user);
 
         _tribesService.GetTribesAsync(WorldType.pl218, Arg.Any<CancellationToken>())
             .Throws(new HttpRequestException("Network error"));
@@ -193,6 +231,17 @@ public sealed class CreateScheduleHandlerTests
     public async Task Handle_WithEmptyEnemyList_DoesNotCallTribesService()
     {
         var userId = Guid.NewGuid();
+        var user = new UserEntity
+        {
+            Id = userId,
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            Provider = "google",
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
@@ -225,6 +274,17 @@ public sealed class CreateScheduleHandlerTests
     public async Task Handle_WithDifferentWorldTypes_CreatesScheduleWithCorrectWorld(WorldType world)
     {
         var userId = Guid.NewGuid();
+        var user = new UserEntity
+        {
+            Id = userId,
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            Provider = "google",
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
@@ -250,6 +310,17 @@ public sealed class CreateScheduleHandlerTests
     public async Task Handle_WithDifferentScheduleTypes_CreatesScheduleWithCorrectType(ScheduleType scheduleType)
     {
         var userId = Guid.NewGuid();
+        var user = new UserEntity
+        {
+            Id = userId,
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            Provider = "google",
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
@@ -272,6 +343,17 @@ public sealed class CreateScheduleHandlerTests
     public async Task Handle_CreatesScheduleWithUniqueId()
     {
         var userId = Guid.NewGuid();
+        var user = new UserEntity
+        {
+            Id = userId,
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            Provider = "google",
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
@@ -294,8 +376,19 @@ public sealed class CreateScheduleHandlerTests
     public async Task Handle_SetsCreationDateToUtcNow()
     {
         var userId = Guid.NewGuid();
+        var user = new UserEntity
+        {
+            Id = userId,
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            Provider = "google",
+            CreatedAt = DateTimeOffset.UtcNow
+        };
 
         var beforeTest = DateTimeOffset.UtcNow;
+
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => callInfo.Arg<ScheduleEntity>());

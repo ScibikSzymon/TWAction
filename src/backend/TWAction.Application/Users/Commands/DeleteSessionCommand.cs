@@ -1,4 +1,3 @@
-using FluentValidation;
 using TWAction.Application.Common;
 using TWAction.Application.Users.Interfaces;
 
@@ -6,36 +5,19 @@ namespace TWAction.Application.Users.Commands;
 
 public sealed record DeleteSessionCommand(Guid SessionId);
 
-public sealed class DeleteSessionCommandValidator : AbstractValidator<DeleteSessionCommand>
+public class DeleteSessionHandler(IUserSessionRepository sessionRepository)
 {
-    public DeleteSessionCommandValidator(IUserSessionRepository sessionRepository)
-    {
-        RuleFor(x => x.SessionId)
-            .NotEmpty()
-            .WithMessage("Session ID must not be empty.");
-
-        RuleFor(x => x.SessionId)
-            .MustAsync(async (sessionId, cancellationToken) =>
-            {
-                var session = await sessionRepository.GetByIdAsync(sessionId, cancellationToken);
-                return session is not null;
-            })
-            .WithMessage(command => $"Session with ID '{command.SessionId}' not found.");
-    }
-}
-
-public class DeleteSessionHandler(
-    IUserSessionRepository sessionRepository,
-    IValidator<DeleteSessionCommand> fluentValidator)
-{
+    /// <summary>
+    /// Handles the deletion of a user session.
+    /// </summary>
+    /// <returns>A result indicating success or failure with an error message.</returns>
     public async Task<Result> Handle(DeleteSessionCommand command, CancellationToken cancellationToken = default)
     {
-        var validationFailure = await FluentValidationBefore.ValidateAsync(
-            fluentValidator, command, cancellationToken);
+        var session = await sessionRepository.GetByIdAsync(command.SessionId, cancellationToken);
 
-        if (validationFailure is not null)
+        if (session is null)
         {
-            return validationFailure;
+            return Result.Failure($"Session with ID '{command.SessionId}' not found.");
         }
 
         await sessionRepository.DeleteByIdAsync(command.SessionId, cancellationToken);

@@ -1,6 +1,4 @@
-using FluentValidation;
 using TWAction.Application.Common;
-using TWAction.Application.Interfaces;
 using TWAction.Application.Mappers;
 using TWAction.Application.Schedules.DTOs;
 using TWAction.Application.Schedules.Interfaces;
@@ -18,76 +16,24 @@ public sealed record UpdateScheduleCommand(
     IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
 
-public sealed class UpdateScheduleCommandValidator : AbstractValidator<UpdateScheduleCommand>
-{
-    public UpdateScheduleCommandValidator(
-        ICurrentUserAccessor currentUser,
-        IScheduleRepository scheduleRepository)
-    {
-        RuleFor(x => x.ScheduleId)
-            .NotEmpty()
-            .WithMessage("Schedule ID must not be empty.");
-
-        RuleFor(x => x.Name)
-            .NotEmpty()
-            .WithMessage("Schedule name is required.")
-            .MaximumLength(100)
-            .WithMessage("Schedule name must not exceed 100 characters.");
-
-        RuleFor(x => x.World)
-            .IsInEnum()
-            .WithMessage("World must be a valid WorldType value.");
-
-        RuleFor(x => x.ScheduleType)
-            .IsInEnum()
-            .WithMessage("Schedule type must be a valid ScheduleType value.");
-
-        RuleFor(x => x.EnemyTribalWarsIds)
-            .Must(ids => ids is null || ids.All(id => id > 0))
-            .WithMessage("All enemy Tribal Wars IDs must be positive integers.");
-
-        RuleFor(x => x.ScheduleId)
-            .MustAsync(async (scheduleId, cancellationToken) =>
-            {
-                var schedule = await scheduleRepository.GetByIdAsync(scheduleId, cancellationToken);
-                return schedule is not null;
-            })
-            .WithMessage(command => $"Schedule with ID '{command.ScheduleId}' not found.")
-            .When(command => currentUser.TryGetUserId(out _));
-
-        RuleFor(x => x.ScheduleId)
-            .MustAsync(async (scheduleId, cancellationToken) =>
-            {
-                var schedule = await scheduleRepository.GetByIdAsync(scheduleId, cancellationToken);
-                if (schedule is null) return true;
-                if (currentUser.IsAdmin) return true;
-                currentUser.TryGetUserId(out var userId);
-                return schedule.UserGuid == userId;
-            })
-            .WithMessage("Schedule not found for specified user.")
-            .When(command => currentUser.TryGetUserId(out _));
-    }
-}
 
 public class UpdateScheduleHandler(
     IScheduleRepository scheduleRepository,
-    ITribesService tribesService,
-    IValidator<UpdateScheduleCommand> fluentValidator)
+    ITribesService tribesService)
 {
-    /// <summary>
-    /// Handles schedule update — runs FluentValidation first, then applies changes.
-    /// </summary>
     public async Task<Result<ScheduleDto>> Handle(UpdateScheduleCommand command, CancellationToken cancellationToken = default)
     {
-        var validationFailure = await FluentValidationBefore.ValidateAsync<UpdateScheduleCommand, ScheduleDto>(
-            fluentValidator, command, cancellationToken);
+        var schedule = await scheduleRepository.GetByIdAsync(command.ScheduleId, cancellationToken);
 
-        if (validationFailure is not null)
+        if (schedule is null)
         {
-            return validationFailure;
+            return Result.Failure<ScheduleDto>($"Schedule with ID '{command.ScheduleId}' not found.");
         }
 
-        var schedule = (await scheduleRepository.GetByIdAsync(command.ScheduleId, cancellationToken))!;
+        if (string.IsNullOrWhiteSpace(command.Name))
+        {
+            return Result.Failure<ScheduleDto>("Schedule name cannot be empty.");
+        }
 
         schedule.Name = command.Name;
 

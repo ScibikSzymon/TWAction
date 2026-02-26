@@ -1,4 +1,3 @@
-using FluentValidation;
 using TWAction.Application.Common;
 using TWAction.Application.Mappers;
 using TWAction.Application.Tribes.DTOs;
@@ -9,30 +8,10 @@ namespace TWAction.Application.Tribes.Queries;
 
 public sealed record GetTribesQuery(WorldType World);
 
-public sealed class GetTribesQueryValidator : AbstractValidator<GetTribesQuery>
-{
-    public GetTribesQueryValidator()
-    {
-        RuleFor(x => x.World)
-            .IsInEnum()
-            .WithMessage("World must be a valid world type.");
-    }
-}
-
-public class GetTribesHandler(
-    ITribesService tribesService,
-    IValidator<GetTribesQuery> fluentValidator)
+public class GetTribesHandler(ITribesService tribesService)
 {
     public async Task<Result<IReadOnlyList<TribeDto>>> Handle(GetTribesQuery query, CancellationToken cancellationToken = default)
     {
-        var validationFailure = await FluentValidationBefore.ValidateAsync<GetTribesQuery, IReadOnlyList<TribeDto>>(
-            fluentValidator, query, cancellationToken);
-
-        if (validationFailure is not null)
-        {
-            return validationFailure;
-        }
-
         try
         {
             var tribes = await tribesService.GetTribesAsync(query.World, cancellationToken);

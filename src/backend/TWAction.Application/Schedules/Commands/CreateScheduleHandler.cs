@@ -1,6 +1,4 @@
-using FluentValidation;
 using TWAction.Application.Common;
-using TWAction.Application.Interfaces;
 using TWAction.Application.Mappers;
 using TWAction.Application.Schedules.DTOs;
 using TWAction.Application.Schedules.Interfaces;
@@ -19,58 +17,18 @@ public sealed record CreateScheduleCommand(
     IReadOnlyList<int> EnemyTribalWarsIds
 );
 
-public sealed class CreateScheduleCommandValidator : AbstractValidator<CreateScheduleCommand>
-{
-    public CreateScheduleCommandValidator(
-        ICurrentUserAccessor currentUser,
-        IUserRepository userRepository)
-    {
-        RuleFor(x => x.UserId)
-            .NotEmpty()
-            .WithMessage("User ID must not be empty.");
-
-        RuleFor(x => x.Name)
-            .NotEmpty()
-            .WithMessage("Schedule name is required.")
-            .MaximumLength(100)
-            .WithMessage("Schedule name must not exceed 100 characters.");
-
-        RuleFor(x => x.World)
-            .IsInEnum()
-            .WithMessage("World must be a valid WorldType value.");
-
-        RuleFor(x => x.ScheduleType)
-            .IsInEnum()
-            .WithMessage("Schedule type must be a valid ScheduleType value.");
-
-        RuleFor(x => x.EnemyTribalWarsIds)
-            .Must(ids => ids is null || ids.All(id => id > 0))
-            .WithMessage("All enemy Tribal Wars IDs must be positive integers.");
-
-        RuleFor(x => x.UserId)
-            .MustAsync(async (userId, cancellationToken) =>
-            {
-                var user = await userRepository.GetByIdAsync(userId, cancellationToken);
-                return user is not null;
-            })
-            .WithMessage(command => $"User with ID '{command.UserId}' not found.")
-            .When(command => currentUser.TryGetUserId(out _));
-    }
-}
 
 public class CreateScheduleHandler(
     IScheduleRepository scheduleRepository,
-    ITribesService tribesService,
-    IValidator<CreateScheduleCommand> fluentValidator)
+    IUserRepository userRepository,
+    ITribesService tribesService)
 {
     public async Task<Result<ScheduleDto>> Handle(CreateScheduleCommand command, CancellationToken cancellationToken = default)
     {
-        var validationFailure = await FluentValidationBefore.ValidateAsync<CreateScheduleCommand, ScheduleDto>(
-            fluentValidator, command, cancellationToken);
-
-        if (validationFailure is not null)
+        var user = await userRepository.GetByIdAsync(command.UserId, cancellationToken);
+        if (user is null)
         {
-            return validationFailure;
+            return Result.Failure<ScheduleDto>($"User with ID '{command.UserId}' not found.");
         }
 
         var schedule = new ScheduleEntity

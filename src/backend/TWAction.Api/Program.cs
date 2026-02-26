@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using TWAction.Infrastructure;
 using TWAction.Persistence;
 using TWAction.Api.Endpoints;
+using TWAction.Api.Validators;
 using TWAction.Api.Extensions;
-using TWAction.Application.Schedules.Queries;
 using FluentValidation;
 using System.Text.Json.Serialization;
 
@@ -14,14 +14,14 @@ builder.AddServiceDefaults();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
 
-builder.Services.AddApiOptions();
+builder.Services.AddApiOptions(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddApiAuthorizationPolicies();
 
-builder.Services.AddValidatorsFromAssemblyContaining<GetTroopsStateValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateScheduleRequestValidator>();
 
 // Configure JSON serialization to use string values for enums
 builder.Services.ConfigureHttpJsonOptions(options =>

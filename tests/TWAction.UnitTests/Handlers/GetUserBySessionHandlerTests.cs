@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using FluentValidation;
-using FluentValidation.Results;
 using NSubstitute;
 using TWAction.Application.Users.Interfaces;
 using TWAction.Application.Users.Queries;
@@ -12,17 +10,13 @@ public sealed class GetUserBySessionHandlerTests
 {
     private readonly IUserSessionRepository _sessionRepository;
     private readonly IUserRepository _userRepository;
-    private readonly IValidator<GetUserBySessionQuery> _fluentValidator;
     private readonly GetUserBySessionHandler _handler;
 
     public GetUserBySessionHandlerTests()
     {
         _sessionRepository = Substitute.For<IUserSessionRepository>();
         _userRepository = Substitute.For<IUserRepository>();
-        _fluentValidator = Substitute.For<IValidator<GetUserBySessionQuery>>();
-        _fluentValidator.ValidateAsync(Arg.Any<GetUserBySessionQuery>(), Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult());
-        _handler = new GetUserBySessionHandler(_sessionRepository, _userRepository, _fluentValidator);
+        _handler = new GetUserBySessionHandler(_sessionRepository, _userRepository);
     }
 
     [Fact]
@@ -66,12 +60,8 @@ public sealed class GetUserBySessionHandlerTests
         var sessionId = Guid.NewGuid();
         var query = new GetUserBySessionQuery(sessionId);
 
-        var failures = new List<ValidationFailure>
-        {
-            new("SessionId", $"Session with ID '{sessionId}' not found.")
-        };
-        _fluentValidator.ValidateAsync(query, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+        _sessionRepository.GetByIdAsync(sessionId, Arg.Any<CancellationToken>())
+            .Returns((UserSessionEntity?)null);
 
         var result = await _handler.Handle(query);
 
@@ -84,14 +74,17 @@ public sealed class GetUserBySessionHandlerTests
     public async Task Handle_WithExpiredSession_ReturnsFailureResult()
     {
         var sessionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var session = new UserSessionEntity
+        {
+            Id = sessionId,
+            UserId = userId,
+            ExpiresAt = DateTimeOffset.UtcNow.AddHours(-1)
+        };
         var query = new GetUserBySessionQuery(sessionId);
 
-        var failures = new List<ValidationFailure>
-        {
-            new("SessionId", "Session has expired.")
-        };
-        _fluentValidator.ValidateAsync(query, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+        _sessionRepository.GetByIdAsync(sessionId, Arg.Any<CancellationToken>())
+            .Returns(session);
 
         var result = await _handler.Handle(query);
 
@@ -104,33 +97,42 @@ public sealed class GetUserBySessionHandlerTests
     public async Task Handle_WithNonExistentUser_ReturnsFailureResult()
     {
         var sessionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var session = new UserSessionEntity
+        {
+            Id = sessionId,
+            UserId = userId,
+            ExpiresAt = DateTimeOffset.UtcNow.AddHours(2)
+        };
         var query = new GetUserBySessionQuery(sessionId);
 
-        var failures = new List<ValidationFailure>
-        {
-            new("SessionId", "User associated with the session was not found.")
-        };
-        _fluentValidator.ValidateAsync(query, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+        _sessionRepository.GetByIdAsync(sessionId, Arg.Any<CancellationToken>())
+            .Returns(session);
+        _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+            .Returns((UserEntity?)null);
 
         var result = await _handler.Handle(query);
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Contain("not found");
+        result.Error.Should().Contain($"User with ID '{userId}' not found.");
     }
 
     [Fact]
     public async Task Handle_WithSessionExpiringExactlyNow_ReturnsFailureResult()
     {
         var sessionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var now = DateTimeOffset.UtcNow;
+        var session = new UserSessionEntity
+        {
+            Id = sessionId,
+            UserId = userId,
+            ExpiresAt = now.AddMilliseconds(-100)
+        };
         var query = new GetUserBySessionQuery(sessionId);
 
-        var failures = new List<ValidationFailure>
-        {
-            new("SessionId", "Session has expired.")
-        };
-        _fluentValidator.ValidateAsync(query, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+        _sessionRepository.GetByIdAsync(sessionId, Arg.Any<CancellationToken>())
+            .Returns(session);
 
         var result = await _handler.Handle(query);
 
@@ -207,19 +209,21 @@ public sealed class GetUserBySessionHandlerTests
     public async Task Handle_VerifiesSessionExpirationBeforeRetrievingUser()
     {
         var sessionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var session = new UserSessionEntity
+        {
+            Id = sessionId,
+            UserId = userId,
+            ExpiresAt = DateTimeOffset.UtcNow.AddHours(-1)
+        };
         var query = new GetUserBySessionQuery(sessionId);
 
-        var failures = new List<ValidationFailure>
-        {
-            new("SessionId", "Session has expired.")
-        };
-        _fluentValidator.ValidateAsync(query, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+        _sessionRepository.GetByIdAsync(sessionId, Arg.Any<CancellationToken>())
+            .Returns(session);
 
         var result = await _handler.Handle(query);
 
         result.IsFailure.Should().BeTrue();
-        await _sessionRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _userRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 }

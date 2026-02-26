@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using FluentValidation;
-using FluentValidation.Results;
 using NSubstitute;
 using TWAction.Application.Settings.Queries;
 using TWAction.Application.Settings.Interfaces;
@@ -11,16 +9,12 @@ namespace TWAction.UnitTests.Handlers;
 public sealed class GetReconnaissanceSettingsHandlerTests
 {
     private readonly IReconnaissanceSettingsRepository _settingsRepository;
-    private readonly IValidator<GetReconnaissanceSettingsQuery> _fluentValidator;
     private readonly GetReconnaissanceSettingsHandler _handler;
 
     public GetReconnaissanceSettingsHandlerTests()
     {
         _settingsRepository = Substitute.For<IReconnaissanceSettingsRepository>();
-        _fluentValidator = Substitute.For<IValidator<GetReconnaissanceSettingsQuery>>();
-        _fluentValidator.ValidateAsync(Arg.Any<GetReconnaissanceSettingsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult());
-        _handler = new GetReconnaissanceSettingsHandler(_settingsRepository, _fluentValidator);
+        _handler = new GetReconnaissanceSettingsHandler(_settingsRepository);
     }
 
     [Fact]
@@ -68,12 +62,8 @@ public sealed class GetReconnaissanceSettingsHandlerTests
         var scheduleId = Guid.NewGuid();
         var query = new GetReconnaissanceSettingsQuery(scheduleId);
 
-        var failures = new List<ValidationFailure>
-        {
-            new("ScheduleId", $"Reconnaissance settings for schedule '{scheduleId}' not found.")
-        };
-        _fluentValidator.ValidateAsync(query, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+        _settingsRepository.GetByScheduleIdAsync(scheduleId, Arg.Any<CancellationToken>())
+            .Returns((ReconnaissanceSettings?)null);
 
         var result = await _handler.Handle(query);
 
@@ -81,6 +71,6 @@ public sealed class GetReconnaissanceSettingsHandlerTests
         result.Error.Should().Contain("not found");
         result.Error.Should().Contain(scheduleId.ToString());
 
-        await _settingsRepository.DidNotReceive().GetByScheduleIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _settingsRepository.Received(1).GetByScheduleIdAsync(scheduleId, Arg.Any<CancellationToken>());
     }
 }

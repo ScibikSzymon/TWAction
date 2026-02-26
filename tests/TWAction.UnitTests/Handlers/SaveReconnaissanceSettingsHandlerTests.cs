@@ -1,9 +1,9 @@
 using AwesomeAssertions;
-using FluentValidation;
-using FluentValidation.Results;
 using NSubstitute;
 using TWAction.Application.Settings.Commands;
 using TWAction.Application.Settings.Interfaces;
+using TWAction.Application.Schedules.Interfaces;
+using TWAction.Domain.Schedules;
 using TWAction.Domain.Settings;
 
 namespace TWAction.UnitTests.Handlers;
@@ -11,16 +11,14 @@ namespace TWAction.UnitTests.Handlers;
 public sealed class SaveReconnaissanceSettingsHandlerTests
 {
     private readonly IReconnaissanceSettingsRepository _settingsRepository;
-    private readonly IValidator<SaveReconnaissanceSettingsCommand> _fluentValidator;
+    private readonly IScheduleRepository _scheduleRepository;
     private readonly SaveReconnaissanceSettingsHandler _handler;
 
     public SaveReconnaissanceSettingsHandlerTests()
     {
         _settingsRepository = Substitute.For<IReconnaissanceSettingsRepository>();
-        _fluentValidator = Substitute.For<IValidator<SaveReconnaissanceSettingsCommand>>();
-        _fluentValidator.ValidateAsync(Arg.Any<SaveReconnaissanceSettingsCommand>(), Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult());
-        _handler = new SaveReconnaissanceSettingsHandler(_settingsRepository, _fluentValidator);
+        _scheduleRepository = Substitute.For<IScheduleRepository>();
+        _handler = new SaveReconnaissanceSettingsHandler(_settingsRepository, _scheduleRepository);
     }
 
     [Fact]
@@ -40,6 +38,15 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             MaxPopulationInSourceVillage: 100,
             SkipNightSendings: false
         );
+
+        var schedule = new ScheduleEntity
+        {
+            Id = scheduleId,
+            ScheduleType = ScheduleType.Reconnaissance
+        };
+
+        _scheduleRepository.GetByIdAsync(scheduleId, Arg.Any<CancellationToken>())
+            .Returns(schedule);
 
         _settingsRepository.GetByScheduleIdAsync(scheduleId, Arg.Any<CancellationToken>())
             .Returns((ReconnaissanceSettings?)null);
@@ -64,6 +71,7 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
         result.Value.MaxPopulationInSourceVillage.Should().Be(100);
         result.Value.SkipNightSendings.Should().BeFalse();
 
+        await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.Received(1).GetByScheduleIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.Received(1).CreateAsync(
             Arg.Is<ReconnaissanceSettings>(s =>
@@ -98,6 +106,12 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             SkipNightSendings: true
         );
 
+        var schedule = new ScheduleEntity
+        {
+            Id = scheduleId,
+            ScheduleType = ScheduleType.Reconnaissance
+        };
+
         var existingSettings = new ReconnaissanceSettings
         {
             Id = settingsId,
@@ -110,6 +124,9 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             MaxPopulationInSourceVillage = 50,
             SkipNightSendings = false
         };
+
+        _scheduleRepository.GetByIdAsync(scheduleId, Arg.Any<CancellationToken>())
+            .Returns(schedule);
 
         _settingsRepository.GetByScheduleIdAsync(scheduleId, Arg.Any<CancellationToken>())
             .Returns(existingSettings);
@@ -130,6 +147,7 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
         result.Value.MaxPopulationInSourceVillage.Should().Be(200);
         result.Value.SkipNightSendings.Should().BeTrue();
 
+        await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.Received(1).GetByScheduleIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.Received(1).UpdateAsync(
             Arg.Is<ReconnaissanceSettings>(s =>
@@ -161,12 +179,8 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             SkipNightSendings: false
         );
 
-        var failures = new List<ValidationFailure>
-        {
-            new("ScheduleId", $"Schedule with ID '{scheduleId}' not found.")
-        };
-        _fluentValidator.ValidateAsync(command, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+        _scheduleRepository.GetByIdAsync(scheduleId, Arg.Any<CancellationToken>())
+            .Returns((ScheduleEntity?)null);
 
         var result = await _handler.Handle(command);
 
@@ -174,6 +188,7 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
         result.Error.Should().Contain("not found");
         result.Error.Should().Contain(scheduleId.ToString());
 
+        await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().GetByScheduleIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().CreateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().UpdateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
@@ -194,19 +209,23 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             SkipNightSendings: false
         );
 
-        var failures = new List<ValidationFailure>
+        var schedule = new ScheduleEntity
         {
-            new("ScheduleId", "Reconnaissance settings can only be set for schedules with type 'Reconnaissance'.")
+            Id = scheduleId,
+            ScheduleType = ScheduleType.Main
         };
-        _fluentValidator.ValidateAsync(command, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+
+        _scheduleRepository.GetByIdAsync(scheduleId, Arg.Any<CancellationToken>())
+            .Returns(schedule);
 
         var result = await _handler.Handle(command);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Contain("Reconnaissance settings can only be set");
         result.Error.Should().Contain("Reconnaissance");
+        result.Error.Should().Contain(ScheduleType.Main.ToString());
 
+        await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().GetByScheduleIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().CreateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().UpdateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
@@ -228,18 +247,21 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             SkipNightSendings: false
         );
 
-        var failures = new List<ValidationFailure>
+        var schedule = new ScheduleEntity
         {
-            new("MinArrivalTime", "MinArrivalTime must be after MinDepartureTime.")
+            Id = scheduleId,
+            ScheduleType = ScheduleType.Reconnaissance
         };
-        _fluentValidator.ValidateAsync(command, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+
+        _scheduleRepository.GetByIdAsync(scheduleId, Arg.Any<CancellationToken>())
+            .Returns(schedule);
 
         var result = await _handler.Handle(command);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Contain("MinArrivalTime must be after MinDepartureTime");
 
+        await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().GetByScheduleIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().CreateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().UpdateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
@@ -262,18 +284,21 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             SkipNightSendings: false
         );
 
-        var failures = new List<ValidationFailure>
+        var schedule = new ScheduleEntity
         {
-            new("MaxArrivalTime", "MaxArrivalTime must be after MinArrivalTime.")
+            Id = scheduleId,
+            ScheduleType = ScheduleType.Reconnaissance
         };
-        _fluentValidator.ValidateAsync(command, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+
+        _scheduleRepository.GetByIdAsync(scheduleId, Arg.Any<CancellationToken>())
+            .Returns(schedule);
 
         var result = await _handler.Handle(command);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Contain("MaxArrivalTime must be after MinArrivalTime");
 
+        await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().GetByScheduleIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().CreateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().UpdateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
@@ -295,18 +320,21 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             SkipNightSendings: false
         );
 
-        var failures = new List<ValidationFailure>
+        var schedule = new ScheduleEntity
         {
-            new("MinSpyCount", "MinSpyCount must be at least 1.")
+            Id = scheduleId,
+            ScheduleType = ScheduleType.Reconnaissance
         };
-        _fluentValidator.ValidateAsync(command, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+
+        _scheduleRepository.GetByIdAsync(scheduleId, Arg.Any<CancellationToken>())
+            .Returns(schedule);
 
         var result = await _handler.Handle(command);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Contain("MinSpyCount must be at least 1");
 
+        await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().GetByScheduleIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().CreateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().UpdateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
@@ -328,18 +356,21 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             SkipNightSendings: false
         );
 
-        var failures = new List<ValidationFailure>
+        var schedule = new ScheduleEntity
         {
-            new("MinDistanceToFront", "MinDistanceToFront cannot be negative.")
+            Id = scheduleId,
+            ScheduleType = ScheduleType.Reconnaissance
         };
-        _fluentValidator.ValidateAsync(command, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+
+        _scheduleRepository.GetByIdAsync(scheduleId, Arg.Any<CancellationToken>())
+            .Returns(schedule);
 
         var result = await _handler.Handle(command);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Contain("MinDistanceToFront cannot be negative");
 
+        await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().GetByScheduleIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().CreateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().UpdateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
@@ -361,18 +392,21 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             SkipNightSendings: false
         );
 
-        var failures = new List<ValidationFailure>
+        var schedule = new ScheduleEntity
         {
-            new("MaxPopulationInSourceVillage", "MaxPopulationInSourceVillage cannot be negative.")
+            Id = scheduleId,
+            ScheduleType = ScheduleType.Reconnaissance
         };
-        _fluentValidator.ValidateAsync(command, Arg.Any<CancellationToken>())
-            .Returns(new ValidationResult(failures));
+
+        _scheduleRepository.GetByIdAsync(scheduleId, Arg.Any<CancellationToken>())
+            .Returns(schedule);
 
         var result = await _handler.Handle(command);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Contain("MaxPopulationInSourceVillage cannot be negative");
 
+        await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().GetByScheduleIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().CreateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
         await _settingsRepository.DidNotReceive().UpdateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>());
