@@ -1,11 +1,13 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// Po³¹czenie z istniej¹c¹ baz¹ z Docker Compose (connection string z appsettings)
-var appDb = builder.AddConnectionString("TWActionDatabase");
+// PostgreSQL (container) + a logical database
+var postgres = builder.AddPostgres("postgres");
+var appDb = postgres.AddDatabase("TWActionDatabase");
 
 // Backend Api (.NET project)
 var Api = builder.AddProject<Projects.TWAction_Api>("Api")
-    .WithReference(appDb);
+    .WithReference(appDb)
+    .WaitFor(appDb);
 
 // ActionGenerator Api (.NET project)
 var actionGeneratorApi = builder.AddProject<Projects.ActionGenerator_Api>("action-generator-Api")
