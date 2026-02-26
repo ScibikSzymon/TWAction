@@ -19,6 +19,11 @@ public static class AttackCommandsEndpoints
             .WithName("GetAttackCommands")
             .Produces<IReadOnlyList<AttackCommandResponseDto>>();
 
+        group.MapGet("summary", GetAttackCommandsSummary)
+            .WithName("GetAttackCommandsSummary")
+            .Produces<AttackCommandsSummaryDto>()
+            .Produces(StatusCodes.Status404NotFound);
+
         return app;
     }
 
@@ -41,6 +46,30 @@ public static class AttackCommandsEndpoints
         if (result.IsFailure)
         {
             return Results.NotFound(new { error = result.Error });
+        }
+
+        return Results.Ok(result.Value);
+    }
+
+    private static async Task<IResult> GetAttackCommandsSummary(
+        Guid scheduleId,
+        HttpContext httpContext,
+        GetAttackCommandsSummaryHandler handler,
+        IMessageBus bus,
+        CancellationToken cancellationToken)
+    {
+        var ownershipResult = await ScheduleOwnershipHelper.ValidateOwnershipAsync(scheduleId, httpContext, bus);
+        if (ownershipResult is not null)
+        {
+            return ownershipResult;
+        }
+
+        var query = new GetAttackCommandsSummaryQuery(scheduleId);
+        var result = await handler.Handle(query, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return Results.NotFound();
         }
 
         return Results.Ok(result.Value);
