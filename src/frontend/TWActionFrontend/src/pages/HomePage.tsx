@@ -189,6 +189,7 @@ const HomePage = () => {
               {activeScheduleId &&
                 schedules.some((s) => s.id === activeScheduleId) && (
                   <ScheduleTabs
+                    key={activeScheduleId}
                     schedule={schedules.find((s) => s.id === activeScheduleId)!}
                   />
                 )}
