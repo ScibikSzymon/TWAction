@@ -10,6 +10,7 @@ import styles from "./TroopsStateManager.module.css";
 interface ReconnaissanceActionsGeneratorProps {
   scheduleId: string;
   schedule: Schedule | null;
+  onScheduleUpdate?: (updatedSchedule: Partial<Schedule>) => void;
 }
 
 const formatDate = (isoString: string): string =>
@@ -32,8 +33,11 @@ const getCommandTypeLabel = (type: string): string =>
 export const ReconnaissanceActionsGenerator = ({
   scheduleId,
   schedule,
+  onScheduleUpdate,
 }: ReconnaissanceActionsGeneratorProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [hasSettings, setHasSettings] = useState(false);
@@ -134,6 +138,58 @@ export const ReconnaissanceActionsGenerator = ({
     }
   };
 
+  const handleSendToPlemionaRozpiski = async (forceOverwrite: boolean = false) => {
+    // If already sent and not forcing overwrite, show confirmation dialog
+    if (schedule?.sentToPlemionaRozpiskiAt && !forceOverwrite) {
+      setShowConfirmDialog(true);
+      return;
+    }
+
+    setIsSending(true);
+    setError(null);
+    setSuccessMessage(null);
+    setShowConfirmDialog(false);
+
+    try {
+      const response = await attackCommandsService.sendToPlemionaRozpiski(
+        scheduleId,
+        forceOverwrite,
+      );
+
+      setSuccessMessage(
+        `Pomyślnie wysłano ${response.commandsSentCount} komend na plemionarozpiski.pl!`,
+      );
+
+      // Notify parent about schedule update
+      onScheduleUpdate?.({ sentToPlemionaRozpiskiAt: response.sentAt });
+
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 10000);
+    } catch (err: unknown) {
+      console.error("Error sending to plemionarozpiski.pl:", err);
+
+      let errorMessage = "Nie udało się wysłać rozpiski na plemionarozpiski.pl";
+
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosError = err as {
+          response?: {
+            status?: number;
+            data?: { error?: string };
+          };
+        };
+
+        if (axiosError.response?.data?.error) {
+          errorMessage = axiosError.response.data.error;
+        }
+      }
+
+      setError(errorMessage);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const hasEnemies = schedule?.enemyIds && schedule.enemyIds.length > 0;
   const canGenerate =
     hasEnemies && hasSettings && hasTroopsState && !isCheckingPrerequisites;
@@ -202,6 +258,12 @@ export const ReconnaissanceActionsGenerator = ({
               Data wygenerowania:{" "}
               <strong>{formatDate(summary.generatedAt)}</strong>
             </li>
+            {schedule?.sentToPlemionaRozpiskiAt && (
+              <li>
+                Wysłano na plemionarozpiski.pl:{" "}
+                <strong>{formatDate(schedule.sentToPlemionaRozpiskiAt)}</strong>
+              </li>
+            )}
           </ul>
         </div>
       )}
@@ -240,12 +302,57 @@ export const ReconnaissanceActionsGenerator = ({
               : "Generuj Akcje Zwiadowcze"}
         </button>
 
+        {summary && (
+          <button
+            className={styles.uploadBtn}
+            onClick={() => handleSendToPlemionaRozpiski(false)}
+            disabled={isSending}
+            style={{ marginLeft: "10px" }}
+          >
+            {isSending
+              ? "Wysyłanie..."
+              : schedule?.sentToPlemionaRozpiskiAt
+                ? "Wyślij ponownie na plemionarozpiski.pl"
+                : "Wyślij na plemionarozpiski.pl"}
+          </button>
+        )}
+
         {!canGenerate && !isCheckingPrerequisites && (
           <p className={styles.hint}>
             Wypełnij wszystkie wymagane dane, aby móc wygenerować akcje.
           </p>
         )}
       </div>
+
+      {showConfirmDialog && (
+        <div className={styles.confirmDialog}>
+          <div className={styles.confirmDialogContent}>
+            <p>
+              Ta rozpiska została już wysłana na plemionarozpiski.pl dnia{" "}
+              <strong>
+                {schedule?.sentToPlemionaRozpiskiAt &&
+                  formatDate(schedule.sentToPlemionaRozpiskiAt)}
+              </strong>
+              .
+            </p>
+            <p>Czy na pewno chcesz nadpisać istniejącą rozpiskę?</p>
+            <div className={styles.confirmDialogButtons}>
+              <button
+                className={styles.uploadBtn}
+                onClick={() => handleSendToPlemionaRozpiski(true)}
+              >
+                Tak, nadpisz
+              </button>
+              <button
+                className={styles.cancelBtn}
+                onClick={() => setShowConfirmDialog(false)}
+              >
+                Anuluj
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

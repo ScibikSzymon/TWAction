@@ -18,6 +18,12 @@ public static class AttackCommandsEndpoints
             .Produces<AttackCommandsSummaryDto>()
             .Produces(StatusCodes.Status404NotFound);
 
+        group.MapPost("send-to-plemiona-rozpiski", SendToPlemionaRozpiski)
+            .WithName("SendToPlemionaRozpiski")
+            .Produces<SendToPlemionaRozpiskiResponse>()
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound);
+
         return app;
     }
 
@@ -44,4 +50,31 @@ public static class AttackCommandsEndpoints
 
         return Results.Ok(result.Value);
     }
+
+    private static async Task<IResult> SendToPlemionaRozpiski(
+        Guid scheduleId,
+        [AsParameters] SendToPlemionaRozpiskiRequest request,
+        HttpContext httpContext,
+        SendToPlemionaRozpiskiHandler handler,
+        IMessageBus bus,
+        CancellationToken cancellationToken)
+    {
+        var ownershipResult = await ScheduleOwnershipHelper.ValidateOwnershipAsync(scheduleId, httpContext, bus);
+        if (ownershipResult is not null)
+        {
+            return ownershipResult;
+        }
+
+        var command = new SendToPlemionaRozpiskiCommand(scheduleId, request.ForceOverwrite);
+        var result = await handler.Handle(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return Results.BadRequest(new { error = result.Error });
+        }
+
+        return Results.Ok(result.Value);
+    }
 }
+
+public sealed record SendToPlemionaRozpiskiRequest(bool ForceOverwrite = false);

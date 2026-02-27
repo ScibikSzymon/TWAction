@@ -6,5 +6,7 @@ export interface AttackCommandsSummary {
   generatedAt: string;
 }
 
-  createdAt: string;
+export interface SendToPlemionaRozpiskiResponse {
+  commandsSentCount: number;
+  sentAt: string;
 }

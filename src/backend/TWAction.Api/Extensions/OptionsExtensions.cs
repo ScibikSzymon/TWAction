@@ -30,6 +30,11 @@ public static class OptionsExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<PlemionaRozpiskiApiOptions>()
+            .BindConfiguration(PlemionaRozpiskiApiOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         return services;
     }
 }

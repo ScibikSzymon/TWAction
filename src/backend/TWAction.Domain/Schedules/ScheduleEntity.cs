@@ -17,6 +17,8 @@ public class ScheduleEntity
     public ScheduleType ScheduleType { get; set; }
     
     public List<TribeInfo> Enemies { get; set; } = new();
+    
+    public DateTimeOffset? SentToPlemionaRozpiskiAt { get; set; }
 }
 
 

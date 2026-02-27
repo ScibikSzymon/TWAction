@@ -8,11 +8,12 @@ import styles from "./ScheduleTabs.module.css";
 
 interface ScheduleTabsProps {
   schedule: Schedule;
+  onScheduleUpdate?: (updatedSchedule: Partial<Schedule>) => void;
 }
 
 type TabType = "troops" | "reconnaissance" | "generate";
 
-export const ScheduleTabs = ({ schedule }: ScheduleTabsProps) => {
+export const ScheduleTabs = ({ schedule, onScheduleUpdate }: ScheduleTabsProps) => {
   const [activeTab, setActiveTab] = useState<TabType>("troops");
 
   const tabs: { id: TabType; label: string; visible: boolean }[] = [
@@ -58,6 +59,7 @@ export const ScheduleTabs = ({ schedule }: ScheduleTabsProps) => {
             <ReconnaissanceActionsGenerator
               scheduleId={schedule.id}
               schedule={schedule}
+              onScheduleUpdate={onScheduleUpdate}
             />
           )}
       </div>

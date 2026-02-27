@@ -17,6 +17,8 @@ public sealed record ScheduleDto
     public required ScheduleType ScheduleType { get; init; }
 
     public required IReadOnlyList<int> EnemyIds { get; init; }
+
+    public DateTimeOffset? SentToPlemionaRozpiskiAt { get; init; }
 }
 
 

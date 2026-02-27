@@ -1,5 +1,8 @@
 import { apiClient } from "../config/api";
-import type { AttackCommandsSummary } from "../types/attackCommands";
+import type {
+  AttackCommandsSummary,
+  SendToPlemionaRozpiskiResponse,
+} from "../types/attackCommands";
 
 export const attackCommandsService = {
   async getAttackCommandsSummary(
@@ -21,5 +24,17 @@ export const attackCommandsService = {
       }
       throw err;
     }
+  },
+
+  async sendToPlemionaRozpiski(
+    scheduleId: string,
+    forceOverwrite: boolean = false,
+  ): Promise<SendToPlemionaRozpiskiResponse> {
+    const { data } = await apiClient.post<SendToPlemionaRozpiskiResponse>(
+      `/schedules/${scheduleId}/attack-commands/send-to-plemiona-rozpiski`,
+      null,
+      { params: { forceOverwrite } },
+    );
+    return data;
   },
 };
