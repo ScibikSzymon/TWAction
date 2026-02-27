@@ -13,7 +13,10 @@ interface ScheduleTabsProps {
 
 type TabType = "troops" | "reconnaissance" | "generate";
 
-export const ScheduleTabs = ({ schedule, onScheduleUpdate }: ScheduleTabsProps) => {
+export const ScheduleTabs = ({
+  schedule,
+  onScheduleUpdate,
+}: ScheduleTabsProps) => {
   const [activeTab, setActiveTab] = useState<TabType>("troops");
 
   const tabs: { id: TabType; label: string; visible: boolean }[] = [

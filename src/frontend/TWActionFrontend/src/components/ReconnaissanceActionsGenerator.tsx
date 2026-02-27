@@ -138,7 +138,9 @@ export const ReconnaissanceActionsGenerator = ({
     }
   };
 
-  const handleSendToPlemionaRozpiski = async (forceOverwrite: boolean = false) => {
+  const handleSendToPlemionaRozpiski = async (
+    forceOverwrite: boolean = false,
+  ) => {
     // If already sent and not forcing overwrite, show confirmation dialog
     if (schedule?.sentToPlemionaRozpiskiAt && !forceOverwrite) {
       setShowConfirmDialog(true);

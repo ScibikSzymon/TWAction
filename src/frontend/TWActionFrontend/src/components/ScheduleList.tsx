@@ -19,14 +19,23 @@ export const ScheduleList = ({
 }: ScheduleListProps) => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const handleDelete = async (scheduleId: string) => {
-    if (!window.confirm("Czy na pewno chcesz usunąć tę rozpiskę?")) {
+  const handleDelete = async (schedule: Schedule) => {
+    let confirmMessage = "Czy na pewno chcesz usunąć tę rozpiskę?";
+
+    if (schedule.sentToPlemionaRozpiskiAt) {
+      confirmMessage =
+        "Ta rozpiska została wysłana na plemionarozpiski.pl.\n\n" +
+        "Usunięcie jej spowoduje również usunięcie rozpiski na plemionarozpiski.pl.\n\n" +
+        "Czy na pewno chcesz kontynuować?";
+    }
+
+    if (!window.confirm(confirmMessage)) {
       return;
     }
 
-    setDeletingId(scheduleId);
+    setDeletingId(schedule.id);
     try {
-      await onDelete(scheduleId);
+      await onDelete(schedule.id);
     } catch (err) {
       console.error("Error deleting schedule:", err);
       alert("Wystąpił błąd podczas usuwania rozpiski");
@@ -96,7 +105,7 @@ export const ScheduleList = ({
                 Edytuj
               </button>
               <button
-                onClick={() => handleDelete(schedule.id)}
+                onClick={() => handleDelete(schedule)}
                 disabled={deletingId === schedule.id}
                 className={styles.deleteBtn}
               >

@@ -119,7 +119,10 @@ const HomePage = () => {
     setEditingSchedule(undefined);
   };
 
-  const handleScheduleUpdate = (scheduleId: string, updates: Partial<Schedule>) => {
+  const handleScheduleUpdate = (
+    scheduleId: string,
+    updates: Partial<Schedule>,
+  ) => {
     setSchedules((prev) =>
       prev.map((s) => (s.id === scheduleId ? { ...s, ...updates } : s)),
     );
