@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using TWAction.Api.Extensions;
+using TWAction.Application.Common;
 using TWAction.Application.ReconnaissanceActions.Commands;
+using TWAction.Application.ReconnaissanceActions.DTOs;
 using TWAction.Application.ReconnaissanceActions.Handlers;
 using Wolverine;
 
@@ -22,21 +24,12 @@ public static class ReconnaissanceActionsEndpoints
 
     private static async Task<IResult> GenerateReconnaissanceActions(
         Guid scheduleId,
-        HttpContext httpContext,
-        GenerateReconnaissanceActionsHandler handler,
         IMessageBus bus,
         CancellationToken cancellationToken)
     {
-        // Validate schedule ownership
-        var ownershipResult = await ScheduleOwnershipHelper.ValidateOwnershipAsync(scheduleId, httpContext, bus);
-        if (ownershipResult is not null)
-        {
-            return ownershipResult;
-        }
-
         var command = new GenerateReconnaissanceActionsCommand(scheduleId);
 
-        var result = await handler.Handle(command, cancellationToken);
+        var result = await bus.InvokeAsync<Result<GenerateReconnaissanceActionsResponse>>(command);
 
         if (result.IsFailure)
         {
