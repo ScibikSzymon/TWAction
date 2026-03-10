@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using TWAction.Api.Extensions;
 using TWAction.Application.Common;
 using TWAction.Application.Schedules.DTOs;

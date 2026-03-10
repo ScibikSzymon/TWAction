@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using TWAction.Api.Options;
 
 namespace TWAction.Api.Extensions;
@@ -13,7 +12,7 @@ public static class AddCorsExtensions
             options.AddPolicy(AllowAllPolicy, corsBuilder =>
             {
                 var corsOptions = configuration.GetSection(CorsOptions.SectionName).Get<CorsOptions>();
-                
+
                 if (corsOptions?.AllowedOrigins is null || corsOptions.AllowedOrigins.Length == 0)
                 {
                     throw new InvalidOperationException(

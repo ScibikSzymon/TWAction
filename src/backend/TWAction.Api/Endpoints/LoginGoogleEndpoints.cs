@@ -2,7 +2,6 @@ namespace TWAction.Api.Endpoints;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -32,10 +31,10 @@ public static class LoginGoogleEndpoints
     }
 
     private static async Task<IResult> GetGoogleCallback(
-        HttpRequest request, 
-        HttpResponse response, 
-        IMessageBus bus, 
-        IOptions<GoogleOptions> googleOptions, 
+        HttpRequest request,
+        HttpResponse response,
+        IMessageBus bus,
+        IOptions<GoogleOptions> googleOptions,
         IOptions<AuthOptions> authOptions)
     {
         var q = request.Query;

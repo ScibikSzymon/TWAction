@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using TWAction.Domain.Users;
 
 namespace TWAction.Api.Extensions;

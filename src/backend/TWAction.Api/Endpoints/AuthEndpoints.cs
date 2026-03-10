@@ -1,6 +1,5 @@
 using Wolverine;
 using Microsoft.Extensions.Options;
-using TWAction.Application.Handlers;
 using TWAction.Application.Common;
 using Microsoft.AspNetCore.Mvc;
 using TWAction.Application.Users.DTOs;

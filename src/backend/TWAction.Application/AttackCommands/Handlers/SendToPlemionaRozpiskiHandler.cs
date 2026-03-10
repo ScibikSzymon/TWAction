@@ -3,7 +3,6 @@ using TWAction.Application.AttackCommands.Interfaces;
 using TWAction.Application.Common;
 using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Tribes.Interfaces;
-using TWAction.Domain.AttackCommands;
 
 namespace TWAction.Application.AttackCommands.Handlers;
 
