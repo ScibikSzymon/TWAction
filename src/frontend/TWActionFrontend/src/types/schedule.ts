@@ -29,7 +29,6 @@ export interface Schedule {
 }
 
 export interface CreateScheduleRequest {
-  userId: string;
   name: string;
   world: string;
   scheduleType: string;

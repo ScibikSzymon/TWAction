@@ -37,11 +37,21 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
     }
 
     [Fact]
+    public async Task GetReconnaissanceSettings_WhenUnauthenticated_ReturnsUnauthorized()
+    {
+        var scheduleId = Guid.NewGuid();
+
+        var response = await _client.GetAsync($"/schedules/{scheduleId}/reconnaissance");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
     public async Task GetReconnaissanceSettings_WhenSettingsExist_ReturnsSettings()
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
@@ -63,7 +73,11 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
         await dbContext.ReconnaissanceSettings.AddAsync(settings);
         await dbContext.SaveChangesAsync();
 
-        var response = await _client.GetAsync($"/schedules/{schedule.Id}/reconnaissance");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(
+            HttpMethod.Get,
+            $"/schedules/{schedule.Id}/reconnaissance",
+            session.Id);
+        var response = await _client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
         var returnedSettings = await response.Content.ReadFromJsonAsync<ReconnaissanceSettingsDto>(_jsonOptions);
@@ -85,13 +99,17 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
             scheduleType: ScheduleType.Reconnaissance);
 
-        var response = await _client.GetAsync($"/schedules/{schedule.Id}/reconnaissance");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(
+            HttpMethod.Get,
+            $"/schedules/{schedule.Id}/reconnaissance",
+            session.Id);
+        var response = await _client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -101,7 +119,7 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
@@ -122,7 +140,12 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
             SkipNightSendings = false
         };
 
-        var response = await _client.PutAsJsonAsync($"/schedules/{schedule.Id}/reconnaissance", request, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(
+            HttpMethod.Put,
+            $"/schedules/{schedule.Id}/reconnaissance",
+            session.Id);
+        httpRequest.Content = JsonContent.Create(request, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         response.EnsureSuccessStatusCode();
         var returnedSettings = await response.Content.ReadFromJsonAsync<ReconnaissanceSettingsDto>(_jsonOptions);
@@ -146,7 +169,7 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
@@ -183,7 +206,12 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
             SkipNightSendings = true
         };
 
-        var response = await _client.PutAsJsonAsync($"/schedules/{schedule.Id}/reconnaissance", request, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(
+            HttpMethod.Put,
+            $"/schedules/{schedule.Id}/reconnaissance",
+            session.Id);
+        httpRequest.Content = JsonContent.Create(request, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         response.EnsureSuccessStatusCode();
         var returnedSettings = await response.Content.ReadFromJsonAsync<ReconnaissanceSettingsDto>(_jsonOptions);
@@ -206,6 +234,9 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
     [Fact]
     public async Task SaveReconnaissanceSettings_WhenScheduleNotFound_ReturnsNotFound()
     {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var scheduleId = Guid.NewGuid();
         var request = new SaveReconnaissanceSettingsRequest
         {
@@ -218,7 +249,12 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
             SkipNightSendings = false
         };
 
-        var response = await _client.PutAsJsonAsync($"/schedules/{scheduleId}/reconnaissance", request, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(
+            HttpMethod.Put,
+            $"/schedules/{scheduleId}/reconnaissance",
+            session.Id);
+        httpRequest.Content = JsonContent.Create(request, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -228,7 +264,7 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
@@ -245,7 +281,12 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
             SkipNightSendings = false
         };
 
-        var response = await _client.PutAsJsonAsync($"/schedules/{schedule.Id}/reconnaissance", request, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(
+            HttpMethod.Put,
+            $"/schedules/{schedule.Id}/reconnaissance",
+            session.Id);
+        httpRequest.Content = JsonContent.Create(request, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -255,7 +296,7 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
@@ -274,7 +315,12 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
             SkipNightSendings = false
         };
 
-        var response = await _client.PutAsJsonAsync($"/schedules/{schedule.Id}/reconnaissance", request, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(
+            HttpMethod.Put,
+            $"/schedules/{schedule.Id}/reconnaissance",
+            session.Id);
+        httpRequest.Content = JsonContent.Create(request, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -284,7 +330,7 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
@@ -301,7 +347,12 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
             SkipNightSendings = false
         };
 
-        var response = await _client.PutAsJsonAsync($"/schedules/{schedule.Id}/reconnaissance", request, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(
+            HttpMethod.Put,
+            $"/schedules/{schedule.Id}/reconnaissance",
+            session.Id);
+        httpRequest.Content = JsonContent.Create(request, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -311,7 +362,7 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
@@ -328,7 +379,12 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
             SkipNightSendings = false
         };
 
-        var response = await _client.PutAsJsonAsync($"/schedules/{schedule.Id}/reconnaissance", request, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(
+            HttpMethod.Put,
+            $"/schedules/{schedule.Id}/reconnaissance",
+            session.Id);
+        httpRequest.Content = JsonContent.Create(request, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -338,7 +394,7 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
@@ -355,8 +411,33 @@ public sealed class ReconnaissanceSettingsEndpointsTests : IClassFixture<TWActio
             SkipNightSendings = false
         };
 
-        var response = await _client.PutAsJsonAsync($"/schedules/{schedule.Id}/reconnaissance", request, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(
+            HttpMethod.Put,
+            $"/schedules/{schedule.Id}/reconnaissance",
+            session.Id);
+        httpRequest.Content = JsonContent.Create(request, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task SaveReconnaissanceSettings_WhenUnauthenticated_ReturnsUnauthorized()
+    {
+        var scheduleId = Guid.NewGuid();
+        var request = new SaveReconnaissanceSettingsRequest
+        {
+            MinDepartureTime = DateTimeOffset.UtcNow,
+            MinArrivalTime = DateTimeOffset.UtcNow.AddHours(1),
+            MaxArrivalTime = DateTimeOffset.UtcNow.AddHours(2),
+            MinDistanceToFront = 5,
+            MinSpyCount = 1,
+            MaxPopulationInSourceVillage = 100,
+            SkipNightSendings = false
+        };
+
+        var response = await _client.PutAsJsonAsync($"/schedules/{scheduleId}/reconnaissance", request, _jsonOptions);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 }

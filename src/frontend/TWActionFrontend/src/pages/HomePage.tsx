@@ -35,7 +35,7 @@ const HomePage = () => {
     setIsLoadingSchedules(true);
     setError(null);
     try {
-      const data = await scheduleService.getSchedulesByUser(user.id);
+      const data = await scheduleService.getSchedules();
       setSchedules(data);
     } catch (err) {
       console.error("Error loading schedules:", err);
@@ -102,10 +102,7 @@ const HomePage = () => {
   const handleEdit = async (schedule: Schedule) => {
     try {
       // Pobierz najnowsze dane rozpiski z bazy
-      const freshSchedule = await scheduleService.getScheduleById(
-        user!.id,
-        schedule.id,
-      );
+      const freshSchedule = await scheduleService.getScheduleById(schedule.id);
       setEditingSchedule(freshSchedule);
       setShowForm(true);
     } catch (err) {
@@ -171,7 +168,6 @@ const HomePage = () => {
 
       {showForm ? (
         <ScheduleForm
-          userId={user!.id}
           schedule={editingSchedule}
           onSubmit={handleSubmitSchedule}
           onCancel={handleCancelForm}

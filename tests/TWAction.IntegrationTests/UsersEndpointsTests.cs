@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using TWAction.Application.Users.DTOs;
+using TWAction.Domain.Users;
 using TWAction.IntegrationTests.Helpers;
 using TWAction.Persistence;
 
@@ -26,11 +27,11 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     }
 
     [Fact]
-    public async Task GetUsers_WhenNoUsers_ReturnsEmptyList()
+    public async Task GetUsers_WhenAuthenticatedUserExists_ReturnsSingleUser()
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, role: UserRole.Admin);
 
         var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
         var response = await _client.SendAsync(request);
@@ -47,7 +48,7 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, role: UserRole.Admin);
         await TestDataSeeder.SeedMultipleUsersAsync(dbContext, 3);
 
         var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
@@ -65,7 +66,7 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, role: UserRole.Admin);
         var seededUser = await TestDataSeeder.SeedUserAsync(
             dbContext,
             email: "john.doe@example.com",
@@ -94,7 +95,7 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, role: UserRole.Admin);
 
         var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
         var response = await _client.SendAsync(request);
@@ -107,11 +108,24 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, role: UserRole.Admin);
 
         var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
         var response = await _client.SendAsync(request);
 
         Assert.Equal("application/json; charset=utf-8", response.Content.Headers.ContentType?.ToString());
+    }
+
+    [Fact]
+    public async Task GetUsers_WhenUserIsNotAdmin_ReturnsForbidden()
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
+
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
+        var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 }

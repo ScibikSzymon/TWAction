@@ -28,7 +28,6 @@ using TWAction.Application.AttackCommands.Handlers;
 using TWAction.Application.ReconnaissanceActions.Interfaces;
 using TWAction.Application.ReconnaissanceActions.Handlers;
 
-
 namespace TWAction.Infrastructure;
 
 public static class DependencyInjection
@@ -54,6 +53,7 @@ public static class DependencyInjection
         // Register HttpClient factory and IMemoryCache for TribalWars Api calls
         services.AddHttpClient<TribesHttpService>();
         services.AddMemoryCache();
+        services.AddHttpContextAccessor();
 
         // Register Generator.Api HTTP client
         services.AddHttpClient<IGeneratorApiClient, GeneratorApiClient>((serviceProvider, client) =>
@@ -77,6 +77,7 @@ public static class DependencyInjection
         services.AddScoped<ITroopsStateRepository, TroopsStateRepository>();
         services.AddScoped<IReconnaissanceSettingsRepository, ReconnaissanceSettingsRepository>();
         services.AddScoped<IAttackCommandRepository, AttackCommandRepository>();
+        services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
 
 
         services.AddSingleton<TroopsStateValidator>();

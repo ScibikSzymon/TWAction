@@ -7,10 +7,6 @@ public sealed class CreateScheduleRequestValidator : AbstractValidator<CreateSch
 {
     public CreateScheduleRequestValidator()
     {
-        RuleFor(x => x.UserId)
-            .NotEmpty()
-            .WithMessage("User ID is required.");
-
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Schedule name is required.")
