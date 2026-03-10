@@ -14,79 +14,86 @@ using TWAction.Application.Handlers;
 using Wolverine;
 using TWAction.Application.Common;
 using TWAction.Application.Users.DTOs;
+using TWAction.Infrastructure.Auth;
 
 public static class LoginGoogleEndpoints
 {
     public static IEndpointRouteBuilder MapLoginGoogleEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/auth/google", (HttpContext http, IOptions<GoogleOptions> googleOptions) =>
-        {
-            var opts = googleOptions.Value;
-            var clientId = opts?.ClientId;
-            var redirectUri = opts?.RedirectUri;
-            var scope = "openid email profile";
-            var state = Guid.NewGuid().ToString("N");
+        var group = app.MapGroup("/auth/google");
 
-            var url = $"https://accounts.google.com/o/oauth2/v2/auth?client_id={Uri.EscapeDataString(clientId)}&redirect_uri={Uri.EscapeDataString(redirectUri)}&response_type=code&scope={Uri.EscapeDataString(scope)}&state={state}&access_type=offline&prompt=consent";
-            return Results.Redirect(url);
-        });
+        group.MapGet("", GetGoogleRedirectUrl)
+            .WithName("LoginWithGoogle");
 
-        app.MapGet("/auth/google/callback", async (
-            HttpRequest request, 
-            HttpResponse response, 
-            IMessageBus bus, 
-            IOptions<GoogleOptions> googleOptions, 
-            IOptions<AuthOptions> authOptions) =>
-        {
-            var q = request.Query;
-            if (!q.TryGetValue("code", out var codeVals))
-            {
-                return Results.BadRequest(new { error = "Missing code" });
-            }
-
-            var code = codeVals.ToString();
-
-            var opts = googleOptions.Value;
-            var clientId = opts?.ClientId ?? string.Empty;
-            var clientSecret = opts?.ClientSecret ?? string.Empty;
-            var redirectUri = opts?.RedirectUri;
-
-            var idToken = await ExchangeCodeForIdTokenAsync(code, clientId, clientSecret, redirectUri);
-            if (string.IsNullOrEmpty(idToken))
-            {
-                return Results.StatusCode(502);
-            }
-
-            using var payloadJson = DecodeIdTokenPayload(idToken);
-            if (payloadJson is null)
-            {
-                return Results.StatusCode(502);
-            }
-
-            var email = payloadJson.RootElement.GetProperty("email").GetString() ?? string.Empty;
-            var name = payloadJson.RootElement.TryGetProperty("name", out var nameEl) ? nameEl.GetString() : null;
-
-            var result = await bus.InvokeAsync<Result<SignInResultDto>>(new SignInWithGoogleCommand(email, name, "google"));
-
-            if (result is null)
-            {
-                return Results.StatusCode(502);
-            }
-
-            SetSessionCookie(response, authOptions, result.Value.SessionId);
-            var frontendUrl = authOptions.Value.FrontendUrl;
-            if (string.IsNullOrWhiteSpace(frontendUrl))
-            {
-                return Results.Problem(
-                    detail: "FrontendUrl is not configured. Please set AuthOptions.FrontendUrl in configuration.",
-                    statusCode: StatusCodes.Status500InternalServerError);
-            }
-            return Results.Redirect(frontendUrl);
-        });
+        group.MapGet("/callback", GetGoogleCallback)
+            .WithName("GoogleCallback");
 
         return app;
     }
 
+    private static async Task<IResult> GetGoogleCallback(
+        HttpRequest request, 
+        HttpResponse response, 
+        IMessageBus bus, 
+        IOptions<GoogleOptions> googleOptions, 
+        IOptions<AuthOptions> authOptions)
+    {
+        var q = request.Query;
+        if (!q.TryGetValue("code", out var codeVals))
+        {
+            return Results.BadRequest(new { error = "Missing code" });
+        }
+
+        var code = codeVals.ToString();
+
+        var opts = googleOptions.Value;
+        var clientId = opts.ClientId;
+        var clientSecret = opts.ClientSecret;
+        var redirectUri = opts.RedirectUri;
+
+        var idToken = await ExchangeCodeForIdTokenAsync(code, clientId, clientSecret, redirectUri);
+        if (string.IsNullOrEmpty(idToken))
+        {
+            return Results.StatusCode(502);
+        }
+
+        using var payloadJson = DecodeIdTokenPayload(idToken);
+        if (payloadJson is null)
+        {
+            return Results.StatusCode(502);
+        }
+
+        var email = payloadJson.RootElement.GetProperty("email").GetString() ?? string.Empty;
+        var name = payloadJson.RootElement.TryGetProperty("name", out var nameEl) ? nameEl.GetString() : null;
+
+        var result = await bus.InvokeAsync<Result<SignInResultDto>>(new SignInWithGoogleCommand(email, name, "google"));
+
+        if (result is null)
+        {
+            return Results.StatusCode(502);
+        }
+
+        SetSessionCookie(response, authOptions, result.Value.SessionId);
+        var frontendUrl = authOptions.Value.FrontendUrl;
+        if (string.IsNullOrWhiteSpace(frontendUrl))
+        {
+            return Results.Problem(
+                detail: "FrontendUrl is not configured. Please set AuthOptions.FrontendUrl in configuration.",
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
+        return Results.Redirect(frontendUrl);
+    }
+    private static async Task<IResult> GetGoogleRedirectUrl(IOptions<GoogleOptions> googleOptions)
+    {
+        var opts = googleOptions.Value;
+        var clientId = opts.ClientId;
+        var redirectUri = opts.RedirectUri;
+        var scope = "openid email profile";
+        var state = Guid.NewGuid().ToString("N");
+
+        var url = $"https://accounts.google.com/o/oauth2/v2/auth?client_id={Uri.EscapeDataString(clientId)}&redirect_uri={Uri.EscapeDataString(redirectUri)}&response_type=code&scope={Uri.EscapeDataString(scope)}&state={state}&access_type=offline&prompt=consent";
+        return Results.Redirect(url);
+    }
     private static async Task<string?> ExchangeCodeForIdTokenAsync(string code, string clientId, string clientSecret, string redirectUri)
     {
         using var http = new HttpClient();

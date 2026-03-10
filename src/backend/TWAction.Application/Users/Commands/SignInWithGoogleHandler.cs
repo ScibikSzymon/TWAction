@@ -31,6 +31,7 @@ public class SignInWithGoogleHandler(IUserRepository userRepository, IUserSessio
                 Email = command.Email,
                 DisplayName = command.DisplayName,
                 Provider = command.Provider,
+                Role = UserRole.User,
                 CreatedAt = DateTimeOffset.UtcNow
             };
             user = await userRepository.AddAsync(user, cancellationToken);

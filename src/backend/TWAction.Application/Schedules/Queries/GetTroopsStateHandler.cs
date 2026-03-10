@@ -1,4 +1,5 @@
 using TWAction.Application.Common;
+using TWAction.Application.Interfaces;
 using TWAction.Application.Schedules.DTOs;
 using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Schedules.Services;
@@ -8,13 +9,34 @@ namespace TWAction.Application.Schedules.Queries;
 public sealed record GetTroopsStateQuery(Guid ScheduleId);
 
 public class GetTroopsStateHandler(
+    IScheduleRepository scheduleRepository,
     ITroopsStateRepository troopsStateRepository,
+    ICurrentUserAccessor currentUser,
     TroopsStateCompressionService compressionService,
     TroopsStateValidator validator,
     TroopsStateStatsExtractor statsExtractor)
 {
+    /// <summary>
+    /// Returns the current troops state for a schedule when the user is authorized.
+    /// </summary>
     public async Task<Result<TroopsStateDto>> Handle(GetTroopsStateQuery query, CancellationToken cancellationToken = default)
     {
+        if (!currentUser.TryGetUserId(out var userId))
+        {
+            return Result.Failure<TroopsStateDto>("User is not authenticated.");
+        }
+
+        var schedule = await scheduleRepository.GetByIdAsync(query.ScheduleId, cancellationToken);
+        if (schedule is null)
+        {
+            return Result.Failure<TroopsStateDto>($"Schedule with ID '{query.ScheduleId}' not found.");
+        }
+
+        if (!currentUser.IsAdmin && schedule.UserGuid != userId)
+        {
+            return Result.Failure<TroopsStateDto>("Schedule not found for specified user.");
+        }
+
         var troopsState = await troopsStateRepository.GetByScheduleIdAsync(query.ScheduleId, cancellationToken);
 
         if (troopsState is null)

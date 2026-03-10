@@ -7,5 +7,6 @@ namespace TWAction.Application.Mappers;
 [Mapper]
 public static partial class IUserMapper
 {
+    [MapProperty(nameof(UserEntity.Role), nameof(UserDto.Role), StringFormat = "G")]
     public static partial UserDto ToDto(UserEntity user);
 }

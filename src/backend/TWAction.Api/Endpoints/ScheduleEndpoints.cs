@@ -2,29 +2,40 @@ namespace TWAction.Api.Endpoints;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using TWAction.Api.Extensions;
+using TWAction.Api.Filters;
 using TWAction.Application.Common;
+using TWAction.Application.Interfaces;
 using TWAction.Application.Schedules.Commands;
 using TWAction.Application.Schedules.DTOs;
 using TWAction.Application.Schedules.Queries;
+using TWAction.Domain.Schedules;
 using Wolverine;
 
 public static class ScheduleEndpoints
 {
     public static IEndpointRouteBuilder MapScheduleEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/schedules");
+        var group = app.MapGroup("/schedules")
+            .RequireAuthorization(AuthorizationPolicies.UserOrAbove);
 
-        group.MapGet("/{userId}", GetSchedulesByUser)
-            .WithName("GetSchedulesByUser");
+        group.MapGet("", GetSchedulesForCurrentUser)
+            .WithName("GetSchedulesForCurrentUser");
 
-        group.MapGet("/{userId}/{scheduleId}", GetScheduleById)
+        group.MapGet("/admin/{userId}", GetSchedulesByUserAsAdmin)
+            .WithName("GetSchedulesByUserAsAdmin")
+            .RequireAuthorization(AuthorizationPolicies.AdminOnly);
+
+        group.MapGet("/{scheduleId}", GetScheduleById)
             .WithName("GetScheduleById");
 
         group.MapPost("", CreateSchedule)
-            .WithName("CreateSchedule");
+            .WithName("CreateSchedule")
+            .AddEndpointFilter<ValidationFilter<CreateScheduleRequest>>();
 
         group.MapPut("/{scheduleId}", UpdateSchedule)
-            .WithName("UpdateSchedule");
+            .WithName("UpdateSchedule")
+            .AddEndpointFilter<ValidationFilter<UpdateScheduleRequest>>();
 
         group.MapDelete("/{scheduleId}", DeleteSchedule)
             .WithName("DeleteSchedule");
@@ -32,10 +43,15 @@ public static class ScheduleEndpoints
         return app;
     }
 
-    private static async Task<IResult> GetSchedulesByUser(
-        Guid userId,
-        IMessageBus bus)
+    private static async Task<IResult> GetSchedulesForCurrentUser(
+        IMessageBus bus,
+        ICurrentUserAccessor currentUser)
     {
+        if (!currentUser.TryGetUserId(out var userId))
+        {
+            return Results.Unauthorized();
+        }
+
         var result = await bus.InvokeAsync<Result<IEnumerable<ScheduleDto>>>(new GetAllSchedulesQuery(userId));
         
         if (result.IsFailure)
@@ -46,11 +62,30 @@ public static class ScheduleEndpoints
         return Results.Ok(result.Value);
     }
 
-    private static async Task<IResult> GetScheduleById(
+    private static async Task<IResult> GetSchedulesByUserAsAdmin(
         Guid userId,
-        Guid scheduleId,
         IMessageBus bus)
     {
+        var result = await bus.InvokeAsync<Result<IEnumerable<ScheduleDto>>>(new GetAllSchedulesQuery(userId));
+
+        if (result.IsFailure)
+        {
+            return Results.BadRequest(new { error = result.Error });
+        }
+
+        return Results.Ok(result.Value);
+    }
+
+    private static async Task<IResult> GetScheduleById(
+        Guid scheduleId,
+        IMessageBus bus,
+        ICurrentUserAccessor currentUser)
+    {
+        if (!currentUser.TryGetUserId(out var userId))
+        {
+            return Results.Unauthorized();
+        }
+
         var result = await bus.InvokeAsync<Result<ScheduleDto>>(new GetScheduleByIdQuery(scheduleId));
 
         if (result.IsFailure)
@@ -58,7 +93,7 @@ public static class ScheduleEndpoints
             return Results.NotFound(new { error = result.Error });
         }
 
-        if (result.Value.UserId != userId)
+        if (!currentUser.IsAdmin && result.Value.UserId != userId)
         {
             return Results.NotFound(new { error = "Schedule not found for specified user." });
         }
@@ -68,14 +103,20 @@ public static class ScheduleEndpoints
 
     private static async Task<IResult> CreateSchedule(
         CreateScheduleRequest request,
-        IMessageBus bus)
+        IMessageBus bus,
+        ICurrentUserAccessor currentUser)
     {
+        if (!currentUser.TryGetUserId(out var userId))
+        {
+            return Results.Unauthorized();
+        }
+
         var command = new CreateScheduleCommand(
-            request.UserId,
+            userId,
             request.Name,
             request.World,
             request.ScheduleType,
-            request.EnemyTribalWarsIds ?? Array.Empty<int>()
+            request.EnemyTribalWarsIds ?? []
         );
 
 
@@ -86,14 +127,32 @@ public static class ScheduleEndpoints
             return Results.BadRequest(new { error = result.Error });
         }
 
-        return Results.Created($"/schedules/{result.Value.UserId}/{result.Value.Id}", result.Value);
+        return Results.Created($"/schedules/{result.Value.Id}", result.Value);
     }
 
     private static async Task<IResult> UpdateSchedule(
         Guid scheduleId,
         UpdateScheduleRequest request,
-        IMessageBus bus)
+        IMessageBus bus,
+        ICurrentUserAccessor currentUser)
     {
+        if (!currentUser.TryGetUserId(out var userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        var scheduleResult = await bus.InvokeAsync<Result<ScheduleDto>>(new GetScheduleByIdQuery(scheduleId));
+
+        if (scheduleResult.IsFailure)
+        {
+            return Results.NotFound(new { error = scheduleResult.Error });
+        }
+
+        if (!currentUser.IsAdmin && scheduleResult.Value.UserId != userId)
+        {
+            return Results.NotFound(new { error = "Schedule not found for specified user." });
+        }
+
         var command = new UpdateScheduleCommand(
             scheduleId,
             request.Name,
@@ -114,8 +173,26 @@ public static class ScheduleEndpoints
 
     private static async Task<IResult> DeleteSchedule(
         Guid scheduleId,
-        IMessageBus bus)
+        IMessageBus bus,
+        ICurrentUserAccessor currentUser)
     {
+        if (!currentUser.TryGetUserId(out var userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        var scheduleResult = await bus.InvokeAsync<Result<ScheduleDto>>(new GetScheduleByIdQuery(scheduleId));
+
+        if (scheduleResult.IsFailure)
+        {
+            return Results.NotFound(new { error = scheduleResult.Error });
+        }
+
+        if (!currentUser.IsAdmin && scheduleResult.Value.UserId != userId)
+        {
+            return Results.NotFound(new { error = "Schedule not found for specified user." });
+        }
+
         var result = await bus.InvokeAsync<Result>(new DeleteScheduleCommand(scheduleId));
 
         if (result.IsFailure)
@@ -129,17 +206,16 @@ public static class ScheduleEndpoints
 }
 
 public sealed record CreateScheduleRequest(
-    Guid UserId,
     string Name,
-    string World,
-    string ScheduleType,
+    WorldType World,
+    ScheduleType ScheduleType,
     IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
 
 public sealed record UpdateScheduleRequest(
     string Name,
-    string World,
-    string ScheduleType,
+    WorldType World,
+    ScheduleType ScheduleType,
     IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
 

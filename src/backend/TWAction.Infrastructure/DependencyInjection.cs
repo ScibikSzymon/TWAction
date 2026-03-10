@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication;
 using Wolverine;
 using TWAction.Application.Interfaces;
 using TWAction.Persistence;
 using TWAction.Persistence.Repositories;
 using TWAction.Infrastructure.Services;
+using TWAction.Infrastructure.Auth;
 using TWAction.Application.Handlers;
 using TWAction.Application.Users.Queries;
 using TWAction.Application.Users.Interfaces;
@@ -19,6 +21,7 @@ using TWAction.Application.Tribes.Queries;
 using TWAction.Application.Settings.Interfaces;
 using TWAction.Application.Settings.Queries;
 using TWAction.Application.Settings.Commands;
+using TWAction.Application.Interfaces;
 
 
 namespace TWAction.Infrastructure;
@@ -46,12 +49,14 @@ public static class DependencyInjection
         // Register HttpClient factory and IMemoryCache for TribalWars Api calls
         services.AddHttpClient<TribesHttpService>();
         services.AddMemoryCache();
+        services.AddHttpContextAccessor();
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ITroopsStateRepository, TroopsStateRepository>();
         services.AddScoped<IReconnaissanceSettingsRepository, ReconnaissanceSettingsRepository>();
+        services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
 
 
         services.AddSingleton<TroopsStateValidator>();
@@ -74,6 +79,12 @@ public static class DependencyInjection
         services.AddTransient<GetTribesHandler>();
         services.AddTransient<GetReconnaissanceSettingsHandler>();
         services.AddTransient<SaveReconnaissanceSettingsHandler>();
+
+        // Register authentication with session-based authentication handler
+        services.AddAuthentication(SessionAuthenticationHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
+                SessionAuthenticationHandler.SchemeName, 
+                options => { });
 
         return services;
     }

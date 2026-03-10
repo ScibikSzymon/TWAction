@@ -2,6 +2,7 @@ namespace TWAction.Api.Endpoints;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using TWAction.Api.Extensions;
 using TWAction.Application.Common;
 using TWAction.Application.Schedules.Commands;
 using TWAction.Application.Schedules.DTOs;
@@ -12,7 +13,8 @@ public static class TroopsStateEndpoints
 {
     public static IEndpointRouteBuilder MapTroopsStateEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/schedules/{scheduleId}/troops");
+        var group = app.MapGroup("/schedules/{scheduleId}/troops")
+            .RequireAuthorization(AuthorizationPolicies.UserOrAbove);
 
         group.MapPost("", UploadTroopsState)
             .WithName("UploadTroopsState");

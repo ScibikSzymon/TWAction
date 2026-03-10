@@ -11,8 +11,8 @@ namespace TWAction.Application.Schedules.Commands;
 public sealed record UpdateScheduleCommand(
     Guid ScheduleId,
     string Name,
-    string World,
-    string ScheduleType,
+    WorldType World,
+    ScheduleType ScheduleType,
     IReadOnlyList<int>? EnemyTribalWarsIds = null
 );
 
@@ -37,24 +37,14 @@ public class UpdateScheduleHandler(
 
         schedule.Name = command.Name;
 
-        if (!Enum.TryParse<WorldType>(command.World, ignoreCase: true, out var world))
-        {
-            return Result.Failure<ScheduleDto>($"Invalid world value '{command.World}'.");
-        }
-
-        if (!Enum.TryParse<ScheduleType>(command.ScheduleType, ignoreCase: true, out var scheduleType))
-        {
-            return Result.Failure<ScheduleDto>($"Invalid schedule type value '{command.ScheduleType}'.");
-        }
-
         // Clear enemies if world changed
-        if (world != schedule.World)
+        if (command.World != schedule.World)
         {
             schedule.Enemies.Clear();
         }
 
-        schedule.World = world;
-        schedule.ScheduleType = scheduleType;
+        schedule.World = command.World;
+        schedule.ScheduleType = command.ScheduleType;
 
         // Handle enemies if provided        
         if (command.EnemyTribalWarsIds != null)
@@ -63,7 +53,7 @@ public class UpdateScheduleHandler(
             {
                 try
                 {
-                    var tribes = await tribesService.GetTribesAsync(world, cancellationToken);
+                    var tribes = await tribesService.GetTribesAsync(command.World, cancellationToken);
 
                     var enemies = tribes
                         .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))

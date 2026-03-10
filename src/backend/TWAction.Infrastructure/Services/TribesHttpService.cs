@@ -27,7 +27,7 @@ public sealed class TribesHttpService(
         // Try to get from cache
         if (cache.TryGetValue(cacheKey, out IReadOnlyList<TribeInfo>? cachedTribes))
         {
-            return cachedTribes;
+            return cachedTribes!;
         }
 
         // Download gzip compressed file

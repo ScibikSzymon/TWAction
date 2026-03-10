@@ -12,6 +12,7 @@ public static class TestDataSeeder
         string email = "test@example.com",
         string? displayName = "Test User",
         string provider = "google",
+        UserRole role = UserRole.User,
         CancellationToken cancellationToken = default)
     {
         var user = new UserEntityBuilder()
@@ -19,6 +20,8 @@ public static class TestDataSeeder
             .WithDisplayName(displayName)
             .WithProvider(provider)
             .Build();
+
+        user.Role = role;
 
         await dbContext.Users.AddAsync(user, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -134,11 +137,19 @@ public static class TestDataSeeder
         string email = "test@example.com",
         string? displayName = "Test User",
         string provider = "google",
+        UserRole role = UserRole.User,
         CancellationToken cancellationToken = default)
     {
-        var user = await SeedUserAsync(dbContext, email, displayName, provider, cancellationToken);
+        var user = await SeedUserAsync(dbContext, email, displayName, provider, role, cancellationToken);
         var session = await SeedSessionAsync(dbContext, user.Id, cancellationToken: cancellationToken);
 
         return (user, session);
+    }
+
+    public static HttpRequestMessage CreateAuthenticatedRequest(HttpMethod method, string uri, Guid sessionId, string cookieName = "TWAction.Session")
+    {
+        var request = new HttpRequestMessage(method, uri);
+        request.Headers.Add("Cookie", $"{cookieName}={sessionId}");
+        return request;
     }
 }

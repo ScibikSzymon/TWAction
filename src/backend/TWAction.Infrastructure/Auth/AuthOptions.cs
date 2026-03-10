@@ -1,4 +1,4 @@
-namespace TWAction.Api.Options;
+namespace TWAction.Infrastructure.Auth;
 
 /// <summary>
 /// Configuration options for authentication settings.

@@ -1,12 +1,13 @@
 using Wolverine;
 using Microsoft.Extensions.Options;
-using TWAction.Api.Options;
 using TWAction.Application.Handlers;
 using TWAction.Application.Common;
 using Microsoft.AspNetCore.Mvc;
 using TWAction.Application.Users.DTOs;
 using TWAction.Application.Users.Queries;
 using TWAction.Application.Users.Commands;
+using TWAction.Infrastructure.Auth;
+using TWAction.Api.Extensions;
 
 namespace TWAction.Api.Endpoints;
 
@@ -46,7 +47,7 @@ public static class AuthEndpoints
             }
 
             return Results.Ok(user.Value);
-        });
+        }).RequireAuthorization(AuthorizationPolicies.UserOrAbove);
 
         group.MapPost("/logout", async (HttpContext http, IOptions<AuthOptions> options, IMessageBus bus) =>
         {

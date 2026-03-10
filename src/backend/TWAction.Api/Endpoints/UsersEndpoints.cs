@@ -2,6 +2,7 @@ namespace TWAction.Api.Endpoints;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using TWAction.Api.Extensions;
 using TWAction.Application.Common;
 using TWAction.Application.Users.DTOs;
 using TWAction.Application.Users.Queries;
@@ -15,7 +16,7 @@ public static class UsersEndpoints
         {
             var users = await bus.InvokeAsync<Result<IEnumerable<UserDto>>>(new GetAllUsersQuery());
             return Results.Json(users.Value);
-        });
+        }).RequireAuthorization(AuthorizationPolicies.AdminOnly);
 
         return app;
     }

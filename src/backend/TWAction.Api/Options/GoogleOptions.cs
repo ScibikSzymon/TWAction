@@ -11,15 +11,15 @@ public sealed class GoogleOptions
     /// <summary>
     /// Google OAuth client id.
     /// </summary>
-    public string? ClientId { get; set; }
+    public string ClientId { get; set; } = null!;
 
     /// <summary>
     /// Google OAuth client secret.
     /// </summary>
-    public string? ClientSecret { get; set; }
+    public string ClientSecret { get; set; } = null!;
 
     /// <summary>
     /// Redirect URI configured in Google Console for the OAuth2 callback.
     /// </summary>
-    public string? RedirectUri { get; set; }
+    public string RedirectUri { get; set; } = null!;
 }
