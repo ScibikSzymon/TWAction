@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using TWAction.Domain.Tribes;
 
 namespace TWAction.Infrastructure.Services;
@@ -6,7 +7,7 @@ namespace TWAction.Infrastructure.Services;
 /// Parses TribalWars player.txt CSV format (NO HEADER).
 /// Format: ID,Name,TribeID,VillagesCount,Points,Rank
 /// </summary>
-public sealed class PlayersCsvParser
+public sealed class PlayersCsvParser(ILogger<PlayersCsvParser> logger)
 {
     /// <summary>
     /// Parses player.txt data from TribalWars.
@@ -39,21 +40,21 @@ public sealed class PlayersCsvParser
 
             if (columns.Length < 6)
             {
-                Console.WriteLine($"Warning: Player row {i + 1} has {columns.Length} columns, expected 6. Line: {lines[i]}");
+                logger.LogWarning($"Warning: Player row {i + 1} has {columns.Length} columns, expected 6. Line: {lines[i]}");
                 continue;
             }
 
             // Parse player ID (column 0)
             if (!int.TryParse(columns[0].Trim(), out var id))
             {
-                Console.WriteLine($"Warning: Player row {i + 1} has invalid ID. Line: {lines[i]}");
+                logger.LogWarning($"Warning: Player row {i + 1} has invalid ID. Line: {lines[i]}");
                 continue;
             }
 
             // Parse tribe ID (column 2)
             if (!int.TryParse(columns[2].Trim(), out var tribeId))
             {
-                Console.WriteLine($"Warning: Player row {i + 1} has invalid TribeID. Line: {lines[i]}");
+                logger.LogWarning($"Warning: Player row {i + 1} has invalid TribeID. Line: {lines[i]}");
                 continue;
             }
 
