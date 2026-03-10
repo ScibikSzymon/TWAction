@@ -13,9 +13,6 @@ namespace TWAction.Api.Endpoints;
 
 public static class AuthEndpoints
 {
-    /// <summary>
-    /// Maps authentication-related endpoints.
-    /// </summary>
     public static void MapAuthEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/auth");
