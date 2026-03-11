@@ -61,10 +61,10 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore src/ActionGenerator/ActionGenerator.API/ActionGenerator.Api.csproj
+        run: dotnet restore src/ActionGenerator/ActionGenerator.Api/ActionGenerator.Api.csproj
 
       - name: Build
-        run: dotnet build src/ActionGenerator/ActionGenerator.API/ActionGenerator.Api.csproj --configuration Release --no-restore
+        run: dotnet build src/ActionGenerator/ActionGenerator.Api/ActionGenerator.Api.csproj --configuration Release --no-restore
 
   frontend:
     name: Build and Lint Frontend
