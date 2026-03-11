@@ -47,6 +47,25 @@ jobs:
             tests/TWAction.UnitTests/TestResults/*.trx
             tests/TWAction.IntegrationTests/TestResults/*.trx
 
+  actiongenerator:
+    name: Build ActionGenerator API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore src/ActionGenerator/ActionGenerator.API/ActionGenerator.Api.csproj
+
+      - name: Build
+        run: dotnet build src/ActionGenerator/ActionGenerator.API/ActionGenerator.Api.csproj --configuration Release --no-restore
+
   frontend:
     name: Build and Lint Frontend
     runs-on: ubuntu-latest
