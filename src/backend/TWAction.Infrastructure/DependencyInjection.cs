@@ -112,11 +112,6 @@ public static class DependencyInjection
             .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
                 SessionAuthenticationHandler.SchemeName, 
                 options => { });
-        // Register authentication with session-based authentication handler
-        services.AddAuthentication(SessionAuthenticationHandler.SchemeName)
-            .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
-                SessionAuthenticationHandler.SchemeName, 
-                options => { });
 
         return services;
     }
