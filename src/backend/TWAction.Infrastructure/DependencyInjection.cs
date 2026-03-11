@@ -102,10 +102,16 @@ public static class DependencyInjection
         services.AddTransient<GetTribesHandler>();
         services.AddTransient<GetReconnaissanceSettingsHandler>();
         services.AddTransient<SaveReconnaissanceSettingsHandler>();
+
         services.AddTransient<GenerateReconnaissanceActionsHandler>();
         services.AddTransient<GetAttackCommandsSummaryHandler>();
         services.AddTransient<SendToPlemionaRozpiskiHandler>();
 
+        // Register authentication with session-based authentication handler
+        services.AddAuthentication(SessionAuthenticationHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
+                SessionAuthenticationHandler.SchemeName, 
+                options => { });
         // Register authentication with session-based authentication handler
         services.AddAuthentication(SessionAuthenticationHandler.SchemeName)
             .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
