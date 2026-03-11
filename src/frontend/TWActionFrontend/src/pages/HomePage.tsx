@@ -116,6 +116,15 @@ const HomePage = () => {
     setEditingSchedule(undefined);
   };
 
+  const handleScheduleUpdate = (
+    scheduleId: string,
+    updates: Partial<Schedule>,
+  ) => {
+    setSchedules((prev) =>
+      prev.map((s) => (s.id === scheduleId ? { ...s, ...updates } : s)),
+    );
+  };
+
   const handleNewSchedule = () => {
     setEditingSchedule(undefined);
     setShowForm(true);
@@ -185,10 +194,10 @@ const HomePage = () => {
               {activeScheduleId &&
                 schedules.some((s) => s.id === activeScheduleId) && (
                   <ScheduleTabs
-                    scheduleId={activeScheduleId}
-                    scheduleType={
-                      schedules.find((s) => s.id === activeScheduleId)!
-                        .scheduleType
+                    key={activeScheduleId}
+                    schedule={schedules.find((s) => s.id === activeScheduleId)!}
+                    onScheduleUpdate={(updates) =>
+                      handleScheduleUpdate(activeScheduleId, updates)
                     }
                   />
                 )}

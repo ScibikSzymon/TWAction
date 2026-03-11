@@ -1,17 +1,15 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// PostgreSQL (container) + a logical database
-var postgres = builder.AddPostgres("postgres");
-var appDb = postgres.AddDatabase("TWActionDatabase");
+// Po³¹czenie z istniej¹c¹ baz¹ z Docker Compose (connection string z appsettings)
+var appDb = builder.AddConnectionString("TWActionDatabase");
+
+// ActionGenerator Api (.NET project)
+var actionGeneratorApi = builder.AddProject<Projects.ActionGenerator_Api>("action-generator-Api");
 
 // Backend Api (.NET project)
 var Api = builder.AddProject<Projects.TWAction_Api>("Api")
     .WithReference(appDb)
-    .WaitFor(appDb);
-
-// ActionGenerator Api (.NET project)
-var actionGeneratorApi = builder.AddProject<Projects.ActionGenerator_Api>("action-generator-Api")
-    .WithReference(Api);
+    .WithReference(actionGeneratorApi);  // TWAction.Api calls Generator.Api
 
 // React frontend (npm)
 // Path is relative to AppHost project folder. Adjust as needed.

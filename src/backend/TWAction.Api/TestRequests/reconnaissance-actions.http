@@ -1,0 +1,112 @@
+@baseUrl = https://localhost:8000
+@scheduleId = {{$guid}}
+@userId = {{$guid}}
+
+### Variables (update these with your actual values)
+# @scheduleId = 550e8400-e29b-41d4-a716-446655440000
+# @userId = 550e8400-e29b-41d4-a716-446655440001
+
+###
+# FLOW: Complete Reconnaissance Action Setup & Generation
+###
+
+### 1. Login with Google (redirect to Google OAuth)
+GET {{baseUrl}}/auth/google
+
+### 2. Get current user (after OAuth callback)
+GET {{baseUrl}}/auth/me
+
+### 3. Create a new schedule
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "name": "Recon Mission Q1 2026",
+  "world": "pl244",
+  "scheduleType": "Reconnaissance",
+  "enemyTribalWarsIds": [123, 456, 789]
+}
+
+### 4. Get all schedules for user
+GET {{baseUrl}}/schedules
+
+### 5. Get specific schedule
+GET {{baseUrl}}/schedules/{{scheduleId}}
+
+### 6. Upload troops state (Tab-separated format)
+POST {{baseUrl}}/schedules/{{scheduleId}}/troops
+Content-Type: application/json
+
+{
+  "rawData": "12345\t67890\t500\t501\t100\t50\t30\t20\t150\t10\t5\t8\t0\t0\n12346\t67890\t501\t502\t120\t60\t40\t25\t180\t15\t8\t10\t0\t0\n12347\t67891\t502\t503\t90\t45\t25\t18\t160\t12\t6\t9\t0\t0"
+}
+
+### 7. Get troops state
+GET {{baseUrl}}/schedules/{{scheduleId}}/troops
+
+### 8. Save reconnaissance settings
+PUT {{baseUrl}}/schedules/{{scheduleId}}/reconnaissance
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2026-02-15T08:00:00Z",
+  "minArrivalTime": "2026-02-15T12:00:00Z",
+  "maxArrivalTime": "2026-02-15T18:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 3,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true
+}
+
+### 9. Get reconnaissance settings
+GET {{baseUrl}}/schedules/{{scheduleId}}/reconnaissance
+
+### 10. Generate reconnaissance actions ??
+POST {{baseUrl}}/schedules/{{scheduleId}}/reconnaissance/actions
+
+### 11. Get generated attack commands
+GET {{baseUrl}}/schedules/{{scheduleId}}/reconnaissance/actions
+
+### 12. Update schedule (change enemy tribes)
+PUT {{baseUrl}}/schedules/{{scheduleId}}
+Content-Type: application/json
+
+{
+  "name": "Recon Mission Q1 2026 - Updated",
+  "world": "pl244",
+  "scheduleType": "Reconnaissance",
+  "enemyTribalWarsIds": [123, 456, 789, 999]
+}
+
+### 13. Delete schedule
+DELETE {{baseUrl}}/schedules/{{scheduleId}}
+
+### 14. Logout
+POST {{baseUrl}}/auth/logout
+
+###
+# STANDALONE ENDPOINTS
+###
+
+### Get all tribes for world
+GET {{baseUrl}}/tribes?world=pl244
+
+### Get all users (Admin only)
+GET {{baseUrl}}/users
+
+###
+# ERROR SCENARIOS
+###
+
+### Try to access schedule without authentication
+GET {{baseUrl}}/schedules/{{scheduleId}}
+
+### Try to generate actions without settings
+POST {{baseUrl}}/schedules/{{scheduleId}}/reconnaissance/actions
+
+### Try to access non-existent schedule
+GET {{baseUrl}}/schedules/00000000-0000-0000-0000-000000000000
+
+### Try to access someone else's schedule (should return 403 Forbid)
+# First create a schedule, then try to access it with different user's session
+GET {{baseUrl}}/schedules/{{scheduleId}}

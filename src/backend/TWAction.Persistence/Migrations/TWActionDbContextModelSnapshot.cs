@@ -22,6 +22,68 @@ namespace TWAction.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("TWAction.Domain.AttackCommands.AttackCommandEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CommandType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DestinationPlayerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DestinationVillageId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DestinationX")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DestinationY")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("MaxArrivalTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("MaxDepartureTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("MinArrivalTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("MinDepartureTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("SourcePlayerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SourceVillageId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SourceX")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SourceY")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("AttackCommands", (string)null);
+                });
+
             modelBuilder.Entity("TWAction.Domain.Schedules.ScheduleEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -41,6 +103,9 @@ namespace TWAction.Persistence.Migrations
 
                     b.Property<int>("ScheduleType")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("SentToPlemionaRozpiskiAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserGuid")
                         .HasColumnType("uuid");

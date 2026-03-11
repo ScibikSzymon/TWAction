@@ -25,6 +25,7 @@ export interface Schedule {
   world: WorldType;
   scheduleType: ScheduleType;
   enemyIds?: number[];
+  sentToPlemionaRozpiskiAt?: string;
 }
 
 export interface CreateScheduleRequest {

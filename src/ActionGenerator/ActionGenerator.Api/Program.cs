@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Scalar.AspNetCore;
 using ActionGenerator.Application;
 using ActionGenerator.Infrastructure;
@@ -21,6 +22,10 @@ public partial class Program
         }
 
         builder.Services.AddProblemDetails();
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
         builder.Services.AddAuthentication(ApiKeyAuthenticationDefaults.Scheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
                 ApiKeyAuthenticationDefaults.Scheme,

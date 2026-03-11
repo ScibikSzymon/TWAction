@@ -14,7 +14,7 @@ public static class ReconnaissanceSettingsEndpoints
     public static IEndpointRouteBuilder MapReconnaissanceSettingsEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/schedules/{scheduleId}/reconnaissance")
-            .RequireAuthorization(AuthorizationPolicies.UserOrAbove);;
+            .RequireAuthorization(AuthorizationPolicies.UserOrAbove); ;
 
         group.MapGet("", GetReconnaissanceSettings)
             .WithName("GetReconnaissanceSettings");

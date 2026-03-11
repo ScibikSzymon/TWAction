@@ -5,7 +5,6 @@ using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Tribes.Interfaces;
 using TWAction.Application.Users.Interfaces;
 using TWAction.Domain.Schedules;
-using TWAction.Domain.Tribes;
 
 namespace TWAction.Application.Schedules.Commands;
 

@@ -63,17 +63,17 @@ public sealed class TroopsStateValidator
             }
 
             // Validate unit counts (columns 2-10)
+            bool canAdd = true; //IDK why but some villages have negative unit counts, TW has nug..
             for (int j = 2; j < ExpectedColumnCount; j++)
             {
                 if (!int.TryParse(columns[j], out var unitCount) || unitCount < 0)
                 {
-                    var unitNames = new[] { "Spear", "Sword", "Archer", "Marcher", "Catapult", "Axe", "Polearm", "Ram", "Trebuchet" };
-                    return Result.Failure<List<string[]>>(
-                        $"Row {i + 1}: Invalid unit count for '{unitNames[j - 2]}'. Must be non-negative integer.");
+                    canAdd = false; 
+                    break;
                 }
             }
-
-            dataRows.Add(columns);
+            if(canAdd)
+                dataRows.Add(columns);
         }
 
         return Result.Success(dataRows);
