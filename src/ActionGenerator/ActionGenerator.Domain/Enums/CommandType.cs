@@ -11,5 +11,6 @@ public enum CommandType
     NobleWithHalfOff,
     NobleWithQuarterOffensive,
     NobleWith150Axes,
-    NobleWith100HeavyCavalry
+    NobleWith100HeavyCavalry,
+    RandomNoble
 }

@@ -33,7 +33,7 @@ internal sealed class OffGenerator : ICommandTypeGenerator
         var catasTargets = targets.Where(t => t.CommandType == CommandType.Catapults).ToList();
         if (catasTargets.Count > 0)
         {
-            var catasSources = FilterCatasSources(allyVillages, settings.CatasSettings, alreadyUsedSourceIds);
+            var catasSources = FilterCatasSources(allyVillages, settings.CatasSettings, []);
             result.AddRange(GenerateOptimal(catasSources, catasTargets, settings));
         }
 
