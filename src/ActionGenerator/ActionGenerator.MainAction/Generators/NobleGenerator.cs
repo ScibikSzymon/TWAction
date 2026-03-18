@@ -42,6 +42,7 @@ internal sealed partial class NobleGenerator : ICommandTypeGenerator
         // Shared state — persists across all command types so later types see earlier assignments
         var totalNoblesUsed = BuildTotalNoblesUsed(alreadyGenerated);
         var noblesUsedPerPlayer = BuildNoblesUsedPerPlayer(alreadyGenerated);
+        var playerBudgetUsed = BuildPlayerBudgetUsed(alreadyGenerated);
 
         foreach (var commandType in NobleCommandTypes)
         {
@@ -54,9 +55,12 @@ internal sealed partial class NobleGenerator : ICommandTypeGenerator
             // Tracker is created fresh per type so the type-local cap resets each iteration,
             // while the shared dictionaries keep accumulating across types.
             var tracker = new NobleTracker(
-                    noblesUsedPerPlayer,
-                    settings.NobleSettings,
-                    MaxNoblesPerVillageForType(commandType));
+                totalNoblesUsed,
+                noblesUsedPerPlayer,
+                playerBudgetUsed,
+                settings.PlayerNobleBudgets,
+                MaxNoblesPerVillageForType(commandType),
+                MaxNoblesPerVillagePerPlayerForType(commandType));
 
             result.AddRange(GenerateForType(typeSources, typeTargets, commandType, settings, tracker));
         }
@@ -208,6 +212,12 @@ internal sealed partial class NobleGenerator : ICommandTypeGenerator
             .GroupBy(cmd => new SourcePlayerKey(cmd.Source.Id, cmd.Target.PlayerId))
             .ToDictionary(g => g.Key, g => (uint)g.Count());
 
+    private static Dictionary<int, uint> BuildPlayerBudgetUsed(IReadOnlyList<AttackCommand> commands)
+        => commands
+            .Where(cmd => NobleCommandTypes.Contains(cmd.Target.CommandType))
+            .GroupBy(cmd => cmd.Source.PlayerId)
+            .ToDictionary(g => g.Key, g => (uint)g.Count());
+
     private static bool HasNoblesLeft(SourceVillage source, Dictionary<int, uint> totalNoblesUsed)
         => totalNoblesUsed.GetValueOrDefault(source.Id) < source.Army.Noble;
 
@@ -224,9 +234,24 @@ internal sealed partial class NobleGenerator : ICommandTypeGenerator
         CommandType.NobleWithFullOff            => 1,
         CommandType.NobleWithHalfOff            => 2,
         CommandType.NobleWithQuarterOffensive   => 4,
-        CommandType.NobleWith150Axes            => 4,
-        CommandType.NobleWith100HeavyCavalry    => 4,
+        CommandType.NobleWith150Axes            => 6,
+        CommandType.NobleWith100HeavyCavalry    => 6,
         CommandType.RandomNoble                 => uint.MaxValue, // capped only by Army.Noble
+        _ => throw new ArgumentOutOfRangeException(nameof(commandType))
+    };
+
+    /// <summary>
+    /// Maximum noble commands one village may send toward the same destination player,
+    /// per command type. Mirrors the maxAttackOnPlayerFromVillage parameter from the old generator.
+    /// </summary>
+    private static uint MaxNoblesPerVillagePerPlayerForType(CommandType commandType) => commandType switch
+    {
+        CommandType.NobleWithFullOff            => 1,
+        CommandType.NobleWithHalfOff            => 2,
+        CommandType.NobleWithQuarterOffensive   => 4,
+        CommandType.NobleWith150Axes            => 2,
+        CommandType.NobleWith100HeavyCavalry    => 2,
+        CommandType.RandomNoble                 => 5,
         _ => throw new ArgumentOutOfRangeException(nameof(commandType))
     };
 

@@ -10,6 +10,12 @@ public sealed class ActionSettings
     public required FakeOffSettings FakeOffSettings { get; init; }
     public required FakeDeffSettings FakeDeffSettings { get; init; }
     public NobleSettings NobleSettings { get; init; } = new();
+
+    /// <summary>
+    /// Noble budget per allied player (PlayerId → max nobles to dispatch).
+    /// Players absent from this dictionary are treated as having no budget limit.
+    /// </summary>
+    public IReadOnlyDictionary<int, uint> PlayerNobleBudgets { get; init; } = new Dictionary<int, uint>();
 }
 
 public class OffSettings
@@ -52,7 +58,4 @@ public class NobleSettings
 
     /// <summary>Maximum offensive potential for NobleWith100HeavyCavalry (def-based noble) sources.</summary>
     public uint MaxOffUnitsForDefNoble { get; set; } = 10_000;
-
-    /// <summary>How many noble commands one source village may send toward the same destination player.</summary>
-    public uint MaxNoblesPerVillagePerPlayer { get; set; } = 2;
 }
