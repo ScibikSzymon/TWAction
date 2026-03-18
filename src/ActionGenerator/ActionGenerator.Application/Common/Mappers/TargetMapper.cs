@@ -19,7 +19,7 @@ internal static class TargetMapper
             MinArrivalTime = minArrivalTime,
             MaxArrivalTime = maxArrivalTime,
             CommandType = CommandType.Reconnaissance, // Always Reconnaissance for now
-            CommnadNumber = 1
+            CommandNumber = 1
         };
     }
 
