@@ -1,3 +1,5 @@
+using ActionGenerator.Domain.Utilities;
+
 namespace ActionGenerator.Domain.Entities;
 
 public sealed class Army

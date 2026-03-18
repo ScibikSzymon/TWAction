@@ -43,6 +43,6 @@ public static class PopulationCalculator
         return army.Axe * AxePopulation
             + army.Light * LightPopulation
             + army.HorseArcher * HorseArcherPopulation
-            + army.Ram * RamPopulation
+            + army.Ram * RamPopulation;
     }
 }

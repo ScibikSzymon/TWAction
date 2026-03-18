@@ -1,3 +1,5 @@
+using ActionGenerator.Domain.Enums;
+
 namespace ActionGenerator.Application.Common.DTOs;
 
 public sealed record TargetDto
