@@ -3,7 +3,6 @@ using ActionGenerator.Application.Common.Mappers;
 using ActionGenerator.Application.Common.Services;
 using ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
 using ActionGenerator.Domain.Entities;
-using ActionGenerator.Domain.Utilities;
 
 namespace ActionGenerator.Application.Features.ReconnaissanceActions.Services;
 
@@ -73,7 +72,7 @@ internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsServi
         return allyVillages
             .Where(v => v.DistanceToFront > minDistanceToFront
                 && v.Army.Spy > minSpyCount
-                && PopulationCalculator.CalculatePopulation(v.Army) < maxPopulation)
+                && v.Army.TotalPotential < maxPopulation)
             .OrderByDescending(v => v.Army.Spy)
             .ToList();
     }

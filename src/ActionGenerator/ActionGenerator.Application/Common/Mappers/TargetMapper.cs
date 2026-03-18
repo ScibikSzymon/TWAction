@@ -18,7 +18,8 @@ internal static class TargetMapper
             Coordinates = new Coordinates { X = dto.X, Y = dto.Y },
             MinArrivalTime = minArrivalTime,
             MaxArrivalTime = maxArrivalTime,
-            CommandType = CommandType.Reconnaissance // Always Reconnaissance for now
+            CommandType = CommandType.Reconnaissance, // Always Reconnaissance for now
+            CommandNumber = 1
         };
     }
 
