@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TWAction.Infrastructure.Auth;
 
 /// <summary>
@@ -11,11 +13,13 @@ public sealed class AuthOptions
     /// <summary>
     /// Name of the cookie used to store the application session id.
     /// </summary>
+    [Required]
     public string? CookieName { get; set; }
 
     /// <summary>
     /// Number of hours before the session expires.
     /// </summary>
+    [Range(1, int.MaxValue)]
     public int SessionExpiryHours { get; set; }
 
     /// <summary>
@@ -26,6 +30,7 @@ public sealed class AuthOptions
     /// <summary>
     /// Defines the same-site policy for the cookie (e.g., "Strict", "Lax", "None").
     /// </summary>
+    [Required]
     public string? CookieSameSite { get; set; }
 
     /// <summary>
@@ -36,5 +41,6 @@ public sealed class AuthOptions
     /// <summary>
     /// URL of the frontend application for redirects after authentication.
     /// </summary>
+    [Required]
     public string? FrontendUrl { get; set; }
 }

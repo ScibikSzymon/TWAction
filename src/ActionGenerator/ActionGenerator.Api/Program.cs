@@ -47,8 +47,6 @@ public partial class Program
             app.MapScalarApiReference();
         }
 
-        app.UseHttpsRedirection();
-
         app.MapReconnaissanceActionsEndpoints();
 
         app.Run();

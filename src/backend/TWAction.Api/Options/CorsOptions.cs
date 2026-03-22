@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TWAction.Api.Options;
 
 /// <summary>
@@ -12,5 +14,7 @@ public sealed class CorsOptions
     /// Must be exact URLs including protocol and port (e.g., "https://yourdomain.com").
     /// Required when using credentials (cookies) in cross-origin requests.
     /// </summary>
+    [Required]
+    [MinLength(1)]
     public string[] AllowedOrigins { get; init; } = [];
 }
