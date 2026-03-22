@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
@@ -48,6 +49,17 @@ public sealed class TWActionWebApplicationFactory : WebApplicationFactory<Progra
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Test");
+
+        builder.ConfigureAppConfiguration((_, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["GeneratorApi:BaseUrl"] = "http://localhost:9999",
+                ["GeneratorApi:ApiKey"] = "test-api-key",
+                ["PlemionaRozpiskiApi:BaseUrl"] = "http://localhost:9998",
+                ["PlemionaRozpiskiApi:ApiKey"] = "test-api-key",
+            });
+        });
 
         builder.ConfigureServices(services =>
         {
