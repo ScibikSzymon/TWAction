@@ -4,9 +4,6 @@ using TWAction.Application.ReconnaissanceActions.Interfaces;
 
 namespace TWAction.Infrastructure.Services;
 
-/// <summary>
-/// HTTP client for Generator.Api.
-/// </summary>
 public sealed class GeneratorApiClient(HttpClient httpClient) : IGeneratorApiClient
 {
     public async Task<IReadOnlyList<AttackCommandDto>> GenerateReconnaissanceActionsAsync(
@@ -20,13 +17,8 @@ public sealed class GeneratorApiClient(HttpClient httpClient) : IGeneratorApiCli
 
         response.EnsureSuccessStatusCode();
 
-        var commands = await response.Content.ReadFromJsonAsync<List<AttackCommandDto>>(cancellationToken);
-
-        if (commands is null)
-        {
-            throw new InvalidOperationException("Generator.Api returned null response.");
-        }
-
+        var commands = await response.Content.ReadFromJsonAsync<List<AttackCommandDto>>(cancellationToken) 
+            ?? throw new InvalidOperationException("Generator.Api returned null response.");
         return commands;
     }
 }
