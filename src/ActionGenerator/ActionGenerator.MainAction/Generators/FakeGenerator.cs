@@ -14,6 +14,9 @@ namespace ActionGenerator.MainAction.Generators;
 ///
 /// FakeDefensive (uniquePerPlayer = false):
 ///   Sources can be reused across different players and are never globally consumed.
+///
+/// Commands are added to storage immediately as they are generated so that subsequent
+/// player groups and FindSource re-orderings always see the current total load per village.
 /// </summary>
 internal sealed class FakeGenerator(ICommandsStorage storage) : ICommandTypeGenerator
 {
@@ -24,27 +27,19 @@ internal sealed class FakeGenerator(ICommandsStorage storage) : ICommandTypeGene
         IReadOnlyList<Target> targets,
         ActionSettings settings)
     {
-        var result = new List<AttackCommand>();
-
         var fakeOffTargets = targets.Where(t => t.CommandType == CommandType.FakeOffensive).ToList();
         if (fakeOffTargets.Count > 0)
         {
-            var sources = FilterFakeOffSources(allyVillages, settings.FakeOffSettings)
-                .Shuffle();
-            var commands = GenerateFakes(sources, fakeOffTargets, settings, storage.Commands, uniquePerPlayer: true);
-            result.AddRange(commands);
+            var sources = FilterFakeOffSources(allyVillages, settings.FakeOffSettings).Shuffle();
+            GenerateFakes(sources, fakeOffTargets, settings, uniquePerPlayer: true);
         }
 
         var fakeDeffTargets = targets.Where(t => t.CommandType == CommandType.FakeDefensive).ToList();
         if (fakeDeffTargets.Count > 0)
         {
-            var sources = FilterFakeDeffSources(allyVillages, settings.FakeDeffSettings)
-                .Shuffle();
-            var commands = GenerateFakes(sources, fakeDeffTargets, settings, storage.Commands, uniquePerPlayer: false);
-            result.AddRange(commands);
+            var sources = FilterFakeDeffSources(allyVillages, settings.FakeDeffSettings).Shuffle();
+            GenerateFakes(sources, fakeDeffTargets, settings, uniquePerPlayer: false);
         }
-
-        storage.Add(result);
     }
 
     private static List<SourceVillage> FilterFakeOffSources(
@@ -70,78 +65,92 @@ internal sealed class FakeGenerator(ICommandsStorage storage) : ICommandTypeGene
             .ToList();
     }
 
-    private static List<AttackCommand> GenerateFakes(
+    private void GenerateFakes(
         List<SourceVillage> sources,
         List<Target> targets,
         ActionSettings settings,
-        IReadOnlyList<AttackCommand> alreadyGenerated,
         bool uniquePerPlayer)
     {
-        var result = new List<AttackCommand>();
-        var commandCountPerSource = sources.ToDictionary(v => v.Id, _ => 0);
-
         var groupedByPlayer = targets
             .GroupBy(t => t.PlayerId)
-            .OrderBy(g => g.Sum(t => t.CommandNumber));
+            .OrderBy(g => g.Sum(t => (int)t.CommandNumber));
 
         foreach (var playerGroup in groupedByPlayer)
         {
-            var sourcesForPlayer = BuildSourcesForPlayer(
-                sources,
-                playerGroup.Key,
-                alreadyGenerated,
-                commandCountPerSource,
-                uniquePerPlayer);
+            var sourcesForPlayer = BuildSourcesForPlayer(sources, playerGroup.Key, uniquePerPlayer);
 
             foreach (var target in playerGroup)
             {
                 for (int i = 0; i < (int)target.CommandNumber; i++)
                 {
-                    var command = FindSource(sourcesForPlayer, target, settings, commandCountPerSource);
+                    var command = FindSource(sourcesForPlayer, target, settings);
                     if (command is null)
                         break;
 
-                    result.Add(command);
-                    commandCountPerSource[command.Source.Id]++;
+                    storage.Add([command]);
 
                     if (uniquePerPlayer)
                         sourcesForPlayer.RemoveAll(v => v.Id == command.Source.Id);
+                    else
+                        BubbleBackByLoad(sourcesForPlayer, command.Source.Id);
                 }
             }
         }
-
-        return result;
     }
 
-    private static List<SourceVillage> BuildSourcesForPlayer(
+    private List<SourceVillage> BuildSourcesForPlayer(
         List<SourceVillage> allSources,
         int playerId,
-        IReadOnlyList<AttackCommand> alreadyGenerated,
-        Dictionary<int, int> commandCountPerSource,
         bool uniquePerPlayer)
     {
         HashSet<int>? excludedSourceIds = null;
         if (uniquePerPlayer)
         {
-            excludedSourceIds = alreadyGenerated
+            excludedSourceIds = storage.Commands
                 .Where(cmd => cmd.Target.PlayerId == playerId)
                 .Select(cmd => cmd.Source.Id)
                 .ToHashSet();
         }
 
-        return allSources
+        var result = allSources
             .Where(v => excludedSourceIds == null || !excludedSourceIds.Contains(v.Id))
-            .OrderBy(v => commandCountPerSource[v.Id])
             .ToList();
+
+        SortByLoad(result);
+        return result;
     }
 
-    private static AttackCommand? FindSource(
-        List<SourceVillage> sortedSources,
-        Target target,
-        ActionSettings settings,
-        Dictionary<int, int> commandCountPerSource)
+    private void SortByLoad(List<SourceVillage> sources) =>
+        sources.Sort((a, b) =>
+            storage.GetCommandsFromSource(a.Id).Count
+                .CompareTo(storage.GetCommandsFromSource(b.Id).Count));
+
+    /// <summary>
+    /// After one command is added, only the source that was just used has a higher count.
+    /// The list is otherwise sorted — so we only need to bubble that one element
+    /// rightward until it reaches its correct position. O(k) swaps where k is typically 0–1.
+    /// </summary>
+    private void BubbleBackByLoad(List<SourceVillage> sources, int updatedSourceId)
     {
-        foreach (var source in sortedSources.OrderBy(v => commandCountPerSource[v.Id]))
+        var index = sources.FindIndex(v => v.Id == updatedSourceId);
+        if (index < 0)
+            return;
+
+        var updatedCount = storage.GetCommandsFromSource(updatedSourceId).Count;
+        while (index + 1 < sources.Count &&
+               storage.GetCommandsFromSource(sources[index + 1].Id).Count < updatedCount)
+        {
+            (sources[index], sources[index + 1]) = (sources[index + 1], sources[index]);
+            index++;
+        }
+    }
+
+    private AttackCommand? FindSource(
+        List<SourceVillage> sources,
+        Target target,
+        ActionSettings settings)
+    {
+        foreach (var source in sources)
         {
             var command = CommandFactory.Create(source, target);
 
@@ -160,3 +169,4 @@ internal sealed class FakeGenerator(ICommandsStorage storage) : ICommandTypeGene
         return null;
     }
 }
+

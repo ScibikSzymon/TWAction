@@ -12,6 +12,9 @@ internal sealed class CommandsStorage : ICommandsStorage
     public IReadOnlyDictionary<int, IReadOnlyList<AttackCommand>> CommandsBySource
         => _bySource.ToDictionary(kvp => kvp.Key, kvp => (IReadOnlyList<AttackCommand>)kvp.Value);
 
+    public IReadOnlyList<AttackCommand> GetCommandsFromSource(int sourceId) =>
+        _bySource.TryGetValue(sourceId, out var list) ? list : [];
+
     public void Add(IEnumerable<AttackCommand> commands)
     {
         foreach (var command in commands)
