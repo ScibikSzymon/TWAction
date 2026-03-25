@@ -8,6 +8,7 @@ public static class DependencyInjection
     public static IServiceCollection AddMainActionGenerator(this IServiceCollection services)
     {
         services.AddScoped<ICommandsStorage, CommandsStorage>();
+        services.AddScoped<NobleLimitsChecker>();
 
         // Order matters: noble sources are excluded from Off/Fake generation via storage
         services.AddScoped<ICommandTypeGenerator, NobleGenerator>();

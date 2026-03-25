@@ -12,83 +12,50 @@ namespace ActionGenerator.MainAction.Generators;
 ///   departs as late as possible (shortest travel time = latest departure window).
 ///
 /// RandomNoble:
-///   Most-constrained-first target selection, but the source village is picked at random
-///   from all eligible villages.
+///   Most-constrained-first target selection, but the source village is picked at random.
 ///
-/// Noble limits are tracked per village (Army.Noble) and per source-to-player pair.
-/// Per-type caps (e.g. max 1 per village for FullOff, max 2 for HalfOff) are game rules
-/// encoded as constants and are not configurable.
+/// Commands are added to storage immediately so that <see cref="NobleLimitsChecker"/>
+/// always sees the current garrison and budget state when evaluating subsequent targets.
 /// </summary>
-internal sealed partial class NobleGenerator(ICommandsStorage storage) : ICommandTypeGenerator
+internal sealed class NobleGenerator(ICommandsStorage storage, NobleLimitsChecker limitsChecker) : ICommandTypeGenerator
 {
-    private static readonly IReadOnlyList<CommandType> NobleCommandTypes =
-    [
-        CommandType.NobleWithFullOff,
-        CommandType.NobleWithHalfOff,
-        CommandType.NobleWithQuarterOffensive,
-        CommandType.NobleWith150Axes,
-        CommandType.NobleWith100HeavyCavalry,
-        CommandType.RandomNoble,
-    ];
-
     public void Generate(
         IReadOnlyList<SourceVillage> allyVillages,
         IReadOnlyList<Target> targets,
         ActionSettings settings)
     {
-        var result = new List<AttackCommand>();
-
-        // Shared state — persists across all command types so later types see earlier assignments
-        var totalNoblesUsed = BuildTotalNoblesUsed(storage.Commands);
-        var noblesUsedPerPlayer = BuildNoblesUsedPerPlayer(storage.Commands);
-        var playerBudgetUsed = BuildPlayerBudgetUsed(storage.Commands);
-
-        foreach (var commandType in NobleCommandTypes)
+        foreach (var commandType in NobleLimitsChecker.NobleCommandTypes)
         {
             var typeTargets = targets.Where(t => t.CommandType == commandType).ToList();
             if (typeTargets.Count == 0)
                 continue;
 
-            var typeSources = FilterSources(allyVillages, commandType, settings.NobleSettings, totalNoblesUsed);
-
-            // Tracker is created fresh per type so the type-local cap resets each iteration,
-            // while the shared dictionaries keep accumulating across types.
-            var tracker = new NobleTracker(
-                totalNoblesUsed,
-                noblesUsedPerPlayer,
-                playerBudgetUsed,
-                settings.PlayerNobleBudgets,
-                MaxNoblesPerVillageForType(commandType),
-                MaxNoblesPerVillagePerPlayerForType(commandType));
-
-            result.AddRange(GenerateForType(typeSources, typeTargets, commandType, settings, tracker));
+            var typeSources = FilterSources(allyVillages, commandType, settings.NobleSettings);
+            GenerateForType(typeSources, typeTargets, commandType, settings);
         }
-
-        storage.Add(result);
     }
 
     // -------------------------------------------------------------------------
     // Core algorithm
     // -------------------------------------------------------------------------
 
-    private static List<AttackCommand> GenerateForType(
+    private void GenerateForType(
         List<SourceVillage> sources,
         List<Target> targets,
         CommandType commandType,
-        ActionSettings settings,
-        NobleTracker tracker)
+        ActionSettings settings)
     {
-        var result = new List<AttackCommand>();
         var potentialPerTarget = BuildPotentialCommands(sources, targets, commandType, settings);
         var remaining = targets.ToHashSet();
 
         while (remaining.Count > 0)
         {
             var mostConstrained = remaining
-                .OrderBy(t => tracker.CountEligible(potentialPerTarget[t]))
+                .OrderBy(t => limitsChecker.CountEligible(potentialPerTarget[t], commandType, settings.PlayerNobleBudgets))
                 .First();
 
-            var eligible = tracker.GetEligible(potentialPerTarget[mostConstrained]);
+            var eligible = limitsChecker.GetEligible(
+                potentialPerTarget[mostConstrained], commandType, settings.PlayerNobleBudgets);
 
             var selected = commandType == CommandType.RandomNoble
                 ? eligible.Shuffle().Take((int)mostConstrained.CommandNumber).ToList()
@@ -97,14 +64,10 @@ internal sealed partial class NobleGenerator(ICommandsStorage storage) : IComman
                     .Take((int)mostConstrained.CommandNumber)
                     .ToList();
 
-            foreach (var cmd in selected)
-                tracker.Record(cmd);
-
-            result.AddRange(selected);
+            // Add immediately so the next iteration's eligibility checks reflect the current state
+            storage.Add(selected);
             remaining.Remove(mostConstrained);
         }
-
-        return result;
     }
 
     // -------------------------------------------------------------------------
@@ -164,95 +127,38 @@ internal sealed partial class NobleGenerator(ICommandsStorage storage) : IComman
     // Source filtering
     // -------------------------------------------------------------------------
 
-    private static List<SourceVillage> FilterSources(
+    private List<SourceVillage> FilterSources(
         IReadOnlyList<SourceVillage> sources,
         CommandType commandType,
-        NobleSettings settings,
-        Dictionary<int, uint> totalNoblesUsed) => commandType switch
+        NobleSettings settings) => commandType switch
     {
         CommandType.NobleWithFullOff or
         CommandType.NobleWithHalfOff or
         CommandType.NobleWithQuarterOffensive =>
-            sources.Where(v => HasNoblesLeft(v, totalNoblesUsed)
+            sources.Where(v => limitsChecker.HasNoblesInGarrison(v)
                             && v.Army.OffensivePotential >= settings.MinOffUnitsForOffNoble
                             && v.DistanceToFront >= settings.MinDistanceFromFront).ToList(),
 
         CommandType.NobleWith150Axes =>
-            sources.Where(v => HasNoblesLeft(v, totalNoblesUsed)
+            sources.Where(v => limitsChecker.HasNoblesInGarrison(v)
                             && v.Army.OffensivePotential >= settings.MinOffUnitsForFakeOffNoble
                             && v.DistanceToFront >= settings.MinDistanceFromFront).ToList(),
 
         CommandType.NobleWith100HeavyCavalry =>
-            sources.Where(v => HasNoblesLeft(v, totalNoblesUsed)
+            sources.Where(v => limitsChecker.HasNoblesInGarrison(v)
                             && v.Army.OffensivePotential < settings.MaxOffUnitsForDefNoble
                             && v.DistanceToFront >= settings.MinDistanceFromFront).ToList(),
 
         CommandType.RandomNoble =>
-            sources.Where(v => HasNoblesLeft(v, totalNoblesUsed)
+            sources.Where(v => limitsChecker.HasNoblesInGarrison(v)
                             && v.DistanceToFront >= settings.MinDistanceFromFront).ToList(),
 
         _ => throw new ArgumentOutOfRangeException(nameof(commandType))
     };
 
     // -------------------------------------------------------------------------
-    // Tracking helpers
+    // Helpers
     // -------------------------------------------------------------------------
-
-    private static Dictionary<int, uint> BuildTotalNoblesUsed(IReadOnlyList<AttackCommand> commands)
-        => commands
-            .Where(cmd => NobleCommandTypes.Contains(cmd.Target.CommandType))
-            .GroupBy(cmd => cmd.Source.Id)
-            .ToDictionary(g => g.Key, g => (uint)g.Count());
-
-    private static Dictionary<SourcePlayerKey, uint> BuildNoblesUsedPerPlayer(
-        IReadOnlyList<AttackCommand> commands)
-        => commands
-            .Where(cmd => NobleCommandTypes.Contains(cmd.Target.CommandType))
-            .GroupBy(cmd => new SourcePlayerKey(cmd.Source.Id, cmd.Target.PlayerId))
-            .ToDictionary(g => g.Key, g => (uint)g.Count());
-
-    private static Dictionary<int, uint> BuildPlayerBudgetUsed(IReadOnlyList<AttackCommand> commands)
-        => commands
-            .Where(cmd => NobleCommandTypes.Contains(cmd.Target.CommandType))
-            .GroupBy(cmd => cmd.Source.PlayerId)
-            .ToDictionary(g => g.Key, g => (uint)g.Count());
-
-    private static bool HasNoblesLeft(SourceVillage source, Dictionary<int, uint> totalNoblesUsed)
-        => totalNoblesUsed.GetValueOrDefault(source.Id) < source.Army.Noble;
-
-    // -------------------------------------------------------------------------
-    // Game-rule constants
-    // -------------------------------------------------------------------------
-
-    /// <summary>
-    /// Maximum noble commands per village for a given type, derived from army composition logic:
-    /// FullOff sends the entire army → only 1 slot; QuarterOff sends ¼ → up to 4 slots, etc.
-    /// </summary>
-    private static uint MaxNoblesPerVillageForType(CommandType commandType) => commandType switch
-    {
-        CommandType.NobleWithFullOff            => 1,
-        CommandType.NobleWithHalfOff            => 2,
-        CommandType.NobleWithQuarterOffensive   => 4,
-        CommandType.NobleWith150Axes            => 6,
-        CommandType.NobleWith100HeavyCavalry    => 6,
-        CommandType.RandomNoble                 => uint.MaxValue, // capped only by Army.Noble
-        _ => throw new ArgumentOutOfRangeException(nameof(commandType))
-    };
-
-    /// <summary>
-    /// Maximum noble commands one village may send toward the same destination player,
-    /// per command type. Mirrors the maxAttackOnPlayerFromVillage parameter from the old generator.
-    /// </summary>
-    private static uint MaxNoblesPerVillagePerPlayerForType(CommandType commandType) => commandType switch
-    {
-        CommandType.NobleWithFullOff            => 1,
-        CommandType.NobleWithHalfOff            => 2,
-        CommandType.NobleWithQuarterOffensive   => 4,
-        CommandType.NobleWith150Axes            => 2,
-        CommandType.NobleWith100HeavyCavalry    => 2,
-        CommandType.RandomNoble                 => 5,
-        _ => throw new ArgumentOutOfRangeException(nameof(commandType))
-    };
 
     private static bool IsOffTypeNoble(CommandType commandType) => commandType is
         CommandType.NobleWithFullOff or
