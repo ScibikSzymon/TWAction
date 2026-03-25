@@ -7,12 +7,14 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddMainActionGenerator(this IServiceCollection services)
     {
-        // Order matters: noble sources are excluded from Off/Fake generation via alreadyGenerated
-        services.AddSingleton<ICommandTypeGenerator, NobleGenerator>();
-        services.AddSingleton<ICommandTypeGenerator, OffGenerator>();
-        services.AddSingleton<ICommandTypeGenerator, FakeGenerator>();
+        services.AddScoped<ICommandsStorage, CommandsStorage>();
 
-        services.AddSingleton<IActionGenerator, ActionGenerator>();
+        // Order matters: noble sources are excluded from Off/Fake generation via storage
+        services.AddScoped<ICommandTypeGenerator, NobleGenerator>();
+        services.AddScoped<ICommandTypeGenerator, OffGenerator>();
+        services.AddScoped<ICommandTypeGenerator, FakeGenerator>();
+
+        services.AddScoped<IActionGenerator, ActionGenerator>();
 
         return services;
     }

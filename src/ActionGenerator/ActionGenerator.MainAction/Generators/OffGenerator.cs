@@ -9,15 +9,14 @@ namespace ActionGenerator.MainAction.Generators;
 /// For each round it picks the target with the fewest available source candidates and
 /// assigns the closest eligible sources up to the required command count.
 /// </summary>
-internal sealed class OffGenerator : ICommandTypeGenerator
+internal sealed class OffGenerator(ICommandsStorage storage) : ICommandTypeGenerator
 {
-    public IReadOnlyList<AttackCommand> Generate(
+    public void Generate(
         IReadOnlyList<SourceVillage> allyVillages,
         IReadOnlyList<Target> targets,
-        ActionSettings settings,
-        IReadOnlyList<AttackCommand> alreadyGenerated)
+        ActionSettings settings)
     {
-        var alreadyUsedSourceIds = alreadyGenerated
+        var alreadyUsedSourceIds = storage.Commands
             .Select(c => c.Source.Id)
             .ToHashSet();
 
@@ -37,7 +36,7 @@ internal sealed class OffGenerator : ICommandTypeGenerator
             result.AddRange(GenerateOptimal(catasSources, catasTargets, settings));
         }
 
-        return result;
+        storage.Add(result);
     }
 
     private static List<SourceVillage> FilterOffSources(

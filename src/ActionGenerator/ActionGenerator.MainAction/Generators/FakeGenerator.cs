@@ -15,15 +15,14 @@ namespace ActionGenerator.MainAction.Generators;
 /// FakeDefensive (uniquePerPlayer = false):
 ///   Sources can be reused across different players and are never globally consumed.
 /// </summary>
-internal sealed class FakeGenerator : ICommandTypeGenerator
+internal sealed class FakeGenerator(ICommandsStorage storage) : ICommandTypeGenerator
 {
     private const double MinFakeDistanceFields = 20.0;
 
-    public IReadOnlyList<AttackCommand> Generate(
+    public void Generate(
         IReadOnlyList<SourceVillage> allyVillages,
         IReadOnlyList<Target> targets,
-        ActionSettings settings,
-        IReadOnlyList<AttackCommand> alreadyGenerated)
+        ActionSettings settings)
     {
         var result = new List<AttackCommand>();
 
@@ -32,7 +31,7 @@ internal sealed class FakeGenerator : ICommandTypeGenerator
         {
             var sources = FilterFakeOffSources(allyVillages, settings.FakeOffSettings)
                 .Shuffle();
-            var commands = GenerateFakes(sources, fakeOffTargets, settings, alreadyGenerated, uniquePerPlayer: true);
+            var commands = GenerateFakes(sources, fakeOffTargets, settings, storage.Commands, uniquePerPlayer: true);
             result.AddRange(commands);
         }
 
@@ -41,11 +40,11 @@ internal sealed class FakeGenerator : ICommandTypeGenerator
         {
             var sources = FilterFakeDeffSources(allyVillages, settings.FakeDeffSettings)
                 .Shuffle();
-            var commands = GenerateFakes(sources, fakeDeffTargets, settings, alreadyGenerated, uniquePerPlayer: false);
+            var commands = GenerateFakes(sources, fakeDeffTargets, settings, storage.Commands, uniquePerPlayer: false);
             result.AddRange(commands);
         }
 
-        return result;
+        storage.Add(result);
     }
 
     private static List<SourceVillage> FilterFakeOffSources(

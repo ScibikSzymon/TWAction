@@ -19,7 +19,7 @@ namespace ActionGenerator.MainAction.Generators;
 /// Per-type caps (e.g. max 1 per village for FullOff, max 2 for HalfOff) are game rules
 /// encoded as constants and are not configurable.
 /// </summary>
-internal sealed partial class NobleGenerator : ICommandTypeGenerator
+internal sealed partial class NobleGenerator(ICommandsStorage storage) : ICommandTypeGenerator
 {
     private static readonly IReadOnlyList<CommandType> NobleCommandTypes =
     [
@@ -31,18 +31,17 @@ internal sealed partial class NobleGenerator : ICommandTypeGenerator
         CommandType.RandomNoble,
     ];
 
-    public IReadOnlyList<AttackCommand> Generate(
+    public void Generate(
         IReadOnlyList<SourceVillage> allyVillages,
         IReadOnlyList<Target> targets,
-        ActionSettings settings,
-        IReadOnlyList<AttackCommand> alreadyGenerated)
+        ActionSettings settings)
     {
         var result = new List<AttackCommand>();
 
         // Shared state — persists across all command types so later types see earlier assignments
-        var totalNoblesUsed = BuildTotalNoblesUsed(alreadyGenerated);
-        var noblesUsedPerPlayer = BuildNoblesUsedPerPlayer(alreadyGenerated);
-        var playerBudgetUsed = BuildPlayerBudgetUsed(alreadyGenerated);
+        var totalNoblesUsed = BuildTotalNoblesUsed(storage.Commands);
+        var noblesUsedPerPlayer = BuildNoblesUsedPerPlayer(storage.Commands);
+        var playerBudgetUsed = BuildPlayerBudgetUsed(storage.Commands);
 
         foreach (var commandType in NobleCommandTypes)
         {
@@ -65,7 +64,7 @@ internal sealed partial class NobleGenerator : ICommandTypeGenerator
             result.AddRange(GenerateForType(typeSources, typeTargets, commandType, settings, tracker));
         }
 
-        return result;
+        storage.Add(result);
     }
 
     // -------------------------------------------------------------------------

@@ -5,9 +5,8 @@ namespace ActionGenerator.MainAction.Generators;
 
 internal interface ICommandTypeGenerator
 {
-    IReadOnlyList<AttackCommand> Generate(
+    void Generate(
         IReadOnlyList<SourceVillage> allyVillages,
         IReadOnlyList<Target> targets,
-        ActionSettings settings,
-        IReadOnlyList<AttackCommand> alreadyGenerated);
+        ActionSettings settings);
 }
