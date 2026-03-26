@@ -58,4 +58,7 @@ public class NobleSettings
 
     /// <summary>Maximum offensive potential for NobleWith100HeavyCavalry (def-based noble) sources.</summary>
     public uint MaxOffUnitsForDefNoble { get; set; } = 10_000;
+
+    /// <summary>Maximum offensive potential for NobleWith100HeavyCavalry (def-based noble) sources.</summary>
+    public uint MinDeffUnitsForDefNoble { get; set; } = 10_000;
 }

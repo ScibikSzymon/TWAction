@@ -51,11 +51,11 @@ internal sealed class NobleGenerator(ICommandsStorage storage, NobleLimitsChecke
         while (remaining.Count > 0)
         {
             var mostConstrained = remaining
-                .OrderBy(t => limitsChecker.CountEligible(potentialPerTarget[t], commandType, settings.PlayerNobleBudgets))
+                .OrderBy(t => limitsChecker.CountAllowed(potentialPerTarget[t], settings.PlayerNobleBudgets))
                 .First();
 
-            var eligible = limitsChecker.GetEligible(
-                potentialPerTarget[mostConstrained], commandType, settings.PlayerNobleBudgets);
+            var eligible = limitsChecker.GetAllowed(
+                potentialPerTarget[mostConstrained], settings.PlayerNobleBudgets);
 
             var selected = commandType == CommandType.RandomNoble
                 ? eligible.Shuffle().Take((int)mostConstrained.CommandNumber).ToList()
@@ -135,23 +135,21 @@ internal sealed class NobleGenerator(ICommandsStorage storage, NobleLimitsChecke
         CommandType.NobleWithFullOff or
         CommandType.NobleWithHalfOff or
         CommandType.NobleWithQuarterOffensive =>
-            sources.Where(v => limitsChecker.HasNoblesInGarrison(v)
-                            && v.Army.OffensivePotential >= settings.MinOffUnitsForOffNoble
+            sources.Where(v => v.Army.OffensivePotential >= settings.MinOffUnitsForOffNoble
                             && v.DistanceToFront >= settings.MinDistanceFromFront).ToList(),
 
         CommandType.NobleWith150Axes =>
-            sources.Where(v => limitsChecker.HasNoblesInGarrison(v)
-                            && v.Army.OffensivePotential >= settings.MinOffUnitsForFakeOffNoble
+            sources.Where(v => v.Army.OffensivePotential >= settings.MinOffUnitsForFakeOffNoble
                             && v.DistanceToFront >= settings.MinDistanceFromFront).ToList(),
 
-        CommandType.NobleWith100HeavyCavalry =>
-            sources.Where(v => limitsChecker.HasNoblesInGarrison(v)
-                            && v.Army.OffensivePotential < settings.MaxOffUnitsForDefNoble
+        CommandType.NobleWith100HeavyCavalry or
+        CommandType.NobleWithDeff =>
+            sources.Where(v => v.Army.OffensivePotential < settings.MaxOffUnitsForDefNoble
+                            && v.Army.DefensivePotential >= settings.MinDeffUnitsForDefNoble
                             && v.DistanceToFront >= settings.MinDistanceFromFront).ToList(),
 
         CommandType.RandomNoble =>
-            sources.Where(v => limitsChecker.HasNoblesInGarrison(v)
-                            && v.DistanceToFront >= settings.MinDistanceFromFront).ToList(),
+            sources.Where(v => v.DistanceToFront >= settings.MinDistanceFromFront).ToList(),
 
         _ => throw new ArgumentOutOfRangeException(nameof(commandType))
     };
