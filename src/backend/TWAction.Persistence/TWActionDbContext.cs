@@ -17,6 +17,8 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
 
     public DbSet<TroopsStateEntity> TroopsStates { get; set; } = null!;
 
+    public DbSet<NobleBudgetEntity> NobleBudgets { get; set; } = null!;
+
     public DbSet<ReconnaissanceSettings> ReconnaissanceSettings { get; set; } = null!;
 
     public DbSet<AttackCommandEntity> AttackCommands { get; set; } = null!;
@@ -27,6 +29,7 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
         modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
         modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
         modelBuilder.ApplyConfiguration(new TroopsStateConfiguration());
+        modelBuilder.ApplyConfiguration(new NobleBudgetConfiguration());
         modelBuilder.ApplyConfiguration(new ReconnaissanceSettingsConfiguration());
         modelBuilder.ApplyConfiguration(new AttackCommandConfiguration());
         base.OnModelCreating(modelBuilder);

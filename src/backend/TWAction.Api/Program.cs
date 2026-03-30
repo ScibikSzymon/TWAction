@@ -62,6 +62,8 @@ app.MapUsersEndpoints();
 app.MapAuthEndpoints();
 app.MapScheduleEndpoints();
 app.MapTroopsStateEndpoints();
+app.MapNobleBudgetEndpoints();
+app.MapPlayerNobleStatsEndpoints();
 app.MapTribesEndpoints();
 app.MapReconnaissanceSettingsEndpoints();
 app.MapAttackCommandsEndpoints();

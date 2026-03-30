@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Schedule } from "../types/schedule";
 import { ScheduleType } from "../types/schedule";
 import { TroopsStateManager } from "./TroopsStateManager";
+import { NobleBudgetManager } from "./NobleBudgetManager";
 import { ReconnaissanceSettings } from "./ReconnaissanceSettings";
 import { ReconnaissanceActionsGenerator } from "./ReconnaissanceActionsGenerator";
 import styles from "./ScheduleTabs.module.css";
@@ -11,7 +12,7 @@ interface ScheduleTabsProps {
   onScheduleUpdate?: (updatedSchedule: Partial<Schedule>) => void;
 }
 
-type TabType = "troops" | "reconnaissance" | "generate";
+type TabType = "troops" | "nobleBudget" | "reconnaissance" | "generate";
 
 export const ScheduleTabs = ({
   schedule,
@@ -21,6 +22,11 @@ export const ScheduleTabs = ({
 
   const tabs: { id: TabType; label: string; visible: boolean }[] = [
     { id: "troops", label: "Stan Armii", visible: true },
+    {
+      id: "nobleBudget",
+      label: "Limity Szlachciców",
+      visible: schedule.scheduleType === ScheduleType.Main,
+    },
     {
       id: "reconnaissance",
       label: "Ustawienia Zwiadowcze",
@@ -53,6 +59,10 @@ export const ScheduleTabs = ({
         {activeTab === "troops" && (
           <TroopsStateManager scheduleId={schedule.id} />
         )}
+        {activeTab === "nobleBudget" &&
+          schedule.scheduleType === ScheduleType.Main && (
+            <NobleBudgetManager scheduleId={schedule.id} />
+          )}
         {activeTab === "reconnaissance" &&
           schedule.scheduleType === ScheduleType.Reconnaissance && (
             <ReconnaissanceSettings scheduleId={schedule.id} />

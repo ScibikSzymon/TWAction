@@ -27,6 +27,8 @@ using TWAction.Application.AttackCommands.Interfaces;
 using TWAction.Application.AttackCommands.Handlers;
 using TWAction.Application.ReconnaissanceActions.Interfaces;
 using TWAction.Application.ReconnaissanceActions.Handlers;
+using TWAction.Application.MainActions.Services;
+using TWAction.Application.MainActions.Queries;
 
 namespace TWAction.Infrastructure;
 
@@ -75,6 +77,7 @@ public static class DependencyInjection
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ITroopsStateRepository, TroopsStateRepository>();
+        services.AddScoped<INobleBudgetRepository, NobleBudgetRepository>();
         services.AddScoped<IReconnaissanceSettingsRepository, ReconnaissanceSettingsRepository>();
         services.AddScoped<IAttackCommandRepository, AttackCommandRepository>();
         services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
