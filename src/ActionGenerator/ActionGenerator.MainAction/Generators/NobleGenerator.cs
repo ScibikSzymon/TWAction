@@ -7,7 +7,7 @@ namespace ActionGenerator.MainAction.Generators;
 /// <summary>
 /// Generates noble commands using a most-constrained-first algorithm.
 ///
-/// Off-type nobles (Full/Half/Quarter/150Axes/100HeavyCavalry):
+/// Off-type nobles (Full/Half/Quarter/150Axes/100HeavyCavalry/NobleWithDeff):
 ///   The closest eligible source is always chosen, which means the command
 ///   departs as late as possible (shortest travel time = latest departure window).
 ///
@@ -54,12 +54,12 @@ internal sealed class NobleGenerator(ICommandsStorage storage, NobleLimitsChecke
                 .OrderBy(t => limitsChecker.CountAllowed(potentialPerTarget[t], settings.PlayerNobleBudgets))
                 .First();
 
-            var eligible = limitsChecker.GetAllowed(
+            var potencialCommands = limitsChecker.GetAllowed(
                 potentialPerTarget[mostConstrained], settings.PlayerNobleBudgets);
 
             var selected = commandType == CommandType.RandomNoble
-                ? eligible.Shuffle().Take((int)mostConstrained.CommandNumber).ToList()
-                : eligible
+                ? potencialCommands.Shuffle().Take((int)mostConstrained.CommandNumber).ToList()
+                : potencialCommands
                     .OrderByDescending(cmd => cmd.MinimalDepartureTime) // closest village = latest possible departure
                     .Take((int)mostConstrained.CommandNumber)
                     .ToList();
@@ -108,7 +108,8 @@ internal sealed class NobleGenerator(ICommandsStorage storage, NobleLimitsChecke
         if (command.MinimalDepartureTime < settings.MinDepartureTime)
             return false;
 
-        if (settings.SkipNightSendings && NightTimeHelper.IsNightTime(command.MinimalDepartureTime))
+        if (settings.SkipNightSendings && NightTimeHelper.IsNightTime(command.MinimalDepartureTime) 
+                && command.Target.MinArrivalTime - command.MinimalDepartureTime > new TimeSpan(24, 0, 0)) //in last night sending noble is allow.
             return false;
 
         var distance = source.Coordinates.CalculateDistance(command.Target.Coordinates);
