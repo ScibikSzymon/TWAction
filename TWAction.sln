@@ -41,8 +41,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionGenerator.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionGenerator.MainAction", "src\ActionGenerator\ActionGenerator.MainAction\ActionGenerator.MainAction.csproj", "{EAFB33CE-16F3-4592-BDCD-1071F74B8FF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator", "..\TribalWars2023\Action\Generator.csproj", "{61E872F6-B353-53DB-64BC-0CBD30E3213E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -221,18 +219,6 @@ Global
 		{EAFB33CE-16F3-4592-BDCD-1071F74B8FF2}.Release|x64.Build.0 = Release|Any CPU
 		{EAFB33CE-16F3-4592-BDCD-1071F74B8FF2}.Release|x86.ActiveCfg = Release|Any CPU
 		{EAFB33CE-16F3-4592-BDCD-1071F74B8FF2}.Release|x86.Build.0 = Release|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Debug|x64.Build.0 = Debug|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Debug|x86.Build.0 = Debug|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Release|x64.ActiveCfg = Release|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Release|x64.Build.0 = Release|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Release|x86.ActiveCfg = Release|Any CPU
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -254,7 +240,6 @@ Global
 		{829ED1DD-0034-8EE9-73BE-CA3FADCFAE80} = {629928A5-41E9-4ACF-84D7-A4E3ACD8152E}
 		{9D8DDA0C-5D6B-0C51-6BF3-296D607A74C3} = {629928A5-41E9-4ACF-84D7-A4E3ACD8152E}
 		{EAFB33CE-16F3-4592-BDCD-1071F74B8FF2} = {629928A5-41E9-4ACF-84D7-A4E3ACD8152E}
-		{61E872F6-B353-53DB-64BC-0CBD30E3213E} = {629928A5-41E9-4ACF-84D7-A4E3ACD8152E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E9F89F2-6387-4C45-ADF4-60B70E7FCAE0}

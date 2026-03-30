@@ -50,6 +50,7 @@ public partial class Program
         app.UseHttpsRedirection();
 
         app.MapReconnaissanceActionsEndpoints();
+        app.MapMainActionsEndpoints();
 
         app.Run();
     }
