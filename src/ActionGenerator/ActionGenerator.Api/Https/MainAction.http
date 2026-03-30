@@ -329,7 +329,7 @@ X-Api-KEY: {{ApiKey}}
       "x": 480,
       "y": 480,
       "army": {
-        "spear": 0, "sword": 0, "axe": 1200, "archer": 0,
+        "spear": 0, "sword": 0, "axe": 12000, "archer": 0,
         "spy": 0, "light": 500, "horseArcher": 0, "heavy": 0,
         "ram": 120, "catapult": 10, "noble": 0
       }
