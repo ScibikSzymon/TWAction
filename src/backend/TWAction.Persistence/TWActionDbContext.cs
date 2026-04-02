@@ -21,6 +21,8 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
 
     public DbSet<ReconnaissanceSettings> ReconnaissanceSettings { get; set; } = null!;
 
+    public DbSet<MainActionSettings> MainActionSettings { get; set; } = null!;
+
     public DbSet<AttackCommandEntity> AttackCommands { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -31,6 +33,7 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
         modelBuilder.ApplyConfiguration(new TroopsStateConfiguration());
         modelBuilder.ApplyConfiguration(new NobleBudgetConfiguration());
         modelBuilder.ApplyConfiguration(new ReconnaissanceSettingsConfiguration());
+        modelBuilder.ApplyConfiguration(new MainActionSettingsConfiguration());
         modelBuilder.ApplyConfiguration(new AttackCommandConfiguration());
         base.OnModelCreating(modelBuilder);
     }

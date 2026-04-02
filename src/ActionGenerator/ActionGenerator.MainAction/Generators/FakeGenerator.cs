@@ -49,7 +49,7 @@ internal sealed class FakeGenerator(ICommandsStorage storage) : ICommandTypeGene
         return sources
             .Where(v => v.Army.OffensivePotential >= settings.MinOffUnits
                      && v.DistanceToFront >= settings.MinDistanceFromFront
-                     && (v.Army.Ram > settings.MinMachineUnits || v.Army.Catapult > settings.MinMachineUnits))
+                     && (v.Army.Ram > FakeOffSettings.MinMachineUnits || v.Army.Catapult > FakeOffSettings.MinMachineUnits))
             .ToList();
     }
 
@@ -59,9 +59,9 @@ internal sealed class FakeGenerator(ICommandsStorage storage) : ICommandTypeGene
     {
         return sources
             .Where(v => v.Army.OffensivePotential < settings.MaxOffUnits
-                     && v.Army.TotalPotential > settings.MinTotalUnits
+                     && v.Army.TotalPotential > FakeDeffSettings.MinTotalUnits
                      && v.DistanceToFront > settings.MinDistanceFromFront
-                     && (v.Army.Ram > settings.MinMachineUnits || v.Army.Catapult > settings.MinMachineUnits))
+                     && (v.Army.Ram > FakeDeffSettings.MinMachineUnits || v.Army.Catapult > FakeDeffSettings.MinMachineUnits))
             .ToList();
     }
 

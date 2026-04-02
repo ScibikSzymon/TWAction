@@ -79,6 +79,7 @@ public static class DependencyInjection
         services.AddScoped<ITroopsStateRepository, TroopsStateRepository>();
         services.AddScoped<INobleBudgetRepository, NobleBudgetRepository>();
         services.AddScoped<IReconnaissanceSettingsRepository, ReconnaissanceSettingsRepository>();
+        services.AddScoped<IMainActionSettingsRepository, MainActionSettingsRepository>();
         services.AddScoped<IAttackCommandRepository, AttackCommandRepository>();
         services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
 
