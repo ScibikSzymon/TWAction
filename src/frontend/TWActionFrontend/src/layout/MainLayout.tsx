@@ -1,12 +1,36 @@
-import { Outlet } from "react-router-dom"
+import { NavLink, Outlet } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import styles from "./MainLayout.module.css";
 
 const MainLayout = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <>
-    This is the Main Layout
-    <Outlet/>
+      {isAuthenticated && (
+        <nav className={styles.nav}>
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `${styles.navLink} ${isActive ? styles.active : ""}`
+            }
+          >
+            📋 Rozpiski
+          </NavLink>
+          <NavLink
+            to="/templates"
+            className={({ isActive }) =>
+              `${styles.navLink} ${isActive ? styles.active : ""}`
+            }
+          >
+            🎯 Szablony akcji
+          </NavLink>
+        </nav>
+      )}
+      <Outlet />
     </>
-  )
-}
+  );
+};
 
-export default MainLayout
+export default MainLayout;

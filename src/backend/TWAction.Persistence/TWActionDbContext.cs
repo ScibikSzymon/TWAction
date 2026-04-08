@@ -3,6 +3,7 @@ using TWAction.Domain.Users;
 using TWAction.Domain.Schedules;
 using TWAction.Domain.Settings;
 using TWAction.Domain.AttackCommands;
+using TWAction.Domain.Templates;
 using TWAction.Persistence.Configurations;
 
 namespace TWAction.Persistence;
@@ -25,6 +26,8 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
 
     public DbSet<AttackCommandEntity> AttackCommands { get; set; } = null!;
 
+    public DbSet<TargetTemplate> TargetTemplates { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new UserConfiguration());
@@ -35,6 +38,7 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
         modelBuilder.ApplyConfiguration(new ReconnaissanceSettingsConfiguration());
         modelBuilder.ApplyConfiguration(new MainActionSettingsConfiguration());
         modelBuilder.ApplyConfiguration(new AttackCommandConfiguration());
+        modelBuilder.ApplyConfiguration(new TargetTemplateConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }

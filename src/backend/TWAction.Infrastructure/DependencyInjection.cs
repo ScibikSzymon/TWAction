@@ -23,12 +23,16 @@ using TWAction.Application.Tribes.Queries;
 using TWAction.Application.Settings.Interfaces;
 using TWAction.Application.Settings.Queries;
 using TWAction.Application.Settings.Commands;
+using TWAction.Application.Templates.Interfaces;
+using TWAction.Application.Templates.Queries;
+using TWAction.Application.Templates.Commands;
 using TWAction.Application.AttackCommands.Interfaces;
 using TWAction.Application.AttackCommands.Handlers;
 using TWAction.Application.ReconnaissanceActions.Interfaces;
 using TWAction.Application.ReconnaissanceActions.Handlers;
 using TWAction.Application.MainActions.Services;
 using TWAction.Application.MainActions.Queries;
+using TWAction.Persistence.Seeders;
 
 namespace TWAction.Infrastructure;
 
@@ -81,6 +85,7 @@ public static class DependencyInjection
         services.AddScoped<IReconnaissanceSettingsRepository, ReconnaissanceSettingsRepository>();
         services.AddScoped<IMainActionSettingsRepository, MainActionSettingsRepository>();
         services.AddScoped<IAttackCommandRepository, AttackCommandRepository>();
+        services.AddScoped<ITargetTemplateRepository, TargetTemplateRepository>();
         services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
 
 
@@ -110,6 +115,14 @@ public static class DependencyInjection
         services.AddTransient<GenerateReconnaissanceActionsHandler>();
         services.AddTransient<GetAttackCommandsSummaryHandler>();
         services.AddTransient<SendToPlemionaRozpiskiHandler>();
+
+        services.AddTransient<GetTargetTemplatesHandler>();
+        services.AddTransient<GetTargetTemplateByIdHandler>();
+        services.AddTransient<CreateTargetTemplateHandler>();
+        services.AddTransient<UpdateTargetTemplateHandler>();
+        services.AddTransient<DeleteTargetTemplateHandler>();
+
+        services.AddScoped<TargetTemplateSeeder>();
 
         // Register authentication with session-based authentication handler
         services.AddAuthentication(SessionAuthenticationHandler.SchemeName)
