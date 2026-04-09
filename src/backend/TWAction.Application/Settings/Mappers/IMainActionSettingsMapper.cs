@@ -14,6 +14,7 @@ public static partial class IMainActionSettingsMapper
         MinDepartureTime = settings.MinDepartureTime,
         SkipNightSendings = settings.SkipNightSendings,
         MaxNobleDistance = settings.MaxNobleDistance,
+        ActionDate = settings.ActionDate,
         OffSettings = new MainActionOffSettingsDto
         {
             MinOffUnits = settings.OffSettings.MinOffUnits,

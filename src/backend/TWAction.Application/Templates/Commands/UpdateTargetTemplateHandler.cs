@@ -53,7 +53,7 @@ public class UpdateTargetTemplateHandler(ITargetTemplateRepository repository)
         }
 
         template.Name = command.Name.Trim();
-        template.Waves = command.Waves.Select(MapWave).ToList();
+        template.Waves = command.Waves.Select(MapWave).OrderBy(w => w.MaxTime).ToList();
 
         await repository.UpdateAsync(template, ct);
         return Result.Success(template.ToDto());

@@ -17,6 +17,7 @@ public sealed class MainActionSettingsConfiguration : IEntityTypeConfiguration<M
         builder.Property(x => x.MinDepartureTime).IsRequired();
         builder.Property(x => x.SkipNightSendings).IsRequired();
         builder.Property(x => x.MaxNobleDistance).IsRequired();
+        builder.Property(x => x.ActionDate).IsRequired();
 
         // Configure owned entities for nested settings
         builder.OwnsOne(x => x.OffSettings, offBuilder =>

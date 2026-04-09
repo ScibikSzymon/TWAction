@@ -13,6 +13,7 @@ public sealed record SaveMainActionSettingsCommand(
     DateTimeOffset MinDepartureTime,
     bool SkipNightSendings,
     uint MaxNobleDistance,
+    DateOnly ActionDate,
     MainActionOffSettingsDto OffSettings,
     MainActionCatasSettingsDto CatasSettings,
     MainActionFakeOffSettingsDto FakeOffSettings,
@@ -151,6 +152,7 @@ public class SaveMainActionSettingsHandler(
             existing.MinDepartureTime = command.MinDepartureTime;
             existing.SkipNightSendings = command.SkipNightSendings;
             existing.MaxNobleDistance = command.MaxNobleDistance;
+            existing.ActionDate = command.ActionDate;
             
             existing.OffSettings.MinOffUnits = command.OffSettings.MinOffUnits;
             existing.OffSettings.MinDistanceFromFront = command.OffSettings.MinDistanceFromFront;
@@ -185,6 +187,7 @@ public class SaveMainActionSettingsHandler(
                 MinDepartureTime = command.MinDepartureTime,
                 SkipNightSendings = command.SkipNightSendings,
                 MaxNobleDistance = command.MaxNobleDistance,
+                ActionDate = command.ActionDate,
                 OffSettings = new MainActionOffSettings
                 {
                     MinOffUnits = command.OffSettings.MinOffUnits,

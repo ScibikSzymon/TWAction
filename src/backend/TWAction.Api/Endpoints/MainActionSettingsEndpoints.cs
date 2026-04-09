@@ -51,6 +51,7 @@ public static class MainActionSettingsEndpoints
             request.MinDepartureTime,
             request.SkipNightSendings,
             request.MaxNobleDistance,
+            request.ActionDate,
             request.OffSettings,
             request.CatasSettings,
             request.FakeOffSettings,

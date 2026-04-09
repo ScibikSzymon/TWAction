@@ -45,7 +45,7 @@ public class CreateTargetTemplateHandler(ITargetTemplateRepository repository)
             UserId = command.UserId,
             Name = command.Name.Trim(),
             IsDefault = false,
-            Waves = command.Waves.Select(MapWave).ToList()
+            Waves = command.Waves.Select(MapWave).OrderBy(w => w.MaxTime).ToList()
         };
 
         var created = await repository.CreateAsync(template, ct);

@@ -13,6 +13,7 @@ internal static class TargetTemplateMapper
             template.Name,
             template.IsDefault,
             template.Waves
+                .OrderBy(w => w.MaxTime)
                 .Select(w => new TemplateWaveDto(w.MinTime, w.MaxTime, w.CommandNumber, w.CommandType))
                 .ToList()
         );

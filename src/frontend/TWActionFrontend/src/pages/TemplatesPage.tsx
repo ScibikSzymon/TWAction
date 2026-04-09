@@ -1,10 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { targetTemplateService } from "../services/targetTemplateService";
-import type {
-  TargetTemplate,
-  TemplateWave,
-} from "../types/targetTemplate";
+import type { TargetTemplate, TemplateWave } from "../types/targetTemplate";
 import {
   ALL_COMMAND_TYPES,
   commandTypeLabels,
@@ -51,9 +48,13 @@ interface WaveEditorProps {
 }
 
 const WaveEditor = ({ waves, onChange }: WaveEditorProps) => {
-  const update = (index: number, field: keyof TemplateWave, value: string | number) => {
+  const update = (
+    index: number,
+    field: keyof TemplateWave,
+    value: string | number,
+  ) => {
     const next = waves.map((w, i) =>
-      i === index ? { ...w, [field]: value } : w
+      i === index ? { ...w, [field]: value } : w,
     );
     onChange(next);
   };
@@ -105,7 +106,9 @@ const WaveEditor = ({ waves, onChange }: WaveEditorProps) => {
               min={1}
               max={99}
               value={wave.commandNumber}
-              onChange={(e) => update(i, "commandNumber", parseInt(e.target.value, 10) || 1)}
+              onChange={(e) =>
+                update(i, "commandNumber", parseInt(e.target.value, 10) || 1)
+              }
               required
             />
           </div>
@@ -156,7 +159,7 @@ const TemplateFormModal = ({
 }: TemplateFormProps) => {
   const [name, setName] = useState(template?.name ?? "");
   const [waves, setWaves] = useState<TemplateWave[]>(
-    template?.waves.length ? template.waves : [createEmptyWave()]
+    template?.waves.length ? template.waves : [createEmptyWave()],
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -241,7 +244,9 @@ const TemplateCard = ({ template, onEdit, onDelete }: TemplateCardProps) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className={`${styles.card} ${template.isDefault ? styles.defaultCard : styles.userCard}`}>
+    <div
+      className={`${styles.card} ${template.isDefault ? styles.defaultCard : styles.userCard}`}
+    >
       <div className={styles.cardHeader}>
         <div className={styles.cardTitle}>
           <span className={styles.templateName}>{template.name}</span>
@@ -256,7 +261,9 @@ const TemplateCard = ({ template, onEdit, onDelete }: TemplateCardProps) => {
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
           >
-            {expanded ? "Zwiń ▲" : `${template.waves.length} fal ▼`}
+            {expanded
+              ? "Zwiń ▲"
+              : `${template.waves.reduce((s, w) => s + w.commandNumber, 0)} rozkazów ▼`}
           </button>
           {!template.isDefault && onEdit && (
             <button
@@ -329,7 +336,12 @@ interface DeleteDialogProps {
   isDeleting: boolean;
 }
 
-const DeleteDialog = ({ template, onConfirm, onCancel, isDeleting }: DeleteDialogProps) => (
+const DeleteDialog = ({
+  template,
+  onConfirm,
+  onCancel,
+  isDeleting,
+}: DeleteDialogProps) => (
   <div className={styles.modalOverlay} onClick={onCancel}>
     <div
       className={`${styles.modal} ${styles.confirmModal}`}
@@ -340,7 +352,8 @@ const DeleteDialog = ({ template, onConfirm, onCancel, isDeleting }: DeleteDialo
       <h2 id="confirm-title">Usuń szablon</h2>
       <p>
         Czy na pewno chcesz usunąć szablon{" "}
-        <strong>&ldquo;{template.name}&rdquo;</strong>? Tej operacji nie można cofnąć.
+        <strong>&ldquo;{template.name}&rdquo;</strong>? Tej operacji nie można
+        cofnąć.
       </p>
       <div className={styles.modalActions}>
         <button
@@ -374,12 +387,16 @@ const TemplatesPage = () => {
 
   // Modal state
   const [showForm, setShowForm] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<TargetTemplate | undefined>();
+  const [editingTemplate, setEditingTemplate] = useState<
+    TargetTemplate | undefined
+  >();
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   // Delete confirmation state
-  const [deletingTemplate, setDeletingTemplate] = useState<TargetTemplate | undefined>();
+  const [deletingTemplate, setDeletingTemplate] = useState<
+    TargetTemplate | undefined
+  >();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const loadTemplates = useCallback(async () => {
@@ -423,15 +440,21 @@ const TemplatesPage = () => {
     setSaveError(null);
     try {
       if (editingTemplate) {
-        const updated = await targetTemplateService.updateTemplate(editingTemplate.id, {
+        const updated = await targetTemplateService.updateTemplate(
+          editingTemplate.id,
+          {
+            name,
+            waves,
+          },
+        );
+        setTemplates((prev) =>
+          prev.map((t) => (t.id === updated.id ? updated : t)),
+        );
+      } else {
+        const created = await targetTemplateService.createTemplate({
           name,
           waves,
         });
-        setTemplates((prev) =>
-          prev.map((t) => (t.id === updated.id ? updated : t))
-        );
-      } else {
-        const created = await targetTemplateService.createTemplate({ name, waves });
         setTemplates((prev) => [...prev, created]);
       }
       setShowForm(false);
@@ -466,7 +489,11 @@ const TemplatesPage = () => {
   const userTemplates = templates.filter((t) => !t.isDefault);
 
   if (authLoading) {
-    return <div className={styles.container}><div className={styles.loading}>Ładowanie...</div></div>;
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Ładowanie...</div>
+      </div>
+    );
   }
 
   if (!isAuthenticated || !user) {

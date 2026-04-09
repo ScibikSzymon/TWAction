@@ -33,6 +33,7 @@ export interface MainActionSettings {
   minDepartureTime: string;
   skipNightSendings: boolean;
   maxNobleDistance: number;
+  actionDate: string; // "YYYY-MM-DD"
   offSettings: MainActionOffSettings;
   catasSettings: MainActionCatasSettings;
   fakeOffSettings: MainActionFakeOffSettings;
@@ -45,6 +46,7 @@ export interface SaveMainActionSettingsRequest {
   minDepartureTime: string;
   skipNightSendings: boolean;
   maxNobleDistance: number;
+  actionDate: string; // "YYYY-MM-DD"
   offSettings: MainActionOffSettings;
   catasSettings: MainActionCatasSettings;
   fakeOffSettings: MainActionFakeOffSettings;
@@ -70,6 +72,7 @@ export const getDefaultMainActionSettings = (): Omit<
     minDepartureTime,
     skipNightSendings: true,
     maxNobleDistance: 49,
+    actionDate: minDepartureTime.toISOString().slice(0, 10),
     offSettings: {
       minOffUnits: 18000,
       minDistanceFromFront: 5,

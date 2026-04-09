@@ -7,6 +7,7 @@ public sealed record MainActionSettingsDto
     public required DateTimeOffset MinDepartureTime { get; init; }
     public required bool SkipNightSendings { get; init; }
     public required uint MaxNobleDistance { get; init; }
+    public required DateOnly ActionDate { get; init; }
     public required MainActionOffSettingsDto OffSettings { get; init; }
     public required MainActionCatasSettingsDto CatasSettings { get; init; }
     public required MainActionFakeOffSettingsDto FakeOffSettings { get; init; }
@@ -54,6 +55,7 @@ public sealed record SaveMainActionSettingsRequest
     public required DateTimeOffset MinDepartureTime { get; init; }
     public required bool SkipNightSendings { get; init; }
     public required uint MaxNobleDistance { get; init; }
+    public required DateOnly ActionDate { get; init; }
     public required MainActionOffSettingsDto OffSettings { get; init; }
     public required MainActionCatasSettingsDto CatasSettings { get; init; }
     public required MainActionFakeOffSettingsDto FakeOffSettings { get; init; }

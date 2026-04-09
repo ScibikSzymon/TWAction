@@ -10,6 +10,8 @@ public sealed class MainActionSettings
     public DateTimeOffset MinDepartureTime { get; set; }
     public bool SkipNightSendings { get; set; }
     public uint MaxNobleDistance { get; set; }
+    /// <summary>The calendar day on which the actions should arrive. Hours/minutes come from the templates.</summary>
+    public DateOnly ActionDate { get; set; }
     public MainActionOffSettings OffSettings { get; set; } = null!;
     public MainActionCatasSettings CatasSettings { get; set; } = null!;
     public MainActionFakeOffSettings FakeOffSettings { get; set; } = null!;

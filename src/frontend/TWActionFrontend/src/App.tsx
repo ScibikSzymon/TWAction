@@ -1,8 +1,8 @@
-import './App.css'
-import HomePage from './pages/HomePage';
-import TemplatesPage from './pages/TemplatesPage';
-import MainLayout from './layout/MainLayout';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import "./App.css";
+import HomePage from "./pages/HomePage";
+import TemplatesPage from "./pages/TemplatesPage";
+import MainLayout from "./layout/MainLayout";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const router = createBrowserRouter([
   {
@@ -12,14 +12,11 @@ const router = createBrowserRouter([
       { path: "/", element: <HomePage /> },
       { path: "/templates", element: <TemplatesPage /> },
     ],
-  }
+  },
 ]);
 
-
 const App = () => {
-  return (
-    <RouterProvider router={router}/>
-  )
-}
+  return <RouterProvider router={router} />;
+};
 
-export default App
+export default App;

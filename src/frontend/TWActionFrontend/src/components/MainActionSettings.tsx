@@ -15,6 +15,7 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
     minDepartureTime: defaults.minDepartureTime.toISOString(),
     skipNightSendings: defaults.skipNightSendings,
     maxNobleDistance: defaults.maxNobleDistance,
+    actionDate: defaults.actionDate,
     offSettings: defaults.offSettings,
     catasSettings: defaults.catasSettings,
     fakeOffSettings: defaults.fakeOffSettings,
@@ -39,6 +40,7 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
           minDepartureTime: data.minDepartureTime,
           skipNightSendings: data.skipNightSendings,
           maxNobleDistance: data.maxNobleDistance,
+          actionDate: data.actionDate,
           offSettings: data.offSettings,
           catasSettings: data.catasSettings,
           fakeOffSettings: data.fakeOffSettings,
@@ -56,6 +58,7 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
             minDepartureTime: defaults.minDepartureTime.toISOString(),
             skipNightSendings: defaults.skipNightSendings,
             maxNobleDistance: defaults.maxNobleDistance,
+            actionDate: defaults.actionDate,
             offSettings: defaults.offSettings,
             catasSettings: defaults.catasSettings,
             fakeOffSettings: defaults.fakeOffSettings,
@@ -155,6 +158,23 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
         >
           ⚙️ Globalne ustawienia
         </summary>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="actionDate">Dzień wejścia akcji:</label>
+          <input
+            id="actionDate"
+            type="date"
+            value={settings.actionDate}
+            onChange={(e) =>
+              setSettings((prev) => ({
+                ...prev,
+                actionDate: e.target.value,
+              }))
+            }
+            min={new Date().toISOString().slice(0, 10)}
+            disabled={isSaving}
+          />
+        </div>
 
         <div className={styles.formGroup}>
           <label htmlFor="minDepartureTime">Czas rozpoczęcia wysyłki:</label>
