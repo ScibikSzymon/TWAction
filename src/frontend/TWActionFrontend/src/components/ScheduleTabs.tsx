@@ -6,6 +6,7 @@ import { NobleBudgetManager } from "./NobleBudgetManager";
 import { ReconnaissanceSettings } from "./ReconnaissanceSettings";
 import { ReconnaissanceActionsGenerator } from "./ReconnaissanceActionsGenerator";
 import { MainActionSettings } from "./MainActionSettings";
+import { TargetGroupsManager } from "./TargetGroupsManager";
 import styles from "./ScheduleTabs.module.css";
 
 interface ScheduleTabsProps {
@@ -17,6 +18,7 @@ type TabType =
   | "troops"
   | "nobleBudget"
   | "mainActionSettings"
+  | "targetGroups"
   | "reconnaissance"
   | "generate";
 
@@ -36,6 +38,11 @@ export const ScheduleTabs = ({
     {
       id: "mainActionSettings",
       label: "Ustawienia Głównej Akcji",
+      visible: schedule.scheduleType === ScheduleType.Main,
+    },
+    {
+      id: "targetGroups",
+      label: "Grupy Celi",
       visible: schedule.scheduleType === ScheduleType.Main,
     },
     {
@@ -77,6 +84,10 @@ export const ScheduleTabs = ({
         {activeTab === "mainActionSettings" &&
           schedule.scheduleType === ScheduleType.Main && (
             <MainActionSettings scheduleId={schedule.id} />
+          )}
+        {activeTab === "targetGroups" &&
+          schedule.scheduleType === ScheduleType.Main && (
+            <TargetGroupsManager scheduleId={schedule.id} />
           )}
         {activeTab === "reconnaissance" &&
           schedule.scheduleType === ScheduleType.Reconnaissance && (

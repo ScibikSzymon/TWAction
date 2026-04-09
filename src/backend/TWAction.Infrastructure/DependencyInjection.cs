@@ -26,6 +26,9 @@ using TWAction.Application.Settings.Commands;
 using TWAction.Application.Templates.Interfaces;
 using TWAction.Application.Templates.Queries;
 using TWAction.Application.Templates.Commands;
+using TWAction.Application.TargetGroups.Interfaces;
+using TWAction.Application.TargetGroups.Queries;
+using TWAction.Application.TargetGroups.Commands;
 using TWAction.Application.AttackCommands.Interfaces;
 using TWAction.Application.AttackCommands.Handlers;
 using TWAction.Application.ReconnaissanceActions.Interfaces;
@@ -86,6 +89,7 @@ public static class DependencyInjection
         services.AddScoped<IMainActionSettingsRepository, MainActionSettingsRepository>();
         services.AddScoped<IAttackCommandRepository, AttackCommandRepository>();
         services.AddScoped<ITargetTemplateRepository, TargetTemplateRepository>();
+        services.AddScoped<ITargetGroupRepository, TargetGroupRepository>();
         services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
 
 
@@ -121,6 +125,12 @@ public static class DependencyInjection
         services.AddTransient<CreateTargetTemplateHandler>();
         services.AddTransient<UpdateTargetTemplateHandler>();
         services.AddTransient<DeleteTargetTemplateHandler>();
+
+        services.AddTransient<GetTargetGroupsHandler>();
+        services.AddTransient<GetTargetGroupByIdHandler>();
+        services.AddTransient<CreateTargetGroupHandler>();
+        services.AddTransient<UpdateTargetGroupHandler>();
+        services.AddTransient<DeleteTargetGroupHandler>();
 
         services.AddScoped<TargetTemplateSeeder>();
 
