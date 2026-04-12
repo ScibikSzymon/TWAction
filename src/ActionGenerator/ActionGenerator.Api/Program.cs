@@ -32,6 +32,7 @@ public partial class Program
                 options => options.ApiKey = apiKey);
         builder.Services.AddAuthorization();
         builder.Services.AddOpenApi();
+        builder.Services.AddHealthChecks();
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure();
 
@@ -48,6 +49,8 @@ public partial class Program
         }
 
         app.MapReconnaissanceActionsEndpoints();
+
+        app.MapHealthChecks("/health");
 
         app.Run();
     }
