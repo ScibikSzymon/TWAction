@@ -19,6 +19,7 @@ public sealed class TargetDtoValidator : AbstractValidator<TargetDto>
         CommandType.NobleWith150Axes,
         CommandType.NobleWith100HeavyCavalry,
         CommandType.RandomNoble,
+        CommandType.NobleWithDeff
     ];
 
     public TargetDtoValidator()
