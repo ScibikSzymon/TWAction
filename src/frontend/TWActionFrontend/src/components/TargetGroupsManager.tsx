@@ -51,7 +51,11 @@ interface WaveEditorProps {
 }
 
 const WaveEditor = ({ waves, onChange }: WaveEditorProps) => {
-  const update = (index: number, field: keyof TemplateWave, value: string | number) => {
+  const update = (
+    index: number,
+    field: keyof TemplateWave,
+    value: string | number,
+  ) => {
     onChange(waves.map((w, i) => (i === index ? { ...w, [field]: value } : w)));
   };
 
@@ -147,10 +151,14 @@ interface GroupDetailProps {
 const GroupDetail = ({ group }: GroupDetailProps) => (
   <div className={styles.groupDetail}>
     <div className={styles.detailSection}>
-      <h5 className={styles.detailTitle}>Wioski ({group.villageCoordinates.length})</h5>
+      <h5 className={styles.detailTitle}>
+        Wioski ({group.villageCoordinates.length})
+      </h5>
       <div className={styles.coordChips}>
         {group.villageCoordinates.map((c) => (
-          <span key={c} className={styles.coordChip}>{c}</span>
+          <span key={c} className={styles.coordChip}>
+            {c}
+          </span>
         ))}
       </div>
     </div>
@@ -213,7 +221,9 @@ const GroupCard = ({ group, onEdit, onDelete }: GroupCardProps) => {
         <div className={styles.groupCardMeta}>
           <span className={styles.groupName}>{group.name}</span>
           <div className={styles.groupBadges}>
-            <span className={styles.badge}>{group.villageCoordinates.length} wiosek</span>
+            <span className={styles.badge}>
+              {group.villageCoordinates.length} wiosek
+            </span>
             <span className={styles.badge}>{cmds} rozkazów</span>
             {group.baseTemplateName && (
               <span className={`${styles.badge} ${styles.badgeTemplate}`}>
@@ -253,7 +263,12 @@ interface DeleteDialogProps {
   onCancel: () => void;
 }
 
-const DeleteDialog = ({ groupName, isDeleting, onConfirm, onCancel }: DeleteDialogProps) => (
+const DeleteDialog = ({
+  groupName,
+  isDeleting,
+  onConfirm,
+  onCancel,
+}: DeleteDialogProps) => (
   <div className={styles.modalOverlay} role="dialog" aria-modal="true">
     <div className={styles.deleteDialog}>
       <h3>Usuń grupę celi</h3>
@@ -262,10 +277,18 @@ const DeleteDialog = ({ groupName, isDeleting, onConfirm, onCancel }: DeleteDial
         operacji nie można cofnąć.
       </p>
       <div className={styles.dialogActions}>
-        <button className={styles.btnSecondary} onClick={onCancel} disabled={isDeleting}>
+        <button
+          className={styles.btnSecondary}
+          onClick={onCancel}
+          disabled={isDeleting}
+        >
           Anuluj
         </button>
-        <button className={styles.btnDanger} onClick={onConfirm} disabled={isDeleting}>
+        <button
+          className={styles.btnDanger}
+          onClick={onConfirm}
+          disabled={isDeleting}
+        >
           {isDeleting ? "Usuwanie…" : "Usuń grupę"}
         </button>
       </div>
@@ -408,19 +431,26 @@ const GroupFormModal = ({
               className={styles.coordsTextarea}
               value={rawCoords}
               onChange={(e) => setRawCoords(e.target.value)}
-              placeholder={"Wklej koordynaty oddzielone spacją lub nową linią\nnp. 473|490 472|488 475|489"}
+              placeholder={
+                "Wklej koordynaty oddzielone spacją lub nową linią\nnp. 473|490 472|488 475|489"
+              }
               rows={4}
             />
             <div className={styles.coordsFeedback}>
               {parsedCoords.length > 0 && (
                 <span className={styles.coordsValid}>
                   ✓ Rozpoznano {parsedCoords.length}{" "}
-                  {parsedCoords.length === 1 ? "wioskę" : parsedCoords.length < 5 ? "wioski" : "wiosek"}
+                  {parsedCoords.length === 1
+                    ? "wioskę"
+                    : parsedCoords.length < 5
+                      ? "wioski"
+                      : "wiosek"}
                 </span>
               )}
               {badTokens.length > 0 && (
                 <span className={styles.coordsInvalid}>
-                  ⚠ Nieprawidłowe wpisy ({badTokens.length}): {badTokens.slice(0, 3).join(", ")}
+                  ⚠ Nieprawidłowe wpisy ({badTokens.length}):{" "}
+                  {badTokens.slice(0, 3).join(", ")}
                   {badTokens.length > 3 ? "…" : ""}
                 </span>
               )}
@@ -468,8 +498,8 @@ const GroupFormModal = ({
             {selectedTemplateId && (
               <p className={styles.templateNote}>
                 ℹ Fale zostały załadowane z szablonu. Możesz je dowolnie
-                modyfikować — zmiany zapisują się razem z grupą, nie wpływają
-                na oryginalny szablon.
+                modyfikować — zmiany zapisują się razem z grupą, nie wpływają na
+                oryginalny szablon.
               </p>
             )}
           </div>
@@ -477,9 +507,7 @@ const GroupFormModal = ({
           {/* Wave Editor */}
           <WaveEditor waves={waves} onChange={setWaves} />
 
-          {saveError && (
-            <div className={styles.saveError}>{saveError}</div>
-          )}
+          {saveError && <div className={styles.saveError}>{saveError}</div>}
 
           <div className={styles.modalFooter}>
             <button
@@ -498,8 +526,8 @@ const GroupFormModal = ({
               {isSaving
                 ? "Zapisywanie…"
                 : isEdit
-                ? "Zapisz zmiany"
-                : "Utwórz grupę"}
+                  ? "Zapisz zmiany"
+                  : "Utwórz grupę"}
             </button>
           </div>
         </form>
@@ -514,7 +542,9 @@ interface TargetGroupsManagerProps {
   scheduleId: string;
 }
 
-export const TargetGroupsManager = ({ scheduleId }: TargetGroupsManagerProps) => {
+export const TargetGroupsManager = ({
+  scheduleId,
+}: TargetGroupsManagerProps) => {
   const [groups, setGroups] = useState<TargetGroup[]>([]);
   const [templates, setTemplates] = useState<TargetTemplate[]>([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -37,8 +37,6 @@ export const targetGroupService = {
   },
 
   async deleteGroup(scheduleId: string, groupId: string): Promise<void> {
-    await apiClient.delete(
-      `/schedules/${scheduleId}/target-groups/${groupId}`,
-    );
+    await apiClient.delete(`/schedules/${scheduleId}/target-groups/${groupId}`);
   },
 };

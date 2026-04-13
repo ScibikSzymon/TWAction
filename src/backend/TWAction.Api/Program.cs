@@ -75,6 +75,7 @@ app.MapAttackCommandsEndpoints();
 app.MapReconnaissanceActionsEndpoints();
 app.MapTargetTemplateEndpoints();
 app.MapTargetGroupEndpoints();
+app.MapMainActionGeneratorEndpoints();
 
 app.MapDefaultEndpoints();
 

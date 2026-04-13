@@ -4,7 +4,8 @@ var builder = DistributedApplication.CreateBuilder(args);
 var appDb = builder.AddConnectionString("TWActionDatabase");
 
 // ActionGenerator Api (.NET project)
-var actionGeneratorApi = builder.AddProject<Projects.ActionGenerator_Api>("action-generator-Api");
+var actionGeneratorApi = builder.AddProject<Projects.ActionGenerator_Api>("action-generator-Api")
+    .WithHttpEndpoint(port: 5277);
 
 // Backend Api (.NET project)
 var Api = builder.AddProject<Projects.TWAction_Api>("Api")

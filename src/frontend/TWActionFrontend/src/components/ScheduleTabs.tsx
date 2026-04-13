@@ -7,6 +7,7 @@ import { ReconnaissanceSettings } from "./ReconnaissanceSettings";
 import { ReconnaissanceActionsGenerator } from "./ReconnaissanceActionsGenerator";
 import { MainActionSettings } from "./MainActionSettings";
 import { TargetGroupsManager } from "./TargetGroupsManager";
+import { MainActionGenerator } from "./MainActionGenerator";
 import styles from "./ScheduleTabs.module.css";
 
 interface ScheduleTabsProps {
@@ -19,6 +20,7 @@ type TabType =
   | "nobleBudget"
   | "mainActionSettings"
   | "targetGroups"
+  | "generateMain"
   | "reconnaissance"
   | "generate";
 
@@ -43,6 +45,11 @@ export const ScheduleTabs = ({
     {
       id: "targetGroups",
       label: "Grupy Celi",
+      visible: schedule.scheduleType === ScheduleType.Main,
+    },
+    {
+      id: "generateMain",
+      label: "Generuj Akcje",
       visible: schedule.scheduleType === ScheduleType.Main,
     },
     {
@@ -88,6 +95,14 @@ export const ScheduleTabs = ({
         {activeTab === "targetGroups" &&
           schedule.scheduleType === ScheduleType.Main && (
             <TargetGroupsManager scheduleId={schedule.id} />
+          )}
+        {activeTab === "generateMain" &&
+          schedule.scheduleType === ScheduleType.Main && (
+            <MainActionGenerator
+              scheduleId={schedule.id}
+              schedule={schedule}
+              onScheduleUpdate={onScheduleUpdate}
+            />
           )}
         {activeTab === "reconnaissance" &&
           schedule.scheduleType === ScheduleType.Reconnaissance && (

@@ -29,6 +29,7 @@ using TWAction.Application.Templates.Commands;
 using TWAction.Application.TargetGroups.Interfaces;
 using TWAction.Application.TargetGroups.Queries;
 using TWAction.Application.TargetGroups.Commands;
+using TWAction.Application.MainActions.Handlers;
 using TWAction.Application.AttackCommands.Interfaces;
 using TWAction.Application.AttackCommands.Handlers;
 using TWAction.Application.ReconnaissanceActions.Interfaces;
@@ -131,6 +132,7 @@ public static class DependencyInjection
         services.AddTransient<CreateTargetGroupHandler>();
         services.AddTransient<UpdateTargetGroupHandler>();
         services.AddTransient<DeleteTargetGroupHandler>();
+        services.AddTransient<GenerateMainActionsHandler>();
 
         services.AddScoped<TargetTemplateSeeder>();
 
