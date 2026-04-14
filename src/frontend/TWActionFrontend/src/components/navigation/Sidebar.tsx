@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import type { User } from "../../types/user";
+import { useI18n } from "../../i18n/I18nProvider";
 import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
@@ -8,6 +9,8 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ user, onLogout }: SidebarProps) => {
+  const { t, language, setLanguage } = useI18n();
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.sidebarHeader}>
@@ -22,7 +25,7 @@ export const Sidebar = ({ user, onLogout }: SidebarProps) => {
             `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
           }
         >
-          Strona główna
+          {t.sidebar.home}
         </NavLink>
 
         {user.role === "Admin" && (
@@ -32,7 +35,7 @@ export const Sidebar = ({ user, onLogout }: SidebarProps) => {
               `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
             }
           >
-            Panel użytkowników
+            {t.sidebar.userPanel}
           </NavLink>
         )}
       </nav>
@@ -42,8 +45,22 @@ export const Sidebar = ({ user, onLogout }: SidebarProps) => {
           <span className={styles.userEmail}>{user.email}</span>
           <span className={styles.userRole}>{user.role}</span>
         </div>
+        <div className={styles.langSwitch}>
+          <button
+            onClick={() => setLanguage("pl")}
+            className={`${styles.langBtn} ${language === "pl" ? styles.langBtnActive : ""}`}
+          >
+            PL
+          </button>
+          <button
+            onClick={() => setLanguage("en")}
+            className={`${styles.langBtn} ${language === "en" ? styles.langBtnActive : ""}`}
+          >
+            EN
+          </button>
+        </div>
         <button onClick={onLogout} className={styles.logoutBtn}>
-          Wyloguj się
+          {t.sidebar.logout}
         </button>
       </div>
     </aside>
