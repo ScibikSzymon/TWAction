@@ -10,10 +10,18 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddJsonConsole(options =>
+{
+    options.TimestampFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
+    options.UseUtcTimestamp = true;
+    options.IncludeScopes = true;
+});
+
 builder.AddServiceDefaults();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddApplicationHealthChecks(builder.Configuration);
 
 builder.Services.AddApiOptions(builder.Configuration);
 

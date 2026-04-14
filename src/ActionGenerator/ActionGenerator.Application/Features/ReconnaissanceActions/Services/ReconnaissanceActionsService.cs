@@ -3,6 +3,8 @@ using ActionGenerator.Application.Common.Mappers;
 using ActionGenerator.Application.Common.Services;
 using ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
 using ActionGenerator.Domain.Entities;
+using Microsoft.Extensions.Logging;
+
 
 namespace ActionGenerator.Application.Features.ReconnaissanceActions.Services;
 
@@ -14,25 +16,31 @@ public interface IReconnaissanceActionsService
         CancellationToken cancellationToken = default);
 }
 
-internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsService
+internal sealed partial class ReconnaissanceActionsService : IReconnaissanceActionsService
 {
     private readonly INightTimeChecker _nightTimeChecker;
     private readonly IFrontDistanceCalculator _frontDistanceCalculator;
     private readonly ICommandFactory _commandGenerator;
+    private readonly ILogger<ReconnaissanceActionsService> _logger;
+
     public ReconnaissanceActionsService(
         INightTimeChecker nightTimeChecker,
         IFrontDistanceCalculator frontDistanceCalculator,
-        ICommandFactory commandFactory)
+        ICommandFactory commandFactory,
+        ILogger<ReconnaissanceActionsService> logger)
     {
         _nightTimeChecker = nightTimeChecker;
         _frontDistanceCalculator = frontDistanceCalculator;
         _commandGenerator = commandFactory;
+        _logger = logger;
     }
 
     public IReadOnlyList<AttackCommandDto> Generate(
         GenerateReconnaissanceActionsRequest request, 
         CancellationToken cancellationToken = default)
     {
+        LogGenerationStarted(request.AllyVillages.Count, request.EnemyVillages.Count);
+
         var allyVillages = request.AllyVillages.ToEntities();
         var enemyVillages = request.EnemyVillages.ToEntities(
             request.MinArrivalTime, 
@@ -48,6 +56,8 @@ internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsServi
             request.MinSpyCount,
             request.MaxPopulationInSourceVillage);
 
+        LogEligibleAllyVillages(eligibleAllyVillages.Count, allyVillages.Count);
+
         var sortedEnemyVillages = enemyVillages
             .OrderBy(v => v.DistanceToFront)
             .ToList();
@@ -59,6 +69,8 @@ internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsServi
             cancellationToken);
 
         var commandDtos = commands.ToDtos();
+
+        LogGenerationCompleted(commandDtos.Count, sortedEnemyVillages.Count);
 
         return commandDtos;
     }
@@ -112,5 +124,14 @@ internal sealed class ReconnaissanceActionsService : IReconnaissanceActionsServi
 
         return commands;
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Starting reconnaissance actions generation with {AllyCount} ally and {EnemyCount} enemy villages")]
+    private partial void LogGenerationStarted(int allyCount, int enemyCount);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{EligibleCount} of {TotalCount} ally villages eligible after filtering")]
+    private partial void LogEligibleAllyVillages(int eligibleCount, int totalCount);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Generation completed: {CommandCount} commands generated for {TargetCount} enemy targets")]
+    private partial void LogGenerationCompleted(int commandCount, int targetCount);
 }
 

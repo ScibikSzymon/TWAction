@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Wolverine;
 using TWAction.Application.Interfaces;
@@ -141,6 +142,38 @@ public static class DependencyInjection
             .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
                 SessionAuthenticationHandler.SchemeName, 
                 options => { });
+
+        return services;
+    }
+
+    public static IServiceCollection AddApplicationHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("TWActionDatabase");
+        var authOptions = configuration.GetSection(AuthOptions.SectionName).Get<AuthOptions>();
+        var generatorOptions = configuration.GetSection(GeneratorApiOptions.SectionName).Get<GeneratorApiOptions>();
+        var rozpiskiOptions = configuration.GetSection(PlemionaRozpiskiApiOptions.SectionName).Get<PlemionaRozpiskiApiOptions>();
+
+        services.AddHealthChecks()
+            .AddNpgSql(
+                connectionString!,
+                name: "postgresql",
+                failureStatus: HealthStatus.Unhealthy,
+                tags: ["db", "ready"])
+            .AddUrlGroup(
+                new Uri(authOptions!.FrontendUrl!),
+                name: "frontend",
+                failureStatus: HealthStatus.Degraded,
+                tags: ["external", "ready"])
+            .AddUrlGroup(
+                new Uri(new Uri(generatorOptions!.BaseUrl), "/health"),
+                name: "action-generator-api",
+                failureStatus: HealthStatus.Degraded,
+                tags: ["external", "ready"])
+            .AddUrlGroup(
+                new Uri(new Uri(rozpiskiOptions!.BaseUrl), "/"),
+                name: "plemiona-rozpiski-api",
+                failureStatus: HealthStatus.Degraded,
+                tags: ["external", "ready"]);
 
         return services;
     }
