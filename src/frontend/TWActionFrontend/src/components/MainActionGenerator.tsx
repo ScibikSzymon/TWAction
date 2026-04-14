@@ -31,6 +31,7 @@ const COMMAND_TYPE_LABELS: Record<string, string> = {
   Catapults: "Burzenie",
   NobleWithDeff: "Szlachcic z zagrodą deffa",
   NobleWithFullOff: "Szlachcic z pełnym offem",
+  NobleWithHalfOff: "Szlachcic z połową offa",
   NobleWithFakeOff: "Szlachcic z fejk offem",
   NobleWithFakeDeff: "Szlachcic z fejk deffem",
 };
@@ -255,11 +256,11 @@ export const MainActionGenerator = ({
               Liczba komend: <strong>{summary.totalCount}</strong>
             </li>
             <li>
-              Pierwszy minutm wysłania:{" "}
+              Pierwszy czas wysłania:{" "}
               <strong>{formatDate(summary.firstMinDepartureTime)}</strong>
             </li>
             <li>
-              Ostatni minut wysłania:{" "}
+              Ostatni czas wysłania:{" "}
               <strong>{formatDate(summary.lastMinDepartureTime)}</strong>
             </li>
             <li>
