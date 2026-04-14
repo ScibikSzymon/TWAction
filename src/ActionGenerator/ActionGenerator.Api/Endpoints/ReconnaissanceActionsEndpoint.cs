@@ -6,15 +6,8 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ActionGenerator.Api.Endpoints;
 
-/// <summary>
-/// Provides API endpoints for reconnaissance action generation.
-/// </summary>
 public static class ReconnaissanceActionsEndpoint
 {
-    /// <summary>
-    /// Maps reconnaissance action endpoints onto the route builder.
-    /// </summary>
-    /// <param name="app">The endpoint route builder.</param>
     public static void MapReconnaissanceActionsEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/Api/reconnaissance-actions");
