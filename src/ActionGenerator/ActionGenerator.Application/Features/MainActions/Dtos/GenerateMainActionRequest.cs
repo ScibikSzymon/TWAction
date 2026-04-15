@@ -14,8 +14,6 @@ public sealed record GenerateMainActionRequest
     public IReadOnlyDictionary<int, uint> PlayerNobleBudgets { get; init; } = new Dictionary<int, uint>();
 
     public uint MaxNobleDistance { get; init; } = 49;
-
-    // Action algorithm settings — sent by the client or populated with backend defaults.
     public OffSettings OffSettings { get; init; } = new();
     public CatasSettings CatasSettings { get; init; } = new();
     public FakeOffSettings FakeOffSettings { get; init; } = new();

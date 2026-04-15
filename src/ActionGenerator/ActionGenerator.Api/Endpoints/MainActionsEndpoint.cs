@@ -6,14 +6,8 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ActionGenerator.Api.Endpoints;
 
-/// <summary>
-/// Provides API endpoints for main action generation (Off, Catas, FakeOff, FakeDeff, Nobles).
-/// </summary>
 public static class MainActionsEndpoint
 {
-    /// <summary>
-    /// Maps main action endpoints onto the route builder.
-    /// </summary>
     public static void MapMainActionsEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/Api/main-actions");
@@ -25,7 +19,6 @@ public static class MainActionsEndpoint
         group.AddEndpointFilter<FilterForValidation<GenerateMainActionRequest>>();
     }
 
-    // Generates main action commands using the application service.
     private static Results<Ok<IReadOnlyList<AttackCommandDto>>, ValidationProblem> GenerateMainActions(
         GenerateMainActionRequest request,
         IMainActionsService service,

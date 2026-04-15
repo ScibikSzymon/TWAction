@@ -70,10 +70,6 @@ internal sealed class NobleGenerator(ICommandsStorage storage, NobleLimitsChecke
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Potential command building
-    // -------------------------------------------------------------------------
-
     private static Dictionary<Target, List<AttackCommand>> BuildPotentialCommands(
         IReadOnlyList<SourceVillage> sources,
         List<Target> targets,
@@ -154,10 +150,6 @@ internal sealed class NobleGenerator(ICommandsStorage storage, NobleLimitsChecke
 
         _ => throw new ArgumentOutOfRangeException(nameof(commandType))
     };
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
 
     private static bool IsOffTypeNoble(CommandType commandType) => commandType is
         CommandType.NobleWithFullOff or

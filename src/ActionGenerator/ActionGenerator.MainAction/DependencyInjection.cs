@@ -10,7 +10,6 @@ public static class DependencyInjection
         services.AddScoped<ICommandsStorage, CommandsStorage>();
         services.AddScoped<NobleLimitsChecker>();
 
-        // Order matters: noble sources are excluded from Off/Fake generation via storage
         services.AddScoped<ICommandTypeGenerator, NobleGenerator>();
         services.AddScoped<ICommandTypeGenerator, OffGenerator>();
         services.AddScoped<ICommandTypeGenerator, FakeGenerator>();
