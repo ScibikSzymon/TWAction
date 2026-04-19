@@ -34,7 +34,7 @@ export const NobleBudgetManager = ({ scheduleId }: NobleBudgetManagerProps) => {
       let existingBudgets: NobleBudget[] = [];
       try {
         existingBudgets = await nobleBudgetService.getNobleBudgets(scheduleId);
-      } catch (err) {
+      } catch {
         // No existing budgets is fine
         console.log("No existing budgets found");
       }
