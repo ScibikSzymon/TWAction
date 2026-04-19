@@ -7,9 +7,11 @@ public enum CommandType
     FakeOffensive,
     FakeDefensive,
     Catapults,
+    NobleWithDeff,
     NobleWithFullOff,
     NobleWithHalfOff,
     NobleWithQuarterOffensive,
     NobleWith150Axes,
-    NobleWith100HeavyCavalry
+    NobleWith100HeavyCavalry,
+    RandomNoble
 }

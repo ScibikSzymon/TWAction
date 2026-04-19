@@ -2,8 +2,12 @@ import { useState } from "react";
 import type { Schedule } from "../types/schedule";
 import { ScheduleType } from "../types/schedule";
 import { TroopsStateManager } from "./TroopsStateManager";
+import { NobleBudgetManager } from "./NobleBudgetManager";
 import { ReconnaissanceSettings } from "./ReconnaissanceSettings";
 import { ReconnaissanceActionsGenerator } from "./ReconnaissanceActionsGenerator";
+import { MainActionSettings } from "./MainActionSettings";
+import { TargetGroupsManager } from "./TargetGroupsManager";
+import { MainActionGenerator } from "./MainActionGenerator";
 import styles from "./ScheduleTabs.module.css";
 
 interface ScheduleTabsProps {
@@ -11,7 +15,14 @@ interface ScheduleTabsProps {
   onScheduleUpdate?: (updatedSchedule: Partial<Schedule>) => void;
 }
 
-type TabType = "troops" | "reconnaissance" | "generate";
+type TabType =
+  | "troops"
+  | "nobleBudget"
+  | "mainActionSettings"
+  | "targetGroups"
+  | "generateMain"
+  | "reconnaissance"
+  | "generate";
 
 export const ScheduleTabs = ({
   schedule,
@@ -21,6 +32,26 @@ export const ScheduleTabs = ({
 
   const tabs: { id: TabType; label: string; visible: boolean }[] = [
     { id: "troops", label: "Stan Armii", visible: true },
+    {
+      id: "nobleBudget",
+      label: "Limity Szlachciców",
+      visible: schedule.scheduleType === ScheduleType.Main,
+    },
+    {
+      id: "mainActionSettings",
+      label: "Ustawienia Głównej Akcji",
+      visible: schedule.scheduleType === ScheduleType.Main,
+    },
+    {
+      id: "targetGroups",
+      label: "Grupy Celi",
+      visible: schedule.scheduleType === ScheduleType.Main,
+    },
+    {
+      id: "generateMain",
+      label: "Generuj Akcje",
+      visible: schedule.scheduleType === ScheduleType.Main,
+    },
     {
       id: "reconnaissance",
       label: "Ustawienia Zwiadowcze",
@@ -53,6 +84,26 @@ export const ScheduleTabs = ({
         {activeTab === "troops" && (
           <TroopsStateManager scheduleId={schedule.id} />
         )}
+        {activeTab === "nobleBudget" &&
+          schedule.scheduleType === ScheduleType.Main && (
+            <NobleBudgetManager scheduleId={schedule.id} />
+          )}
+        {activeTab === "mainActionSettings" &&
+          schedule.scheduleType === ScheduleType.Main && (
+            <MainActionSettings scheduleId={schedule.id} />
+          )}
+        {activeTab === "targetGroups" &&
+          schedule.scheduleType === ScheduleType.Main && (
+            <TargetGroupsManager scheduleId={schedule.id} />
+          )}
+        {activeTab === "generateMain" &&
+          schedule.scheduleType === ScheduleType.Main && (
+            <MainActionGenerator
+              scheduleId={schedule.id}
+              schedule={schedule}
+              onScheduleUpdate={onScheduleUpdate}
+            />
+          )}
         {activeTab === "reconnaissance" &&
           schedule.scheduleType === ScheduleType.Reconnaissance && (
             <ReconnaissanceSettings scheduleId={schedule.id} />

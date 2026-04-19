@@ -49,6 +49,7 @@ public partial class Program
         }
 
         app.MapReconnaissanceActionsEndpoints();
+        app.MapMainActionsEndpoints();
 
         app.MapHealthChecks("/health");
 

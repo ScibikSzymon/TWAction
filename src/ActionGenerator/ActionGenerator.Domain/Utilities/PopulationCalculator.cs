@@ -30,4 +30,19 @@ public static class PopulationCalculator
             + army.Catapult * CatapultPopulation
             + army.Noble * NoblePopulation;
     }
+    public static uint CalculateOffensivePopulation(Army army)
+    {
+        return army.Axe * AxePopulation
+            + army.Light * LightPopulation
+            + army.HorseArcher * HorseArcherPopulation
+            + army.Ram * RamPopulation;
+    }
+
+        public static uint CalculateDefensivePopulation(Army army)
+    {
+        return army.Axe * AxePopulation
+            + army.Light * LightPopulation
+            + army.HorseArcher * HorseArcherPopulation
+            + army.Ram * RamPopulation;
+    }
 }
