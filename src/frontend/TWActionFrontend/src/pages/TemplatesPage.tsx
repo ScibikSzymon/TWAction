@@ -407,6 +407,7 @@ const TemplatesPage = () => {
       const data = await targetTemplateService.getTemplates();
       setTemplates(data);
     } catch (err) {
+      console.error("Error loading templates:", err);
       setError("Nie udało się załadować szablonów.");
     } finally {
       setIsLoading(false);
