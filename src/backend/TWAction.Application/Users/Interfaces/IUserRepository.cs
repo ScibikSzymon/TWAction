@@ -11,4 +11,6 @@ public interface IUserRepository
     Task<IReadOnlyList<UserEntity>> ListAllAsync(CancellationToken cancellationToken = default);
     
     Task<UserEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }

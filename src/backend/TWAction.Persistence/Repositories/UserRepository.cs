@@ -27,4 +27,16 @@ public class UserRepository(TWActionDbContext db) : IUserRepository
     {
         return await db.Users.FindAsync(new object[] { id }, cancellationToken).AsTask();
     }
+
+    public async Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var user = await db.Users.FindAsync(new object[] { id }, cancellationToken).AsTask();
+        if (user is null)
+        {
+            return;
+        }
+
+        db.Users.Remove(user);
+        await db.SaveChangesAsync(cancellationToken);
+    }
 }
