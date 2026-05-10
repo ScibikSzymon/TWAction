@@ -3,6 +3,7 @@ import type {
   AttackCommandsSummary,
   SendToPlemionaRozpiskiResponse,
 } from "../types/attackCommands";
+import type { MainActionStats } from "../types/mainActionStats";
 
 export const attackCommandsService = {
   async getAttackCommandsSummary(
@@ -34,6 +35,13 @@ export const attackCommandsService = {
       `/schedules/${scheduleId}/attack-commands/send-to-plemiona-rozpiski`,
       null,
       { params: { forceOverwrite } },
+    );
+    return data;
+  },
+
+  async getMainActionStats(scheduleId: string): Promise<MainActionStats> {
+    const { data } = await apiClient.get<MainActionStats>(
+      `/schedules/${scheduleId}/attack-commands/stats`,
     );
     return data;
   },

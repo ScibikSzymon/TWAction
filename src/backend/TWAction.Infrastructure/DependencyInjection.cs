@@ -120,6 +120,7 @@ public static class DependencyInjection
 
         services.AddTransient<GenerateReconnaissanceActionsHandler>();
         services.AddTransient<GetAttackCommandsSummaryHandler>();
+        services.AddTransient<GetMainActionStatsHandler>();
         services.AddTransient<SendToPlemionaRozpiskiHandler>();
 
         services.AddTransient<GetTargetTemplatesHandler>();

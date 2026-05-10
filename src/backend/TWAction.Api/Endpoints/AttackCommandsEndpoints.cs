@@ -18,6 +18,11 @@ public static class AttackCommandsEndpoints
             .Produces<AttackCommandsSummaryDto>()
             .Produces(StatusCodes.Status404NotFound);
 
+        group.MapGet("stats", GetMainActionStats)
+            .WithName("GetMainActionStats")
+            .Produces<MainActionStatsDto>()
+            .Produces(StatusCodes.Status404NotFound);
+
         group.MapPost("send-to-plemiona-rozpiski", SendToPlemionaRozpiski)
             .WithName("SendToPlemionaRozpiski")
             .Produces<SendToPlemionaRozpiskiResponse>()
@@ -25,6 +30,30 @@ public static class AttackCommandsEndpoints
             .Produces(StatusCodes.Status404NotFound);
 
         return app;
+    }
+
+    private static async Task<IResult> GetMainActionStats(
+        Guid scheduleId,
+        HttpContext httpContext,
+        GetMainActionStatsHandler handler,
+        IMessageBus bus,
+        CancellationToken cancellationToken)
+    {
+        var ownershipResult = await ScheduleOwnershipHelper.ValidateOwnershipAsync(scheduleId, httpContext, bus);
+        if (ownershipResult is not null)
+        {
+            return ownershipResult;
+        }
+
+        var query = new GetMainActionStatsQuery(scheduleId);
+        var result = await handler.Handle(query, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return Results.NotFound(new { error = result.Error });
+        }
+
+        return Results.Ok(result.Value);
     }
 
     private static async Task<IResult> GetAttackCommandsSummary(
