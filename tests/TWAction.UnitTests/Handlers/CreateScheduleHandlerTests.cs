@@ -43,7 +43,7 @@ public sealed class CreateScheduleHandlerTests
             .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<ScheduleEntity>()!));
 
         var command = new CreateScheduleCommand(
             UserId: userId,
@@ -56,13 +56,14 @@ public sealed class CreateScheduleHandlerTests
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Name.Should().Be("Test Schedule");
-        result.Value.World.Should().Be(WorldType.pl218);
-        result.Value.ScheduleType.Should().Be(ScheduleType.Main);
-        result.Value.UserId.Should().Be(userId);
+        result.Value!.Name.Should().Be("Test Schedule");
+        result.Value!.World.Should().Be(WorldType.pl218);
+        result.Value!.ScheduleType.Should().Be(ScheduleType.Main);
+        result.Value!.UserId.Should().Be(userId);
 
         await _scheduleRepository.Received(1).AddAsync(
             Arg.Is<ScheduleEntity>(s =>
+                s != null &&
                 s.Name == "Test Schedule" &&
                 s.World == WorldType.pl218 &&
                 s.ScheduleType == ScheduleType.Main &&
@@ -124,7 +125,7 @@ public sealed class CreateScheduleHandlerTests
             .Returns(tribes);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<ScheduleEntity>()!));
 
         var command = new CreateScheduleCommand(
             UserId: userId,
@@ -137,9 +138,9 @@ public sealed class CreateScheduleHandlerTests
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.EnemyIds.Should().HaveCount(2);
-        result.Value.EnemyIds.Should().Contain(1);
-        result.Value.EnemyIds.Should().Contain(3);
+        result.Value!.EnemyIds.Should().HaveCount(2);
+        result.Value!.EnemyIds.Should().Contain(1);
+        result.Value!.EnemyIds.Should().Contain(3);
 
         await _tribesService.Received(1).GetTribesAsync(WorldType.pl219, Arg.Any<CancellationToken>());
     }
@@ -244,7 +245,7 @@ public sealed class CreateScheduleHandlerTests
             .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<ScheduleEntity>()!));
 
         var command = new CreateScheduleCommand(
             UserId: userId,
@@ -257,7 +258,7 @@ public sealed class CreateScheduleHandlerTests
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.EnemyIds.Should().BeEmpty();
+        result.Value!.EnemyIds.Should().BeEmpty();
 
         await _tribesService.DidNotReceive().GetTribesAsync(
             Arg.Any<WorldType>(),
@@ -287,7 +288,7 @@ public sealed class CreateScheduleHandlerTests
             .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<ScheduleEntity>()!));
 
         var command = new CreateScheduleCommand(
             UserId: userId,
@@ -300,7 +301,7 @@ public sealed class CreateScheduleHandlerTests
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.World.Should().Be(world);
+        result.Value!.World.Should().Be(world);
     }
 
     [Theory]
@@ -323,7 +324,7 @@ public sealed class CreateScheduleHandlerTests
             .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<ScheduleEntity>()!));
 
         var command = new CreateScheduleCommand(
             UserId: userId,
@@ -336,7 +337,7 @@ public sealed class CreateScheduleHandlerTests
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.ScheduleType.Should().Be(scheduleType);
+        result.Value!.ScheduleType.Should().Be(scheduleType);
     }
 
     [Fact]
@@ -356,7 +357,7 @@ public sealed class CreateScheduleHandlerTests
             .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<ScheduleEntity>()!));
 
         var command = new CreateScheduleCommand(
             UserId: userId,
@@ -369,7 +370,7 @@ public sealed class CreateScheduleHandlerTests
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Id.Should().NotBe(Guid.Empty);
+        result.Value!.Id.Should().NotBe(Guid.Empty);
     }
 
     [Fact]
@@ -391,7 +392,7 @@ public sealed class CreateScheduleHandlerTests
             .Returns(user);
 
         _scheduleRepository.AddAsync(Arg.Any<ScheduleEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<ScheduleEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<ScheduleEntity>()!));
 
         var command = new CreateScheduleCommand(
             UserId: userId,
@@ -405,7 +406,7 @@ public sealed class CreateScheduleHandlerTests
         var afterTest = DateTimeOffset.UtcNow;
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.CreationDate.Should().BeOnOrAfter(beforeTest);
-        result.Value.CreationDate.Should().BeOnOrBefore(afterTest);
+        result.Value!.CreationDate.Should().BeOnOrAfter(beforeTest);
+        result.Value!.CreationDate.Should().BeOnOrBefore(afterTest);
     }
 }

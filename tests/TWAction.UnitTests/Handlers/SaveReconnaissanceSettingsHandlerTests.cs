@@ -54,27 +54,28 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
         _settingsRepository.CreateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
-                var settings = callInfo.Arg<ReconnaissanceSettings>();
+                var settings = callInfo.Arg<ReconnaissanceSettings>()!;
                 settings.Id = Guid.NewGuid();
-                return settings;
+                return Task.FromResult(settings);
             });
 
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.ScheduleId.Should().Be(scheduleId);
-        result.Value.MinDepartureTime.Should().Be(minDepartureTime);
-        result.Value.MinArrivalTime.Should().Be(minArrivalTime);
-        result.Value.MaxArrivalTime.Should().Be(maxArrivalTime);
-        result.Value.MinDistanceToFront.Should().Be(5);
-        result.Value.MinSpyCount.Should().Be(1);
-        result.Value.MaxPopulationInSourceVillage.Should().Be(100);
-        result.Value.SkipNightSendings.Should().BeFalse();
+        result.Value!.ScheduleId.Should().Be(scheduleId);
+        result.Value!.MinDepartureTime.Should().Be(minDepartureTime);
+        result.Value!.MinArrivalTime.Should().Be(minArrivalTime);
+        result.Value!.MaxArrivalTime.Should().Be(maxArrivalTime);
+        result.Value!.MinDistanceToFront.Should().Be(5);
+        result.Value!.MinSpyCount.Should().Be(1);
+        result.Value!.MaxPopulationInSourceVillage.Should().Be(100);
+        result.Value!.SkipNightSendings.Should().BeFalse();
 
         await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.Received(1).GetByScheduleIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.Received(1).CreateAsync(
             Arg.Is<ReconnaissanceSettings>(s =>
+                s != null &&
                 s.ScheduleId == scheduleId &&
                 s.MinDepartureTime == minDepartureTime &&
                 s.MinArrivalTime == minArrivalTime &&
@@ -132,25 +133,26 @@ public sealed class SaveReconnaissanceSettingsHandlerTests
             .Returns(existingSettings);
 
         _settingsRepository.UpdateAsync(Arg.Any<ReconnaissanceSettings>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<ReconnaissanceSettings>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<ReconnaissanceSettings>()!));
 
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Id.Should().Be(settingsId);
-        result.Value.ScheduleId.Should().Be(scheduleId);
-        result.Value.MinDepartureTime.Should().Be(minDepartureTime);
-        result.Value.MinArrivalTime.Should().Be(minArrivalTime);
-        result.Value.MaxArrivalTime.Should().Be(maxArrivalTime);
-        result.Value.MinDistanceToFront.Should().Be(10);
-        result.Value.MinSpyCount.Should().Be(2);
-        result.Value.MaxPopulationInSourceVillage.Should().Be(200);
-        result.Value.SkipNightSendings.Should().BeTrue();
+        result.Value!.Id.Should().Be(settingsId);
+        result.Value!.ScheduleId.Should().Be(scheduleId);
+        result.Value!.MinDepartureTime.Should().Be(minDepartureTime);
+        result.Value!.MinArrivalTime.Should().Be(minArrivalTime);
+        result.Value!.MaxArrivalTime.Should().Be(maxArrivalTime);
+        result.Value!.MinDistanceToFront.Should().Be(10);
+        result.Value!.MinSpyCount.Should().Be(2);
+        result.Value!.MaxPopulationInSourceVillage.Should().Be(200);
+        result.Value!.SkipNightSendings.Should().BeTrue();
 
         await _scheduleRepository.Received(1).GetByIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.Received(1).GetByScheduleIdAsync(scheduleId, Arg.Any<CancellationToken>());
         await _settingsRepository.Received(1).UpdateAsync(
             Arg.Is<ReconnaissanceSettings>(s =>
+                s != null &&
                 s.Id == settingsId &&
                 s.ScheduleId == scheduleId &&
                 s.MinDepartureTime == minDepartureTime &&
