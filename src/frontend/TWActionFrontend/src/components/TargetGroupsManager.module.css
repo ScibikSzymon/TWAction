@@ -1,0 +1,689 @@
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+
+.container {
+  padding: 1rem 0;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+/* ─── States ─────────────────────────────────────────────────────────────── */
+
+.loadingState {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-muted, #64748b);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  border: 2px dashed var(--color-border, #e2e8f0);
+  border-radius: 0.75rem;
+  background: var(--color-surface, #f8fafc);
+}
+
+.emptyTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.emptyText {
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.retryBtn {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid #dc2626;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* ─── Group List ─────────────────────────────────────────────────────────── */
+
+.groupList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ─── Group Card ─────────────────────────────────────────────────────────── */
+
+.groupCard {
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 0.75rem;
+  background: var(--color-card-bg, #ffffff);
+  overflow: hidden;
+  transition: box-shadow 0.15s ease;
+}
+
+.groupCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.groupCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  flex-wrap: wrap;
+}
+
+.groupCardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.groupName {
+  font-size: 0.975rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.groupBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--color-surface, #f1f5f9);
+  border: 1px solid var(--color-border, #e2e8f0);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #475569);
+  white-space: nowrap;
+}
+
+.badgeTemplate {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.groupCardActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ─── Card Detail ────────────────────────────────────────────────────────── */
+
+.groupDetail {
+  border-top: 1px solid var(--color-border, #e2e8f0);
+  padding: 1rem;
+  background: var(--color-surface, #f8fafc);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detailSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detailTitle {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted, #64748b);
+}
+
+.coordChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.coordChip {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.375rem;
+  background: #dbeafe;
+  border: 1px solid #93c5fd;
+  color: #1e40af;
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+
+/* ─── Wave Table ─────────────────────────────────────────────────────────── */
+
+.waveTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.waveTable th,
+.waveTable td {
+  padding: 0.4rem 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.waveTable th {
+  font-weight: 600;
+  color: var(--color-text-muted, #64748b);
+  background: var(--color-surface, #f1f5f9);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.commandBadge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+
+.btnPrimary {
+  padding: 0.5rem 1.1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--color-accent, #2563eb);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: var(--color-accent-dark, #1d4ed8);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 0.5rem;
+  background: var(--color-card-bg, #ffffff);
+  color: var(--color-text-secondary, #475569);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  border-color: var(--color-accent, #2563eb);
+  color: var(--color-accent, #2563eb);
+}
+
+.btnSecondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnEdit {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid #93c5fd;
+  border-radius: 0.4rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnEdit:hover {
+  background: #dbeafe;
+}
+
+.btnExpand {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 0.4rem;
+  background: var(--color-surface, #f1f5f9);
+  color: var(--color-text-secondary, #475569);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnExpand:hover {
+  background: var(--color-border, #e2e8f0);
+}
+
+.btnDelete {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid #fca5a5;
+  border-radius: 0.4rem;
+  background: #fff5f5;
+  color: #ef4444;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnDelete:hover {
+  background: #fee2e2;
+}
+
+.btnDanger {
+  padding: 0.5rem 1.1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnDanger:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btnDanger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Modal ──────────────────────────────────────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: var(--color-card-bg, #ffffff);
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+  flex-shrink: 0;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-muted, #64748b);
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.modalClose:hover {
+  color: var(--color-text-primary, #1e293b);
+  background: var(--color-surface, #f1f5f9);
+}
+
+.modalBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border, #e2e8f0);
+}
+
+/* ─── Form Fields ────────────────────────────────────────────────────────── */
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fieldLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #475569);
+}
+
+.fieldInput {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  background: var(--color-input-bg, #ffffff);
+  color: var(--color-text-primary, #1e293b);
+  transition: border-color 0.15s;
+}
+
+.fieldInput:focus {
+  outline: none;
+  border-color: var(--color-accent, #2563eb);
+}
+
+.fieldSelect {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  background: var(--color-input-bg, #ffffff);
+  color: var(--color-text-primary, #1e293b);
+  width: 100%;
+  transition: border-color 0.15s;
+  cursor: pointer;
+}
+
+.fieldSelect:focus {
+  outline: none;
+  border-color: var(--color-accent, #2563eb);
+}
+
+.coordsTextarea {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-family: monospace;
+  background: var(--color-input-bg, #ffffff);
+  color: var(--color-text-primary, #1e293b);
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.15s;
+}
+
+.coordsTextarea:focus {
+  outline: none;
+  border-color: var(--color-accent, #2563eb);
+}
+
+.coordsFeedback {
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.coordsValid {
+  color: #16a34a;
+}
+
+.coordsInvalid {
+  color: #d97706;
+}
+
+.coordsHint {
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.templateSelectorRow {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.templateNote {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  font-size: 0.8rem;
+}
+
+/* ─── Wave Editor ────────────────────────────────────────────────────────── */
+
+.waveEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 0.5rem;
+  padding: 0.875rem;
+  background: var(--color-surface, #f8fafc);
+}
+
+.waveEditorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #475569);
+}
+
+.addWaveBtn {
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--color-accent, #2563eb);
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--color-accent, #2563eb);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.addWaveBtn:hover {
+  background: #eff6ff;
+}
+
+.emptyWaves {
+  margin: 0;
+  text-align: center;
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 0.85rem;
+  padding: 0.75rem 0;
+}
+
+.waveRow {
+  display: grid;
+  grid-template-columns: 110px 110px 90px 1fr 32px;
+  gap: 0.5rem;
+  align-items: end;
+}
+
+.waveField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.waveField label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #64748b);
+  font-weight: 500;
+}
+
+.waveField input,
+.waveField select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 0.375rem;
+  font-size: 0.85rem;
+  background: var(--color-input-bg, #ffffff);
+  color: var(--color-text-primary, #1e293b);
+  width: 100%;
+}
+
+.waveField input:focus,
+.waveField select:focus {
+  outline: none;
+  border-color: var(--color-accent, #2563eb);
+}
+
+.waveTypeField {
+  min-width: 0;
+}
+
+.removeWaveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #fca5a5;
+  border-radius: 0.375rem;
+  background: #fff5f5;
+  color: #ef4444;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.removeWaveBtn:hover {
+  background: #fee2e2;
+}
+
+.saveError {
+  padding: 0.65rem 0.875rem;
+  border-radius: 0.5rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 0.85rem;
+}
+
+/* ─── Delete Dialog ──────────────────────────────────────────────────────── */
+
+.deleteDialog {
+  background: var(--color-card-bg, #ffffff);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.deleteDialog h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.deleteDialog p {
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #475569);
+  line-height: 1.5;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 560px) {
+  .waveRow {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .waveTypeField {
+    grid-column: 1 / -1;
+  }
+
+  .removeWaveBtn {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .groupCardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .groupCardActions {
+    flex-wrap: wrap;
+  }
+}

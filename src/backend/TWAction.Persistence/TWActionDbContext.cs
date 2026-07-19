@@ -3,6 +3,8 @@ using TWAction.Domain.Users;
 using TWAction.Domain.Schedules;
 using TWAction.Domain.Settings;
 using TWAction.Domain.AttackCommands;
+using TWAction.Domain.Templates;
+using TWAction.Domain.TargetGroups;
 using TWAction.Persistence.Configurations;
 
 namespace TWAction.Persistence;
@@ -17,9 +19,17 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
 
     public DbSet<TroopsStateEntity> TroopsStates { get; set; } = null!;
 
+    public DbSet<NobleBudgetEntity> NobleBudgets { get; set; } = null!;
+
     public DbSet<ReconnaissanceSettings> ReconnaissanceSettings { get; set; } = null!;
 
+    public DbSet<MainActionSettings> MainActionSettings { get; set; } = null!;
+
     public DbSet<AttackCommandEntity> AttackCommands { get; set; } = null!;
+
+    public DbSet<TargetTemplate> TargetTemplates { get; set; } = null!;
+
+    public DbSet<TargetGroup> TargetGroups { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,8 +37,12 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
         modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
         modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
         modelBuilder.ApplyConfiguration(new TroopsStateConfiguration());
+        modelBuilder.ApplyConfiguration(new NobleBudgetConfiguration());
         modelBuilder.ApplyConfiguration(new ReconnaissanceSettingsConfiguration());
+        modelBuilder.ApplyConfiguration(new MainActionSettingsConfiguration());
         modelBuilder.ApplyConfiguration(new AttackCommandConfiguration());
+        modelBuilder.ApplyConfiguration(new TargetTemplateConfiguration());
+        modelBuilder.ApplyConfiguration(new TargetGroupConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }

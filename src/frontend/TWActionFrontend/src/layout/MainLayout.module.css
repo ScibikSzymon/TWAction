@@ -74,3 +74,39 @@
   flex: 1;
   overflow-y: auto;
 }
+
+.nav {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.875rem 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border-bottom: 3px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.navLink:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-radius: 4px 4px 0 0;
+}
+
+.navLink.active {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+}

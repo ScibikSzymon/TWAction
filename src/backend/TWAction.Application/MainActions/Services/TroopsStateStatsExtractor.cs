@@ -1,18 +1,18 @@
-namespace TWAction.Application.Schedules.Services;
+namespace TWAction.Application.MainActions.Services;
 
 public sealed class TroopsStateStatsExtractor
 {
     /// <summary>
     /// Extracts village count and unique player count from parsed troops data
     /// </summary>
-    public TroopsStateStats Extract(List<string[]> dataRows)
+    public TroopsStateStats Extract(ParsedTroopsData parsedData)
     {
-        var villageCount = dataRows
+        var villageCount = parsedData.DataRows
             .Select(row => row[1].Trim()) // Village coordinates are at column 1
             .Distinct()
             .Count();
 
-        var uniquePlayers = dataRows
+        var uniquePlayers = parsedData.DataRows
             .Select(row => row[0].Trim()) // Player name is at column 0
             .Distinct()
             .Count();

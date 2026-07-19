@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ActionGenerator.Domain\ActionGenerator.Domain.csproj" />
+    <ProjectReference Include="..\ActionGenerator.MainAction\ActionGenerator.MainAction.csproj" />
   </ItemGroup>
 
   <ItemGroup>

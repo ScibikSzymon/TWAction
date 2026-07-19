@@ -84,6 +84,35 @@ namespace TWAction.Persistence.Migrations
                     b.ToTable("AttackCommands", (string)null);
                 });
 
+            modelBuilder.Entity("TWAction.Domain.Schedules.NobleBudgetEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Budget")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("PlayerId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduleId", "PlayerId")
+                        .IsUnique();
+
+                    b.ToTable("NobleBudgets", (string)null);
+                });
+
             modelBuilder.Entity("TWAction.Domain.Schedules.ScheduleEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -147,6 +176,39 @@ namespace TWAction.Persistence.Migrations
                     b.ToTable("TroopsStates", (string)null);
                 });
 
+            modelBuilder.Entity("TWAction.Domain.Settings.MainActionSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("ActionDate")
+                        .HasColumnType("date");
+
+                    b.Property<long>("MaxNobleDistance")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("MinDepartureTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PlayerNobleBudgets")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("SkipNightSendings")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduleId")
+                        .IsUnique();
+
+                    b.ToTable("MainActionSettings", (string)null);
+                });
+
             modelBuilder.Entity("TWAction.Domain.Settings.ReconnaissanceSettings", b =>
                 {
                     b.Property<Guid>("Id")
@@ -183,6 +245,70 @@ namespace TWAction.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("ReconnaissanceSettings", (string)null);
+                });
+
+            modelBuilder.Entity("TWAction.Domain.TargetGroups.TargetGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("BaseTemplateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BaseTemplateName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("VillageCoordinates")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Waves")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("TargetGroups", (string)null);
+                });
+
+            modelBuilder.Entity("TWAction.Domain.Templates.TargetTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Waves")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TargetTemplates", (string)null);
                 });
 
             modelBuilder.Entity("TWAction.Domain.Users.UserEntity", b =>
@@ -242,6 +368,15 @@ namespace TWAction.Persistence.Migrations
                     b.ToTable("UserSessions", (string)null);
                 });
 
+            modelBuilder.Entity("TWAction.Domain.Schedules.NobleBudgetEntity", b =>
+                {
+                    b.HasOne("TWAction.Domain.Schedules.ScheduleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("TWAction.Domain.Schedules.ScheduleEntity", b =>
                 {
                     b.HasOne("TWAction.Domain.Users.UserEntity", null)
@@ -260,6 +395,137 @@ namespace TWAction.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TWAction.Domain.Settings.MainActionSettings", b =>
+                {
+                    b.HasOne("TWAction.Domain.Schedules.ScheduleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("TWAction.Domain.Settings.MainActionCatasSettings", "CatasSettings", b1 =>
+                        {
+                            b1.Property<Guid>("MainActionSettingsId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<long>("MaxOffUnits")
+                                .HasColumnType("bigint");
+
+                            b1.Property<long>("MinCatasNumber")
+                                .HasColumnType("bigint");
+
+                            b1.Property<long>("MinDistanceFromFront")
+                                .HasColumnType("bigint");
+
+                            b1.HasKey("MainActionSettingsId");
+
+                            b1.ToTable("MainActionSettings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MainActionSettingsId");
+                        });
+
+                    b.OwnsOne("TWAction.Domain.Settings.MainActionFakeDeffSettings", "FakeDeffSettings", b1 =>
+                        {
+                            b1.Property<Guid>("MainActionSettingsId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<long>("MaxOffUnits")
+                                .HasColumnType("bigint");
+
+                            b1.Property<long>("MinDistanceFromFront")
+                                .HasColumnType("bigint");
+
+                            b1.HasKey("MainActionSettingsId");
+
+                            b1.ToTable("MainActionSettings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MainActionSettingsId");
+                        });
+
+                    b.OwnsOne("TWAction.Domain.Settings.MainActionFakeOffSettings", "FakeOffSettings", b1 =>
+                        {
+                            b1.Property<Guid>("MainActionSettingsId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<long>("MinDistanceFromFront")
+                                .HasColumnType("bigint");
+
+                            b1.Property<long>("MinOffUnits")
+                                .HasColumnType("bigint");
+
+                            b1.HasKey("MainActionSettingsId");
+
+                            b1.ToTable("MainActionSettings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MainActionSettingsId");
+                        });
+
+                    b.OwnsOne("TWAction.Domain.Settings.MainActionNobleSettings", "NobleSettings", b1 =>
+                        {
+                            b1.Property<Guid>("MainActionSettingsId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<long>("MaxOffUnitsForDefNoble")
+                                .HasColumnType("bigint");
+
+                            b1.Property<long>("MinDeffUnitsForDefNoble")
+                                .HasColumnType("bigint");
+
+                            b1.Property<long>("MinDistanceFromFront")
+                                .HasColumnType("bigint");
+
+                            b1.Property<long>("MinOffUnitsForFakeOffNoble")
+                                .HasColumnType("bigint");
+
+                            b1.Property<long>("MinOffUnitsForOffNoble")
+                                .HasColumnType("bigint");
+
+                            b1.HasKey("MainActionSettingsId");
+
+                            b1.ToTable("MainActionSettings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MainActionSettingsId");
+                        });
+
+                    b.OwnsOne("TWAction.Domain.Settings.MainActionOffSettings", "OffSettings", b1 =>
+                        {
+                            b1.Property<Guid>("MainActionSettingsId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<long>("MinDistanceFromFront")
+                                .HasColumnType("bigint");
+
+                            b1.Property<long>("MinOffUnits")
+                                .HasColumnType("bigint");
+
+                            b1.HasKey("MainActionSettingsId");
+
+                            b1.ToTable("MainActionSettings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MainActionSettingsId");
+                        });
+
+                    b.Navigation("CatasSettings")
+                        .IsRequired();
+
+                    b.Navigation("FakeDeffSettings")
+                        .IsRequired();
+
+                    b.Navigation("FakeOffSettings")
+                        .IsRequired();
+
+                    b.Navigation("NobleSettings")
+                        .IsRequired();
+
+                    b.Navigation("OffSettings")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("TWAction.Domain.Settings.ReconnaissanceSettings", b =>
                 {
                     b.HasOne("TWAction.Domain.Schedules.ScheduleEntity", null)
@@ -267,6 +533,23 @@ namespace TWAction.Persistence.Migrations
                         .HasForeignKey("ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TWAction.Domain.TargetGroups.TargetGroup", b =>
+                {
+                    b.HasOne("TWAction.Domain.Schedules.ScheduleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TWAction.Domain.Templates.TargetTemplate", b =>
+                {
+                    b.HasOne("TWAction.Domain.Users.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("TWAction.Domain.Users.UserSessionEntity", b =>

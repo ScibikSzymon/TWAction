@@ -1,6 +1,12 @@
 using TWAction.Application.Common;
 
-namespace TWAction.Application.Schedules.Services;
+namespace TWAction.Application.MainActions.Services;
+
+public sealed class ParsedTroopsData
+{
+    public required string[] Header { get; init; }
+    public required List<string[]> DataRows { get; init; }
+}
 
 public sealed class TroopsStateValidator
 {
@@ -12,11 +18,11 @@ public sealed class TroopsStateValidator
         "Nazwa gracza,Wioska,Piki,Miecze,Zwiad,CK,Katasy,Topory,LK,Tarany,Grube"
     };
 
-    public Result<List<string[]>> ValidateAndParse(string rawData)
+    public Result<ParsedTroopsData> ValidateAndParse(string rawData)
     {
         if (string.IsNullOrWhiteSpace(rawData))
         {
-            return Result.Failure<List<string[]>>("Troops data cannot be empty.");
+            return Result.Failure<ParsedTroopsData>("Troops data cannot be empty.");
         }
 
         var lines = rawData.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
@@ -26,16 +32,17 @@ public sealed class TroopsStateValidator
 
         if (lines.Count < 2)
         {
-            return Result.Failure<List<string[]>>("Troops data must contain header and at least one data row.");
+            return Result.Failure<ParsedTroopsData>("Troops data must contain header and at least one data row.");
         }
 
         // Validate header
         if (!ValidHeaders.Contains(lines[0]))
         {
-            return Result.Failure<List<string[]>>(
+            return Result.Failure<ParsedTroopsData>(
                 $"Invalid header. Expected one of: {string.Join(" or ", ValidHeaders)}");
         }
 
+        var header = lines[0].Split(',');
         var dataRows = new List<string[]>();
 
         // Validate data rows
@@ -45,21 +52,21 @@ public sealed class TroopsStateValidator
 
             if (columns.Length != ExpectedColumnCount)
             {
-                return Result.Failure<List<string[]>>(
+                return Result.Failure<ParsedTroopsData>(
                     $"Row {i + 1} has {columns.Length} columns, expected {ExpectedColumnCount}.");
             }
 
             // Validate player name (column 0)
             if (string.IsNullOrWhiteSpace(columns[0]))
             {
-                return Result.Failure<List<string[]>>($"Row {i + 1}: Player name cannot be empty.");
+                return Result.Failure<ParsedTroopsData>($"Row {i + 1}: Player name cannot be empty.");
             }
 
             // Validate village coordinates (column 1)
             var villageValidation = ValidateVillageCoordinates(columns[1], i + 1);
             if (villageValidation.IsFailure)
             {
-                return Result.Failure<List<string[]>>(villageValidation.Error);
+                return Result.Failure<ParsedTroopsData>(villageValidation.Error);
             }
 
             // Validate unit counts (columns 2-10)
@@ -76,7 +83,11 @@ public sealed class TroopsStateValidator
                 dataRows.Add(columns);
         }
 
-        return Result.Success(dataRows);
+        return Result.Success(new ParsedTroopsData
+        {
+            Header = header,
+            DataRows = dataRows
+        });
     }
 
     private Result ValidateVillageCoordinates(string coordinates, int rowNumber)

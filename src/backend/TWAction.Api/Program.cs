@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TWAction.Infrastructure;
 using TWAction.Persistence;
+using TWAction.Persistence.Seeders;
 using TWAction.Api.Endpoints;
 using TWAction.Api.Validators;
 using TWAction.Api.Extensions;
@@ -54,6 +55,9 @@ if (!app.Environment.IsProduction() && !app.Environment.IsEnvironment("Test"))
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
     db.Database.Migrate();
+
+    var seeder = scope.ServiceProvider.GetRequiredService<TargetTemplateSeeder>();
+    await seeder.SeedAsync();
 }
 
 if (app.Environment.IsDevelopment())
@@ -70,10 +74,16 @@ app.MapUsersEndpoints();
 app.MapAuthEndpoints();
 app.MapScheduleEndpoints();
 app.MapTroopsStateEndpoints();
+app.MapNobleBudgetEndpoints();
+app.MapPlayerNobleStatsEndpoints();
 app.MapTribesEndpoints();
 app.MapReconnaissanceSettingsEndpoints();
+app.MapMainActionSettingsEndpoints();
 app.MapAttackCommandsEndpoints();
 app.MapReconnaissanceActionsEndpoints();
+app.MapTargetTemplateEndpoints();
+app.MapTargetGroupEndpoints();
+app.MapMainActionGeneratorEndpoints();
 
 app.MapDefaultEndpoints();
 

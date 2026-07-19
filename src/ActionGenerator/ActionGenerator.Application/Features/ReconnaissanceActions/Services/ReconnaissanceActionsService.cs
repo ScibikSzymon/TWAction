@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 
 namespace ActionGenerator.Application.Features.ReconnaissanceActions.Services;
 
-
 public interface IReconnaissanceActionsService
 {
     IReadOnlyList<AttackCommandDto> Generate(
@@ -84,7 +83,7 @@ internal sealed partial class ReconnaissanceActionsService : IReconnaissanceActi
         return allyVillages
             .Where(v => v.DistanceToFront > minDistanceToFront
                 && v.Army.Spy > minSpyCount
-                && PopulationCalculator.CalculatePopulation(v.Army) < maxPopulation)
+                && v.Army.TotalPotential < maxPopulation)
             .OrderByDescending(v => v.Army.Spy)
             .ToList();
     }

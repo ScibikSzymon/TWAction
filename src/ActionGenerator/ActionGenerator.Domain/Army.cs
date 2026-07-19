@@ -1,3 +1,5 @@
+using ActionGenerator.Domain.Utilities;
+
 namespace ActionGenerator.Domain.Entities;
 
 public sealed class Army
@@ -13,4 +15,19 @@ public sealed class Army
     public uint Ram { get; init; }
     public uint Catapult { get; init; }
     public uint Noble { get; init; }
+
+    private readonly Lazy<uint> _offensivePotential;
+    private readonly Lazy<uint> _defensivePotential;
+    private readonly Lazy<uint> _totalPotential;
+
+    public Army()
+    {
+        _offensivePotential = new Lazy<uint>(() => PopulationCalculator.CalculateOffensivePopulation(this));
+        _defensivePotential = new Lazy<uint>(() => PopulationCalculator.CalculateDefensivePopulation(this));
+        _totalPotential = new Lazy<uint>(() => PopulationCalculator.CalculatePopulation(this));
+    }
+
+    public uint OffensivePotential => _offensivePotential.Value;
+    public uint DefensivePotential => _defensivePotential.Value;
+    public uint TotalPotential => _totalPotential.Value;
 }
