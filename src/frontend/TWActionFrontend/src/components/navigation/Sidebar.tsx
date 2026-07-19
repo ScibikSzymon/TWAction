@@ -28,6 +28,23 @@ export const Sidebar = ({ user, onLogout }: SidebarProps) => {
           {t.sidebar.home}
         </NavLink>
 
+        <NavLink
+          to="/templates"
+          className={({ isActive }) =>
+            `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
+          }
+        >
+          🎯 Szablony akcji
+        </NavLink>
+        <NavLink
+          to="/schedules"
+          className={({ isActive }) =>
+            `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
+          }
+        >
+          📋 Rozpiski
+        </NavLink>
+
         {user.role === "Admin" && (
           <NavLink
             to="/admin/users"
