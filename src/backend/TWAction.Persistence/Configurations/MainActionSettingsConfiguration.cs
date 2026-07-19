@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TWAction.Domain.Schedules;
 using TWAction.Domain.Settings;
@@ -10,6 +11,19 @@ public sealed class MainActionSettingsConfiguration : IEntityTypeConfiguration<M
 {
     public void Configure(EntityTypeBuilder<MainActionSettings> builder)
     {
+        var nobleBudgetsComparer = new ValueComparer<Dictionary<int, uint>>(
+            (left, right) =>
+                ReferenceEquals(left, right) ||
+                (left != null && right != null &&
+                 left.Count == right.Count &&
+                 left.All(item => right.ContainsKey(item.Key) && right[item.Key] == item.Value)),
+            value => value == null
+                ? 0
+                : value
+                    .OrderBy(item => item.Key)
+                    .Aggregate(0, (current, item) => HashCode.Combine(current, item.Key, item.Value)),
+            value => value == null ? new Dictionary<int, uint>() : value.ToDictionary(item => item.Key, item => item.Value));
+
         builder.ToTable("MainActionSettings");
         builder.HasKey(x => x.Id);
         
@@ -59,7 +73,8 @@ public sealed class MainActionSettingsConfiguration : IEntityTypeConfiguration<M
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<Dictionary<int, uint>>(v, (JsonSerializerOptions?)null) ?? new Dictionary<int, uint>())
-            .HasColumnType("jsonb");
+            .HasColumnType("jsonb")
+            .Metadata.SetValueComparer(nobleBudgetsComparer);
 
         // Unique constraint - one settings per schedule
         builder.HasIndex(x => x.ScheduleId).IsUnique();

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TWAction.Domain.Templates;
 using TWAction.Domain.Users;
@@ -10,6 +11,30 @@ public sealed class TargetTemplateConfiguration : IEntityTypeConfiguration<Targe
 {
     public void Configure(EntityTypeBuilder<TargetTemplate> builder)
     {
+        var wavesComparer = new ValueComparer<List<TemplateWave>>(
+            (left, right) =>
+                ReferenceEquals(left, right) ||
+                (left != null && right != null &&
+                 left.Count == right.Count &&
+                 left.Zip(right).All(pair =>
+                     pair.First.MinTime == pair.Second.MinTime &&
+                     pair.First.MaxTime == pair.Second.MaxTime &&
+                     pair.First.CommandNumber == pair.Second.CommandNumber &&
+                     pair.First.CommandType == pair.Second.CommandType)),
+            value => value == null
+                ? 0
+                : value.Aggregate(0, (current, wave) =>
+                    HashCode.Combine(current, wave.MinTime, wave.MaxTime, wave.CommandNumber, wave.CommandType)),
+            value => value == null
+                ? new List<TemplateWave>()
+                : value.Select(wave => new TemplateWave
+                {
+                    MinTime = wave.MinTime,
+                    MaxTime = wave.MaxTime,
+                    CommandNumber = wave.CommandNumber,
+                    CommandType = wave.CommandType
+                }).ToList());
+
         builder.ToTable("TargetTemplates");
         builder.HasKey(t => t.Id);
 
@@ -28,7 +53,8 @@ public sealed class TargetTemplateConfiguration : IEntityTypeConfiguration<Targe
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<TemplateWave>>(v, (JsonSerializerOptions?)null) ?? new List<TemplateWave>())
-            .HasColumnType("jsonb");
+            .HasColumnType("jsonb")
+            .Metadata.SetValueComparer(wavesComparer);
 
         // Index for efficient per-user lookups.
         builder.HasIndex(t => t.UserId);
