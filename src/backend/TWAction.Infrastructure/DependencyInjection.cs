@@ -15,28 +15,15 @@ using TWAction.Application.Handlers;
 using TWAction.Application.Users.Queries;
 using TWAction.Application.Users.Interfaces;
 using TWAction.Application.Schedules.Interfaces;
-using TWAction.Application.Schedules.Queries;
-using TWAction.Application.Schedules.Commands;
-using TWAction.Application.Users.Commands;
 using TWAction.Application.Schedules.Services;
 using TWAction.Application.Tribes.Interfaces;
 using TWAction.Application.Tribes.Queries;
 using TWAction.Application.Settings.Interfaces;
-using TWAction.Application.Settings.Queries;
-using TWAction.Application.Settings.Commands;
 using TWAction.Application.Templates.Interfaces;
-using TWAction.Application.Templates.Queries;
-using TWAction.Application.Templates.Commands;
 using TWAction.Application.TargetGroups.Interfaces;
-using TWAction.Application.TargetGroups.Queries;
-using TWAction.Application.TargetGroups.Commands;
-using TWAction.Application.MainActions.Handlers;
 using TWAction.Application.AttackCommands.Interfaces;
-using TWAction.Application.AttackCommands.Handlers;
 using TWAction.Application.ReconnaissanceActions.Interfaces;
-using TWAction.Application.ReconnaissanceActions.Handlers;
 using TWAction.Application.MainActions.Services;
-using TWAction.Application.MainActions.Queries;
 using TWAction.Persistence.Seeders;
 
 namespace TWAction.Infrastructure;
@@ -59,6 +46,8 @@ public static class DependencyInjection
         {
             opts.Durability.Mode = DurabilityMode.MediatorOnly;
             opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
+            opts.CodeGeneration
+                .AlwaysUseServiceLocationFor<TWActionDbContext>();
         });
 
         // Register HttpClient factory and IMemoryCache for TribalWars Api calls
@@ -102,38 +91,6 @@ public static class DependencyInjection
         services.AddSingleton<PlayersCsvParser>();
         services.AddSingleton<VillagesCsvParser>();
         services.AddScoped<ITribesService, TribesHttpService>();
-
-        services.AddTransient<SignInWithGoogleHandler>();
-        services.AddTransient<GetAllUsersHandler>();
-        services.AddTransient<GetUserBySessionHandler>();
-        services.AddTransient<DeleteSessionHandler>();
-        services.AddTransient<GetAllSchedulesHandler>();
-        services.AddTransient<GetScheduleByIdHandler>();
-        services.AddTransient<CreateScheduleHandler>();
-        services.AddTransient<UpdateScheduleHandler>();
-        services.AddTransient<DeleteScheduleHandler>();
-        services.AddTransient<UploadTroopsStateHandler>();
-        services.AddTransient<GetTroopsStateHandler>();
-        services.AddTransient<GetTribesHandler>();
-        services.AddTransient<GetReconnaissanceSettingsHandler>();
-        services.AddTransient<SaveReconnaissanceSettingsHandler>();
-
-        services.AddTransient<GenerateReconnaissanceActionsHandler>();
-        services.AddTransient<GetAttackCommandsSummaryHandler>();
-        services.AddTransient<SendToPlemionaRozpiskiHandler>();
-
-        services.AddTransient<GetTargetTemplatesHandler>();
-        services.AddTransient<GetTargetTemplateByIdHandler>();
-        services.AddTransient<CreateTargetTemplateHandler>();
-        services.AddTransient<UpdateTargetTemplateHandler>();
-        services.AddTransient<DeleteTargetTemplateHandler>();
-
-        services.AddTransient<GetTargetGroupsHandler>();
-        services.AddTransient<GetTargetGroupByIdHandler>();
-        services.AddTransient<CreateTargetGroupHandler>();
-        services.AddTransient<UpdateTargetGroupHandler>();
-        services.AddTransient<DeleteTargetGroupHandler>();
-        services.AddTransient<GenerateMainActionsHandler>();
 
         services.AddScoped<TargetTemplateSeeder>();
 
