@@ -18,6 +18,15 @@ public class UserSessionRepository(TWActionDbContext db) : IUserSessionRepositor
         return await db.UserSessions.FindAsync(new object[] { id }, cancellationToken).AsTask();
     }
 
+    public async Task<IReadOnlyList<UserSessionEntity>> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await db.UserSessions
+            .AsNoTracking()
+            .Where(s => s.UserId == userId)
+            .OrderByDescending(s => s.ExpiresAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task DeleteExpiredAsync(CancellationToken cancellationToken = default)
     {
         var expired = await db.UserSessions.Where(s => s.ExpiresAt < DateTimeOffset.UtcNow).ToListAsync(cancellationToken);
@@ -37,6 +46,21 @@ public class UserSessionRepository(TWActionDbContext db) : IUserSessionRepositor
         }
 
         db.UserSessions.Remove(session);
+        await db.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var sessions = await db.UserSessions
+            .Where(s => s.UserId == userId)
+            .ToListAsync(cancellationToken);
+
+        if (sessions.Count == 0)
+        {
+            return;
+        }
+
+        db.UserSessions.RemoveRange(sessions);
         await db.SaveChangesAsync(cancellationToken);
     }
 }

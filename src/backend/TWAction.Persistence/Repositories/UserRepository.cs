@@ -28,6 +28,13 @@ public class UserRepository(TWActionDbContext db) : IUserRepository
         return await db.Users.FindAsync(new object[] { id }, cancellationToken).AsTask();
     }
 
+    public async Task<UserEntity> UpdateAsync(UserEntity user, CancellationToken cancellationToken = default)
+    {
+        db.Users.Update(user);
+        await db.SaveChangesAsync(cancellationToken);
+        return user;
+    }
+
     public async Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var user = await db.Users.FindAsync(new object[] { id }, cancellationToken).AsTask();

@@ -6,3 +6,18 @@ export interface User {
   role: string;
   createdAt: string;
 }
+
+export type UserRole = "User" | "Admin";
+
+export interface UpdateUserRequest {
+  email: string;
+  displayName: string;
+  role: UserRole;
+}
+
+export interface UserSession {
+  id: string;
+  userId: string;
+  expiresAt: string;
+  isActive: boolean;
+}

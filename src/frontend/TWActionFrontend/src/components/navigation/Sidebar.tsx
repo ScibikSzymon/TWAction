@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import type { User } from "../../types/user";
-import { useI18n } from "../../i18n/I18nProvider";
+import { useI18n } from "../../i18n/useI18n";
 import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
