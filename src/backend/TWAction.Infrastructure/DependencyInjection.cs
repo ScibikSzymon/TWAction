@@ -47,7 +47,14 @@ public static class DependencyInjection
             opts.Durability.Mode = DurabilityMode.MediatorOnly;
             opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
             opts.CodeGeneration
-                .AlwaysUseServiceLocationFor<TWActionDbContext>();
+                .AlwaysUseServiceLocationFor<TWActionDbContext>()
+                // TribesHttpService is registered through AddHttpClient, whose
+                // opaque factory cannot be inlined by Wolverine code generation.
+                .AlwaysUseServiceLocationFor<ITribesService>()
+                // The external API clients use the same typed HttpClient
+                // registration and therefore require the same treatment.
+                .AlwaysUseServiceLocationFor<IGeneratorApiClient>()
+                .AlwaysUseServiceLocationFor<IPlemionaRozpiskiApiClient>();
         });
 
         // Register HttpClient factory and IMemoryCache for TribalWars Api calls
