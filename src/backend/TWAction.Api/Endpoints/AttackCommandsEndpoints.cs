@@ -1,4 +1,5 @@
 using TWAction.Api.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using TWAction.Application.AttackCommands.DTOs;
 using TWAction.Application.AttackCommands.Handlers;
 using TWAction.Application.AttackCommands.Queries;
@@ -59,7 +60,7 @@ public static class AttackCommandsEndpoints
     private static async Task<IResult> GetAttackCommandsSummary(
         Guid scheduleId,
         HttpContext httpContext,
-        GetAttackCommandsSummaryHandler handler,
+        [FromServices] GetAttackCommandsSummaryHandler handler,
         IMessageBus bus,
         CancellationToken cancellationToken)
     {
@@ -84,7 +85,7 @@ public static class AttackCommandsEndpoints
         Guid scheduleId,
         [AsParameters] SendToPlemionaRozpiskiRequest request,
         HttpContext httpContext,
-        SendToPlemionaRozpiskiHandler handler,
+        [FromServices] SendToPlemionaRozpiskiHandler handler,
         IMessageBus bus,
         CancellationToken cancellationToken)
     {

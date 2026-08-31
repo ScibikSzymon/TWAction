@@ -3,11 +3,10 @@ using ActionGenerator.Application.Common.Mappers;
 using ActionGenerator.Application.Common.Services;
 using ActionGenerator.Application.Features.ReconnaissanceActions.DTOs;
 using ActionGenerator.Domain.Entities;
+using ActionGenerator.Domain.Utilities;
 using Microsoft.Extensions.Logging;
 
-
 namespace ActionGenerator.Application.Features.ReconnaissanceActions.Services;
-
 
 public interface IReconnaissanceActionsService
 {

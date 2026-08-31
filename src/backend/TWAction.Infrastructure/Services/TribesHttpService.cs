@@ -73,7 +73,7 @@ public sealed class TribesHttpService(
         // Try to get from cache
         if (cache.TryGetValue(cacheKey, out Dictionary<int, PlayerInfo>? cachedPlayers))
         {
-            return cachedPlayers;
+            return cachedPlayers!;
         }
 
         // Download gzip compressed file
@@ -112,7 +112,8 @@ public sealed class TribesHttpService(
         var cacheKey = $"tw_villages_{worldString}";
 
         // Try to get from cache
-        if (cache.TryGetValue(cacheKey, out (Dictionary<int, VillageInfo>, Dictionary<int, VillageInfo>)? cachedVillages))
+        if (cache.TryGetValue(cacheKey, out (Dictionary<int, VillageInfo>, Dictionary<int, VillageInfo>)? cachedVillages)
+            && cachedVillages.HasValue)
         {
             return cachedVillages.Value;
         }

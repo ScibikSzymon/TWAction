@@ -13,13 +13,7 @@ import { ScheduleTabs } from "../components/ScheduleTabs";
 import styles from "./HomePage.module.css";
 
 const HomePage = () => {
-  const {
-    user,
-    isLoading: authLoading,
-    login,
-    logout,
-    isAuthenticated,
-  } = useAuth();
+  const { user } = useAuth();
   const { activeScheduleId, setActive, clearActive } = useActiveSchedule();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isLoadingSchedules, setIsLoadingSchedules] = useState(false);
@@ -130,38 +124,12 @@ const HomePage = () => {
     setShowForm(true);
   };
 
-  if (authLoading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>Ładowanie...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loginCard}>
-          <h1>TWAction</h1>
-          <p>Zarządzaj swoimi rozpiskami</p>
-          <button onClick={login} className={styles.loginBtn}>
-            Zaloguj się przez Google
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.userInfo}>
           <h1>Moje Rozpiski</h1>
-          <p>Zalogowany jako: {user?.email}</p>
         </div>
-        <button onClick={logout} className={styles.logoutBtn}>
-          Wyloguj się
-        </button>
       </header>
 
       {error && <div className={styles.error}>{error}</div>}
