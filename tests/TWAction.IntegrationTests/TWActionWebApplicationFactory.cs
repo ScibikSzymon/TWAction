@@ -13,8 +13,7 @@ namespace TWAction.IntegrationTests;
 
 public sealed class TWActionWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:17-alpine")
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres:17-alpine")
         .WithDatabase("twaction_test")
         .WithUsername("test")
         .WithPassword("test")

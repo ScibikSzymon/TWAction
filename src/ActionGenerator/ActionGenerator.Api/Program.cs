@@ -31,7 +31,7 @@ public partial class Program
                 ApiKeyAuthenticationDefaults.Scheme,
                 options => options.ApiKey = apiKey);
         builder.Services.AddAuthorization();
-        builder.Services.AddOpenApi();
+        builder.Services.AddOpenApi(); //http://localhost:<port>/scalar 
         builder.Services.AddHealthChecks();
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure();
@@ -50,6 +50,8 @@ public partial class Program
 
         app.MapReconnaissanceActionsEndpoints();
         app.MapMainActionsEndpoints();
+
+        app.MapHealthChecks("/health");
 
         app.MapHealthChecks("/health");
 
