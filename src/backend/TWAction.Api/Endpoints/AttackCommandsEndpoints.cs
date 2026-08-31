@@ -36,7 +36,7 @@ public static class AttackCommandsEndpoints
     private static async Task<IResult> GetMainActionStats(
         Guid scheduleId,
         HttpContext httpContext,
-        GetMainActionStatsHandler handler,
+        [FromServices] GetMainActionStatsHandler handler,
         IMessageBus bus,
         CancellationToken cancellationToken)
     {
