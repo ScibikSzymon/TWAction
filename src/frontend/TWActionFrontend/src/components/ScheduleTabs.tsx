@@ -8,6 +8,7 @@ import { ReconnaissanceActionsGenerator } from "./ReconnaissanceActionsGenerator
 import { MainActionSettings } from "./MainActionSettings";
 import { TargetGroupsManager } from "./TargetGroupsManager";
 import { MainActionGenerator } from "./MainActionGenerator";
+import { MainActionStats } from "./MainActionStats";
 import styles from "./ScheduleTabs.module.css";
 
 interface ScheduleTabsProps {
@@ -21,6 +22,7 @@ type TabType =
   | "mainActionSettings"
   | "targetGroups"
   | "generateMain"
+  | "statsMain"
   | "reconnaissance"
   | "generate";
 
@@ -50,6 +52,11 @@ export const ScheduleTabs = ({
     {
       id: "generateMain",
       label: "Generuj Akcje",
+      visible: schedule.scheduleType === ScheduleType.Main,
+    },
+    {
+      id: "statsMain",
+      label: "Statystyki",
       visible: schedule.scheduleType === ScheduleType.Main,
     },
     {
@@ -103,6 +110,10 @@ export const ScheduleTabs = ({
               schedule={schedule}
               onScheduleUpdate={onScheduleUpdate}
             />
+          )}
+        {activeTab === "statsMain" &&
+          schedule.scheduleType === ScheduleType.Main && (
+            <MainActionStats scheduleId={schedule.id} />
           )}
         {activeTab === "reconnaissance" &&
           schedule.scheduleType === ScheduleType.Reconnaissance && (
