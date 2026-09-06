@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { attackCommandsService } from "../services/attackCommandsService";
 import type {
-  MainActionStats,
+  MainActionStats as MainActionStatsData,
   CommandsPerPlayer,
   CommandsPerDeparturePeriod,
 } from "../types/mainActionStats";
@@ -114,7 +114,7 @@ function PlayerTable({ rows, selectedType, allTypes }: PlayerTableProps) {
 // ── Hour bar chart ────────────────────────────────────────────────────────────
 
 interface HourChartProps {
-  data: MainActionStats["commandsPerArrivalHour"];
+  data: MainActionStatsData["commandsPerArrivalHour"];
   selectedType: string;
 }
 
@@ -362,7 +362,7 @@ function TypeFilter({ allTypes, selected, onChange }: TypeFilterProps) {
 // ── Root component ────────────────────────────────────────────────────────────
 
 export const MainActionStats = ({ scheduleId }: MainActionStatsProps) => {
-  const [stats, setStats] = useState<MainActionStats | null>(null);
+  const [stats, setStats] = useState<MainActionStatsData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
