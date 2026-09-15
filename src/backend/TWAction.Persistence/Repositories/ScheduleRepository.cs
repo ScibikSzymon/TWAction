@@ -15,6 +15,7 @@ public class ScheduleRepository(TWActionDbContext db) : IScheduleRepository
     {
         return await db.Schedules
             .Where(s => s.UserGuid == userId)
+            .OrderByDescending(s => s.CreationDate)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
