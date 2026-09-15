@@ -230,34 +230,36 @@ export const ReconnaissanceSettings = ({
         />
       </div>
 
-      <div className={`${styles.formGroup} ${styles.formGroupRow}`}>
-        <label htmlFor="minArrivalTime">Minimalny czas dotarcia ataków:</label>
-        <input
-          id="minArrivalTime"
-          type="datetime-local"
-          value={formatDateTimeLocal(settings.minArrivalTime)}
-          onChange={(e) =>
-            handleDateTimeChange("minArrivalTime", e.target.value)
-          }
-          min={getMinDateTime()}
-          max={getMaxDateTime()}
-          disabled={isSaving}
-        />
-      </div>
+      <div className={styles.formGroupPair}>
+        <div className={`${styles.formGroup} ${styles.formGroupRow}`}>
+          <label htmlFor="minArrivalTime">Minimalny czas dotarcia ataków:</label>
+          <input
+            id="minArrivalTime"
+            type="datetime-local"
+            value={formatDateTimeLocal(settings.minArrivalTime)}
+            onChange={(e) =>
+              handleDateTimeChange("minArrivalTime", e.target.value)
+            }
+            min={getMinDateTime()}
+            max={getMaxDateTime()}
+            disabled={isSaving}
+          />
+        </div>
 
-      <div className={`${styles.formGroup} ${styles.formGroupRow}`}>
-        <label htmlFor="maxArrivalTime">Maksymalny czas dotarcia ataków:</label>
-        <input
-          id="maxArrivalTime"
-          type="datetime-local"
-          value={formatDateTimeLocal(settings.maxArrivalTime)}
-          onChange={(e) =>
-            handleDateTimeChange("maxArrivalTime", e.target.value)
-          }
-          min={getMinDateTime()}
-          max={getMaxDateTime()}
-          disabled={isSaving}
-        />
+        <div className={`${styles.formGroup} ${styles.formGroupRow}`}>
+          <label htmlFor="maxArrivalTime">Maksymalny czas dotarcia ataków:</label>
+          <input
+            id="maxArrivalTime"
+            type="datetime-local"
+            value={formatDateTimeLocal(settings.maxArrivalTime)}
+            onChange={(e) =>
+              handleDateTimeChange("maxArrivalTime", e.target.value)
+            }
+            min={getMinDateTime()}
+            max={getMaxDateTime()}
+            disabled={isSaving}
+          />
+        </div>
       </div>
 
       <div className={styles.formGroup}>
