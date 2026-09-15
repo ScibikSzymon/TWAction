@@ -19,16 +19,6 @@ export const Sidebar = ({ user, onLogout }: SidebarProps) => {
 
       <nav className={styles.nav}>
         <NavLink
-          to="/"
-          end
-          className={({ isActive }) =>
-            `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
-          }
-        >
-          {t.sidebar.home}
-        </NavLink>
-
-        <NavLink
           to="/templates"
           className={({ isActive }) =>
             `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
@@ -37,7 +27,8 @@ export const Sidebar = ({ user, onLogout }: SidebarProps) => {
           🎯 Szablony akcji
         </NavLink>
         <NavLink
-          to="/schedules"
+          to="/"
+          end
           className={({ isActive }) =>
             `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
           }

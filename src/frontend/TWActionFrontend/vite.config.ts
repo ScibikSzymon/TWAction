@@ -5,7 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
+    // PORT is injected by Aspire (AppHost.cs) so it stays the single source of truth for the port.
+    port: Number(process.env.PORT) || 3000,
+    strictPort: true,
     proxy:{
       '/api' : {
         target: 'http://localhost:8000',
