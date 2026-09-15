@@ -140,38 +140,38 @@ const HomePage = () => {
           onSubmit={handleSubmitSchedule}
           onCancel={handleCancelForm}
         />
+      ) : isLoadingSchedules ? (
+        <div className={styles.loading}>Ładowanie rozpisek...</div>
       ) : (
-        <>
-          <div className={styles.actions}>
-            <button onClick={handleNewSchedule} className={styles.newBtn}>
-              + Nowa rozpiska
-            </button>
+        <div className={styles.body}>
+          <div className={styles.listColumn}>
+            <div className={styles.actions}>
+              <button onClick={handleNewSchedule} className={styles.newBtn}>
+                + Nowa rozpiska
+              </button>
+            </div>
+            <ScheduleList
+              schedules={schedules}
+              activeScheduleId={activeScheduleId}
+              onEdit={handleEdit}
+              onDelete={handleDeleteSchedule}
+              onSetActive={setActive}
+            />
           </div>
 
-          {isLoadingSchedules ? (
-            <div className={styles.loading}>Ładowanie rozpisek...</div>
-          ) : (
-            <>
-              <ScheduleList
-                schedules={schedules}
-                activeScheduleId={activeScheduleId}
-                onEdit={handleEdit}
-                onDelete={handleDeleteSchedule}
-                onSetActive={setActive}
-              />
-              {activeScheduleId &&
-                schedules.some((s) => s.id === activeScheduleId) && (
-                  <ScheduleTabs
-                    key={activeScheduleId}
-                    schedule={schedules.find((s) => s.id === activeScheduleId)!}
-                    onScheduleUpdate={(updates) =>
-                      handleScheduleUpdate(activeScheduleId, updates)
-                    }
-                  />
-                )}
-            </>
-          )}
-        </>
+          {activeScheduleId &&
+            schedules.some((s) => s.id === activeScheduleId) && (
+              <div className={styles.tabsColumn}>
+                <ScheduleTabs
+                  key={activeScheduleId}
+                  schedule={schedules.find((s) => s.id === activeScheduleId)!}
+                  onScheduleUpdate={(updates) =>
+                    handleScheduleUpdate(activeScheduleId, updates)
+                  }
+                />
+              </div>
+            )}
+        </div>
       )}
     </div>
   );
