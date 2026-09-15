@@ -25,10 +25,10 @@ const UserPanel = () => {
 
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
-  const [sortField, setSortField] = useState<SortField>("createdAt");
+  const [sortField, setSortField] = useState<SortField | null>("createdAt");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(50);
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -70,6 +70,8 @@ const UserPanel = () => {
       const matchesRole = roleFilter === "all" || user.role === roleFilter;
       return matchesSearch && matchesRole;
     });
+
+    if (!sortField) return filtered;
 
     return [...filtered].sort((first, second) => {
       const firstValue = sortField === "createdAt"
@@ -113,10 +115,16 @@ const UserPanel = () => {
   );
 
   const handleSort = (field: SortField) => {
-    if (sortField === field) setSortDirection((current) => current === "asc" ? "desc" : "asc");
-    else {
+    if (sortField !== field) {
       setSortField(field);
       setSortDirection("asc");
+      return;
+    }
+
+    if (sortDirection === "asc") {
+      setSortDirection("desc");
+    } else {
+      setSortField(null);
     }
   };
 

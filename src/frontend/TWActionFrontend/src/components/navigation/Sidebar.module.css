@@ -1,10 +1,12 @@
 .sidebar {
   width: 260px;
   min-width: 260px;
+  height: 100vh;
   background: var(--bg-secondary);
   border-right: 1px solid var(--border-primary);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .sidebarHeader {
@@ -66,6 +68,15 @@
   flex-direction: column;
   gap: 0.125rem;
   padding: 0 0.25rem;
+}
+
+.userName {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .userEmail {

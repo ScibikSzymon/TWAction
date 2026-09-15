@@ -34,6 +34,14 @@
   font-weight: 600;
 }
 
+.requirementMet {
+  color: var(--accent-success);
+}
+
+.requirementMissing {
+  color: var(--text-muted);
+}
+
 .uploadSection {
   margin-top: 1.5rem;
 }

@@ -62,6 +62,35 @@
   color: var(--text-muted);
 }
 
+.formGroupRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+}
+
+.formGroupRow label {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.formGroupRow input {
+  width: auto;
+  flex: 0 1 auto;
+  padding: 0.5rem 0.75rem;
+}
+
+.formGroupPair {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.formGroupPair .formGroup {
+  flex: 1;
+  min-width: 260px;
+}
+
 .actions {
   display: flex;
   gap: 0.75rem;
@@ -112,83 +141,6 @@
 .submitBtn:active:not(:disabled),
 .cancelBtn:active:not(:disabled) {
   transform: translateY(0);
-}
-
-.error {
-  background: #fee;
-  color: #c33;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  border: 1px solid #fcc;
-}
-
-.formGroup {
-  margin-bottom: 1rem;
-}
-
-.formGroup label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #555;
-}
-
-.formGroup input,
-.formGroup select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.formGroup input:focus,
-.formGroup select:focus {
-  outline: none;
-  border-color: #4caf50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-}
-
-.submitBtn,
-.cancelBtn {
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.submitBtn {
-  background: #4caf50;
-  color: white;
-}
-
-.submitBtn:hover:not(:disabled) {
-  background: #45a049;
-}
-
-.cancelBtn {
-  background: #f0f0f0;
-  color: #333;
-}
-
-.cancelBtn:hover:not(:disabled) {
-  background: #e0e0e0;
-}
-
-.submitBtn:disabled,
-.cancelBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 /* Reconnaissance Settings */
@@ -271,6 +223,17 @@
   margin-top: 0.25rem;
 }
 
+.sliderValue {
+  display: inline-block;
+  margin-left: 0.375rem;
+  padding: 0.1rem 0.5rem;
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-primary);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
 .checkboxLabel {
   display: flex;
   align-items: center;
@@ -289,4 +252,12 @@
 .checkboxLabel span {
   font-weight: 500;
   color: var(--text-primary);
+}
+
+.saveRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }

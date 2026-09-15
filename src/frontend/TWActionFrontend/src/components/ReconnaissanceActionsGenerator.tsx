@@ -196,31 +196,17 @@ export const ReconnaissanceActionsGenerator = ({
   const canGenerate =
     hasEnemies && hasSettings && hasTroopsState && !isCheckingPrerequisites;
 
-  const getWarningMessage = (): string | null => {
-    if (!schedule) return "Ładowanie rozpiski...";
-    if (isCheckingPrerequisites) return "Sprawdzanie wymaganych danych...";
+  const requirementItems = [
+    { label: "Wybrani są wrogowie (plemię lub gracze)", met: !!hasEnemies },
+    { label: "Wgrany jest stan wojsk", met: hasTroopsState },
+    { label: "Zapisane są ustawienia zwiadowcze", met: hasSettings },
+  ];
 
-    const missingItems: string[] = [];
-    if (!hasEnemies)
-      missingItems.push("Wybierz wrogów w ustawieniach rozpiski");
-    if (!hasTroopsState)
-      missingItems.push('Wgraj stan wojsk w zakładce "Stan Armii"');
-    if (!hasSettings)
-      missingItems.push(
-        'Zapisz ustawienia zwiadowcze w zakładce "Ustawienia Zwiadowcze"',
-      );
-
-    if (missingItems.length > 0) {
-      return (
-        "Aby wygenerować akcje zwiadowcze, musisz:\n" +
-        missingItems.map((item) => `• ${item}`).join("\n")
-      );
-    }
-
-    return null;
-  };
-
-  const warningMessage = getWarningMessage();
+  const loadingMessage = !schedule
+    ? "Ładowanie rozpiski..."
+    : isCheckingPrerequisites
+      ? "Sprawdzanie wymaganych danych..."
+      : null;
 
   return (
     <div className={styles.container}>
@@ -270,24 +256,33 @@ export const ReconnaissanceActionsGenerator = ({
         </div>
       )}
 
-      {warningMessage && (
+      {loadingMessage && (
         <div className={styles.info}>
-          <p style={{ whiteSpace: "pre-line" }}>{warningMessage}</p>
+          <p>{loadingMessage}</p>
         </div>
       )}
 
-      {!warningMessage && !summary && (
+      {!loadingMessage && !summary && (
         <div className={styles.info}>
-          <p>Wszystkie wymagane dane zostały wprowadzone:</p>
+          <p>Wymagane dane:</p>
           <ul>
-            <li>✓ Wybrani są wrogowie (plemię lub gracze)</li>
-            <li>✓ Wgrany jest stan wojsk</li>
-            <li>✓ Zapisane są ustawienia zwiadowcze</li>
+            {requirementItems.map((item) => (
+              <li
+                key={item.label}
+                className={
+                  item.met ? styles.requirementMet : styles.requirementMissing
+                }
+              >
+                {item.met ? "✓" : "✗"} {item.label}
+              </li>
+            ))}
           </ul>
-          <p>
-            System automatycznie wygeneruje optymalną rozpiskę akcji
-            zwiadowczych na podstawie wprowadzonych danych.
-          </p>
+          {canGenerate && (
+            <p>
+              System automatycznie wygeneruje optymalną rozpiskę akcji
+              zwiadowczych na podstawie wprowadzonych danych.
+            </p>
+          )}
         </div>
       )}
 

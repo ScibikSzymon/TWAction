@@ -1,8 +1,58 @@
 .container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 2rem;
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  gap: 1.5rem;
+}
+
+.listColumn {
+  flex: 0 0 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.listScroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  scrollbar-width: auto;
+  scrollbar-color: var(--text-muted) transparent;
+}
+
+.listScroll::-webkit-scrollbar {
+  width: 12px;
+}
+
+.listScroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.listScroll::-webkit-scrollbar-thumb {
+  background-color: var(--text-muted);
+  border-radius: 8px;
+}
+
+.listScroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary);
+}
+
+.tabsColumn {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .loading {
@@ -66,9 +116,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border-primary);
+  flex-shrink: 0;
 }
 
 .userInfo h1 {
@@ -111,14 +162,17 @@
 }
 
 .actions {
-  margin-bottom: 2rem;
+  margin-bottom: 0;
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .newBtn {
   background: var(--accent-primary);
   color: white;
   border: none;
-  padding: 0.875rem 2rem;
+  padding: 0.875rem 1.25rem;
   font-size: 1rem;
   font-weight: 600;
   border-radius: 10px;
@@ -127,6 +181,24 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border-secondary);
+  border-radius: 10px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--accent-primary);
 }
 
 .newBtn:hover {

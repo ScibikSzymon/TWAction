@@ -215,7 +215,7 @@ export const ReconnaissanceSettings = ({
         <div className={styles.success}>Ustawienia zapisane pomyślnie!</div>
       )}
 
-      <div className={styles.formGroup}>
+      <div className={`${styles.formGroup} ${styles.formGroupRow}`}>
         <label htmlFor="minDepartureTime">Czas rozpoczęcia wysyłki:</label>
         <input
           id="minDepartureTime"
@@ -230,39 +230,42 @@ export const ReconnaissanceSettings = ({
         />
       </div>
 
-      <div className={styles.formGroup}>
-        <label htmlFor="minArrivalTime">Minimalny czas dotarcia ataków:</label>
-        <input
-          id="minArrivalTime"
-          type="datetime-local"
-          value={formatDateTimeLocal(settings.minArrivalTime)}
-          onChange={(e) =>
-            handleDateTimeChange("minArrivalTime", e.target.value)
-          }
-          min={getMinDateTime()}
-          max={getMaxDateTime()}
-          disabled={isSaving}
-        />
-      </div>
+      <div className={styles.formGroupPair}>
+        <div className={`${styles.formGroup} ${styles.formGroupRow}`}>
+          <label htmlFor="minArrivalTime">Minimalny czas dotarcia ataków:</label>
+          <input
+            id="minArrivalTime"
+            type="datetime-local"
+            value={formatDateTimeLocal(settings.minArrivalTime)}
+            onChange={(e) =>
+              handleDateTimeChange("minArrivalTime", e.target.value)
+            }
+            min={getMinDateTime()}
+            max={getMaxDateTime()}
+            disabled={isSaving}
+          />
+        </div>
 
-      <div className={styles.formGroup}>
-        <label htmlFor="maxArrivalTime">Maksymalny czas dotarcia ataków:</label>
-        <input
-          id="maxArrivalTime"
-          type="datetime-local"
-          value={formatDateTimeLocal(settings.maxArrivalTime)}
-          onChange={(e) =>
-            handleDateTimeChange("maxArrivalTime", e.target.value)
-          }
-          min={getMinDateTime()}
-          max={getMaxDateTime()}
-          disabled={isSaving}
-        />
+        <div className={`${styles.formGroup} ${styles.formGroupRow}`}>
+          <label htmlFor="maxArrivalTime">Maksymalny czas dotarcia ataków:</label>
+          <input
+            id="maxArrivalTime"
+            type="datetime-local"
+            value={formatDateTimeLocal(settings.maxArrivalTime)}
+            onChange={(e) =>
+              handleDateTimeChange("maxArrivalTime", e.target.value)
+            }
+            min={getMinDateTime()}
+            max={getMaxDateTime()}
+            disabled={isSaving}
+          />
+        </div>
       </div>
 
       <div className={styles.formGroup}>
         <label htmlFor="minDistanceToFront">
-          Minimalna odległość do frontu: {settings.minDistanceToFront}
+          Minimalna odległość do frontu:{" "}
+          <span className={styles.sliderValue}>{settings.minDistanceToFront}</span>
         </label>
         <input
           id="minDistanceToFront"
@@ -287,7 +290,8 @@ export const ReconnaissanceSettings = ({
 
       <div className={styles.formGroup}>
         <label htmlFor="minSpyCount">
-          Minimalna liczba zwiadowców: {settings.minSpyCount}
+          Minimalna liczba zwiadowców:{" "}
+          <span className={styles.sliderValue}>{settings.minSpyCount}</span>
         </label>
         <input
           id="minSpyCount"
@@ -314,7 +318,9 @@ export const ReconnaissanceSettings = ({
       <div className={styles.formGroup}>
         <label htmlFor="maxPopulationInSourceVillage">
           Maksymalna populacja w wiosce źródłowej:{" "}
-          {settings.maxPopulationInSourceVillage}
+          <span className={styles.sliderValue}>
+            {settings.maxPopulationInSourceVillage}
+          </span>
         </label>
         <input
           id="maxPopulationInSourceVillage"
@@ -338,7 +344,7 @@ export const ReconnaissanceSettings = ({
         </div>
       </div>
 
-      <div className={styles.formGroup}>
+      <div className={styles.saveRow}>
         <label className={styles.checkboxLabel}>
           <input
             id="skipNightSendings"
@@ -354,16 +360,16 @@ export const ReconnaissanceSettings = ({
           />
           <span>Pomiń wysyłki nocne</span>
         </label>
-      </div>
 
-      <button
-        type="button"
-        onClick={handleSave}
-        disabled={isSaving}
-        className={styles.submitBtn}
-      >
-        {isSaving ? "Zapisywanie..." : "Zapisz ustawienia"}
-      </button>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={isSaving}
+          className={styles.submitBtn}
+        >
+          {isSaving ? "Zapisywanie..." : "Zapisz ustawienia"}
+        </button>
+      </div>
     </div>
   );
 };
