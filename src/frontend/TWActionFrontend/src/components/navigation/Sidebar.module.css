@@ -70,6 +70,15 @@
   padding: 0 0.25rem;
 }
 
+.userName {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .userEmail {
   color: var(--text-primary);
   font-size: 0.85rem;

@@ -22,6 +22,7 @@ const HomePage = () => {
   const [editingSchedule, setEditingSchedule] = useState<Schedule | undefined>(
     undefined,
   );
+  const [searchQuery, setSearchQuery] = useState("");
 
   const loadSchedules = useCallback(async () => {
     if (!user?.id) return;
@@ -124,6 +125,10 @@ const HomePage = () => {
     setShowForm(true);
   };
 
+  const filteredSchedules = schedules.filter((schedule) =>
+    schedule.name.toLowerCase().includes(searchQuery.trim().toLowerCase()),
+  );
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -147,16 +152,25 @@ const HomePage = () => {
           <div className={styles.listColumn}>
             <div className={styles.actions}>
               <button onClick={handleNewSchedule} className={styles.newBtn}>
-                + Nowa rozpiska
+                + Nowa
               </button>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Szukaj rozpiski..."
+                className={styles.searchInput}
+              />
             </div>
-            <ScheduleList
-              schedules={schedules}
-              activeScheduleId={activeScheduleId}
-              onEdit={handleEdit}
-              onDelete={handleDeleteSchedule}
-              onSetActive={setActive}
-            />
+            <div className={styles.listScroll}>
+              <ScheduleList
+                schedules={filteredSchedules}
+                activeScheduleId={activeScheduleId}
+                onEdit={handleEdit}
+                onDelete={handleDeleteSchedule}
+                onSetActive={setActive}
+              />
+            </div>
           </div>
 
           {activeScheduleId &&
