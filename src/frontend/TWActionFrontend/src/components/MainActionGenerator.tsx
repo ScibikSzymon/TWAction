@@ -211,34 +211,6 @@ export const MainActionGenerator = ({
     hasTargetGroups &&
     !isCheckingPrerequisites;
 
-  const getWarningMessage = (): string | null => {
-    if (!schedule) return "Ładowanie rozpiski...";
-    if (isCheckingPrerequisites) return "Sprawdzanie wymaganych danych...";
-
-    const missingItems: string[] = [];
-    if (!hasTroopsState)
-      missingItems.push('Wgraj stan wojsk w zakładce "Stan Armii"');
-    if (!hasSettings)
-      missingItems.push(
-        'Zapisz ustawienia głównej akcji w zakładce "Ustawienia Głównej Akcji"',
-      );
-    if (!hasTargetGroups)
-      missingItems.push(
-        'Utwórz przynajmniej jedną grupę celi w zakładce "Grupy Celi"',
-      );
-
-    if (missingItems.length > 0) {
-      return (
-        "Aby wygenerować główną akcję, musisz:\n" +
-        missingItems.map((item) => `• ${item}`).join("\n")
-      );
-    }
-
-    return null;
-  };
-
-  const warningMessage = getWarningMessage();
-
   return (
     <div className={styles.container}>
       <h3>Generuj Główną Akcję</h3>
@@ -287,28 +259,62 @@ export const MainActionGenerator = ({
         </div>
       )}
 
-      {warningMessage && (
+      {(!schedule || isCheckingPrerequisites) && (
         <div className={styles.info}>
-          <p style={{ whiteSpace: "pre-line" }}>{warningMessage}</p>
-        </div>
-      )}
-
-      {!warningMessage && !summary && (
-        <div className={styles.info}>
-          <p>Wszystkie wymagane dane zostały wprowadzone:</p>
-          <ul>
-            <li>✓ Wgrany jest stan wojsk</li>
-            <li>✓ Zapisane są ustawienia głównej akcji</li>
-            <li>✓ Zdefiniowane są grupy celi ({targetGroupCount})</li>
-          </ul>
           <p>
-            System automatycznie wygeneruje optymalną rozpiskę głównej akcji na
-            podstawie wprowadzonych danych.
+            {!schedule
+              ? "Ładowanie rozpiski..."
+              : "Sprawdzanie wymaganych danych..."}
           </p>
         </div>
       )}
 
-      {!warningMessage && summary && (
+      {schedule && !isCheckingPrerequisites && (
+        <div className={styles.info}>
+          <p>Aby wygenerować główną akcję, musisz spełnić poniższe warunki:</p>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            <li
+              style={{
+                color: hasTroopsState
+                  ? "var(--accent-success)"
+                  : "var(--accent-danger)",
+              }}
+            >
+              {hasTroopsState ? "✓" : "✗"} Wgraj stan wojsk w zakładce "Stan
+              Armii"
+            </li>
+            <li
+              style={{
+                color: hasSettings
+                  ? "var(--accent-success)"
+                  : "var(--accent-danger)",
+              }}
+            >
+              {hasSettings ? "✓" : "✗"} Zapisz ustawienia głównej akcji w
+              zakładce "Ustawienia Głównej Akcji"
+            </li>
+            <li
+              style={{
+                color: hasTargetGroups
+                  ? "var(--accent-success)"
+                  : "var(--accent-danger)",
+              }}
+            >
+              {hasTargetGroups ? "✓" : "✗"} Utwórz przynajmniej jedną grupę
+              celi w zakładce "Grupy Celi"
+              {hasTargetGroups && ` (${targetGroupCount})`}
+            </li>
+          </ul>
+          {canGenerate && (
+            <p>
+              System automatycznie wygeneruje optymalną rozpiskę głównej
+              akcji na podstawie wprowadzonych danych.
+            </p>
+          )}
+        </div>
+      )}
+
+      {canGenerate && summary && (
         <div className={styles.info}>
           <p>
             Grupy celi: <strong>{targetGroupCount}</strong>

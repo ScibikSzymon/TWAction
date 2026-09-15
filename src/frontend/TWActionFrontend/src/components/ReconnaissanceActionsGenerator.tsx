@@ -265,7 +265,7 @@ export const ReconnaissanceActionsGenerator = ({
       {!loadingMessage && !summary && (
         <div className={styles.info}>
           <p>Wymagane dane:</p>
-          <ul>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {requirementItems.map((item) => (
               <li
                 key={item.label}

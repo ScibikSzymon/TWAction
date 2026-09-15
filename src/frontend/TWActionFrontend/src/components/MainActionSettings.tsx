@@ -225,7 +225,8 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
 
         <div className={styles.formGroup}>
           <label htmlFor="maxNobleDistance">
-            Maksymalny dystans szlachcica: {settings.maxNobleDistance}
+            Maksymalny dystans szlachcica:{" "}
+            <span className={styles.sliderValue}>{settings.maxNobleDistance}</span>
           </label>
           <input
             id="maxNobleDistance"
@@ -251,7 +252,9 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
         <div className={styles.formGroup}>
           <label htmlFor="nobleMinDistanceFromFront">
             Minimalny dystans od frontu:{" "}
-            {settings.nobleSettings.minDistanceFromFront}
+            <span className={styles.sliderValue}>
+              {settings.nobleSettings.minDistanceFromFront}
+            </span>
           </label>
           <input
             id="nobleMinDistanceFromFront"
@@ -283,7 +286,9 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
             title="Szlachcic z pełnym offem (pełna armia)"
           >
             Min. populacja offensywna dla offoszlachty:{" "}
-            {settings.nobleSettings.minOffUnitsForOffNoble}
+            <span className={styles.sliderValue}>
+              {settings.nobleSettings.minOffUnitsForOffNoble}
+            </span>
           </label>
           <input
             id="nobleMinOffUnitsForOffNoble"
@@ -316,7 +321,9 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
             title="Szlachcic z 150 toporami (lekki atak)"
           >
             Min. populacja offensywna dla fejk offoszlachty:{" "}
-            {settings.nobleSettings.minOffUnitsForFakeOffNoble}
+            <span className={styles.sliderValue}>
+              {settings.nobleSettings.minOffUnitsForFakeOffNoble}
+            </span>
           </label>
           <input
             id="nobleMinOffUnitsForFakeOffNoble"
@@ -349,7 +356,9 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
             title="Szlachcic z ciężką kawalerią (z wioski deffowej)"
           >
             Max. populacja offensywna dla deffoszlachty:{" "}
-            {settings.nobleSettings.maxOffUnitsForDefNoble}
+            <span className={styles.sliderValue}>
+              {settings.nobleSettings.maxOffUnitsForDefNoble}
+            </span>
           </label>
           <input
             id="nobleMaxOffUnitsForDefNoble"
@@ -382,7 +391,9 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
             title="Wymagane jednostki deffowe dla szlachcica deffowego"
           >
             Min. populacja defensywna dla deffoszlachty:{" "}
-            {settings.nobleSettings.minDeffUnitsForDefNoble}
+            <span className={styles.sliderValue}>
+              {settings.nobleSettings.minDeffUnitsForDefNoble}
+            </span>
           </label>
           <input
             id="nobleMinDeffUnitsForDefNoble"
@@ -427,7 +438,8 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
 
         <div className={styles.formGroup}>
           <label htmlFor="offMinOffUnits">
-            Minimalna siła offu: {settings.offSettings.minOffUnits}
+            Minimalna siła offu:{" "}
+            <span className={styles.sliderValue}>{settings.offSettings.minOffUnits}</span>
           </label>
           <input
             id="offMinOffUnits"
@@ -457,7 +469,9 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
         <div className={styles.formGroup}>
           <label htmlFor="offMinDistanceFromFront">
             Minimalny dystans od frontu:{" "}
-            {settings.offSettings.minDistanceFromFront}
+            <span className={styles.sliderValue}>
+              {settings.offSettings.minDistanceFromFront}
+            </span>
           </label>
           <input
             id="offMinDistanceFromFront"
@@ -501,7 +515,10 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
 
         <div className={styles.formGroup}>
           <label htmlFor="catasMinCatasNumber">
-            Minimalna liczba katapult: {settings.catasSettings.minCatasNumber}
+            Minimalna liczba katapult:{" "}
+            <span className={styles.sliderValue}>
+              {settings.catasSettings.minCatasNumber}
+            </span>
           </label>
           <input
             id="catasMinCatasNumber"
@@ -530,7 +547,8 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
 
         <div className={styles.formGroup}>
           <label htmlFor="catasMaxOffUnits">
-            Maksymalna siła offu: {settings.catasSettings.maxOffUnits}
+            Maksymalna siła offu:{" "}
+            <span className={styles.sliderValue}>{settings.catasSettings.maxOffUnits}</span>
           </label>
           <input
             id="catasMaxOffUnits"
@@ -560,7 +578,9 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
         <div className={styles.formGroup}>
           <label htmlFor="catasMinDistanceFromFront">
             Minimalny dystans od frontu:{" "}
-            {settings.catasSettings.minDistanceFromFront}
+            <span className={styles.sliderValue}>
+              {settings.catasSettings.minDistanceFromFront}
+            </span>
           </label>
           <input
             id="catasMinDistanceFromFront"
@@ -609,7 +629,10 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
 
           <div className={styles.formGroup}>
             <label htmlFor="fakeOffMinOffUnits">
-              Minimalna siła offu: {settings.fakeOffSettings.minOffUnits}
+              Minimalna siła offu:{" "}
+              <span className={styles.sliderValue}>
+                {settings.fakeOffSettings.minOffUnits}
+              </span>
             </label>
             <input
               id="fakeOffMinOffUnits"
@@ -639,7 +662,9 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
           <div className={styles.formGroup}>
             <label htmlFor="fakeOffMinDistanceFromFront">
               Minimalny dystans od frontu:{" "}
-              {settings.fakeOffSettings.minDistanceFromFront}
+              <span className={styles.sliderValue}>
+                {settings.fakeOffSettings.minDistanceFromFront}
+              </span>
             </label>
             <input
               id="fakeOffMinDistanceFromFront"
@@ -673,7 +698,10 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
 
           <div className={styles.formGroup}>
             <label htmlFor="fakeDeffMaxOffUnits">
-              Maksymalna siła offu: {settings.fakeDeffSettings.maxOffUnits}
+              Maksymalna siła offu:{" "}
+              <span className={styles.sliderValue}>
+                {settings.fakeDeffSettings.maxOffUnits}
+              </span>
             </label>
             <input
               id="fakeDeffMaxOffUnits"
@@ -703,7 +731,9 @@ export const MainActionSettings = ({ scheduleId }: MainActionSettingsProps) => {
           <div className={styles.formGroup}>
             <label htmlFor="fakeDeffMinDistanceFromFront">
               Minimalny dystans od frontu:{" "}
-              {settings.fakeDeffSettings.minDistanceFromFront}
+              <span className={styles.sliderValue}>
+                {settings.fakeDeffSettings.minDistanceFromFront}
+              </span>
             </label>
             <input
               id="fakeDeffMinDistanceFromFront"
