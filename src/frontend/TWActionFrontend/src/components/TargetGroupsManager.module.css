@@ -1,0 +1,690 @@
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+
+.container {
+  padding: 1rem 0;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ─── States ─────────────────────────────────────────────────────────────── */
+
+.loadingState {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  border: 2px dashed var(--border-secondary);
+  border-radius: 0.75rem;
+  background: var(--bg-tertiary);
+}
+
+.emptyTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.emptyText {
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--accent-danger);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.retryBtn {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--accent-danger);
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--accent-danger);
+  cursor: pointer;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* ─── Group List ─────────────────────────────────────────────────────────── */
+
+.groupList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ─── Group Card ─────────────────────────────────────────────────────────── */
+
+.groupCard {
+  border: 1px solid var(--border-secondary);
+  border-radius: 0.75rem;
+  background: var(--bg-secondary);
+  overflow: hidden;
+  transition: box-shadow 0.15s ease;
+}
+
+.groupCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.groupCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  flex-wrap: wrap;
+}
+
+.groupCardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.groupName {
+  font-size: 0.975rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.groupBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-secondary);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.badgeTemplate {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: var(--accent-primary);
+}
+
+.groupCardActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ─── Card Detail ────────────────────────────────────────────────────────── */
+
+.groupDetail {
+  border-top: 1px solid var(--border-secondary);
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detailSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detailTitle {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.coordChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.coordChip {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.375rem;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: var(--accent-primary);
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+
+/* ─── Wave Table ─────────────────────────────────────────────────────────── */
+
+.waveTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.waveTable th,
+.waveTable td {
+  padding: 0.4rem 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.waveTable th {
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.commandBadge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+
+.btnPrimary {
+  padding: 0.5rem 1.1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--accent-primary);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-secondary);
+  border-radius: 0.5rem;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.btnSecondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnEdit {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 0.4rem;
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnEdit:hover {
+  background: rgba(59, 130, 246, 0.25);
+}
+
+.btnExpand {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--border-secondary);
+  border-radius: 0.4rem;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnExpand:hover {
+  background: var(--bg-hover);
+}
+
+.btnDelete {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 0.4rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--accent-danger);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnDelete:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.btnDanger {
+  padding: 0.5rem 1.1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--accent-danger);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnDanger:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btnDanger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Modal ──────────────────────────────────────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: var(--bg-secondary);
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-secondary);
+  flex-shrink: 0;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.modalClose:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.modalBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-secondary);
+}
+
+/* ─── Form Fields ────────────────────────────────────────────────────────── */
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fieldLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.fieldInput {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border-secondary);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  transition: border-color 0.15s;
+}
+
+.fieldInput:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.fieldSelect {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border-secondary);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  width: 100%;
+  transition: border-color 0.15s;
+  cursor: pointer;
+}
+
+.fieldSelect:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.coordsTextarea {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border-secondary);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-family: monospace;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.15s;
+}
+
+.coordsTextarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.coordsFeedback {
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.coordsValid {
+  color: #16a34a;
+}
+
+.coordsInvalid {
+  color: #d97706;
+}
+
+.coordsHint {
+  color: var(--text-muted);
+}
+
+.templateSelectorRow {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.templateNote {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: var(--accent-primary);
+  font-size: 0.8rem;
+}
+
+/* ─── Wave Editor ────────────────────────────────────────────────────────── */
+
+.waveEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid var(--border-secondary);
+  border-radius: 0.5rem;
+  padding: 0.875rem;
+  background: var(--bg-tertiary);
+}
+
+.waveEditorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.addWaveBtn {
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--accent-primary);
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--accent-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.addWaveBtn:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.emptyWaves {
+  margin: 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 0.75rem 0;
+}
+
+.waveRow {
+  display: grid;
+  grid-template-columns: 110px 110px 90px 1fr 32px;
+  gap: 0.5rem;
+  align-items: end;
+}
+
+.waveField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.waveField label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.waveField input,
+.waveField select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border-secondary);
+  border-radius: 0.375rem;
+  font-size: 0.85rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.waveField input:focus,
+.waveField select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.waveTypeField {
+  min-width: 0;
+}
+
+.removeWaveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 0.375rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--accent-danger);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.removeWaveBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.saveError {
+  padding: 0.65rem 0.875rem;
+  border-radius: 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--accent-danger);
+  font-size: 0.85rem;
+}
+
+/* ─── Delete Dialog ──────────────────────────────────────────────────────── */
+
+.deleteDialog {
+  background: var(--bg-secondary);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.deleteDialog h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.deleteDialog p {
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 560px) {
+  .waveRow {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .waveTypeField {
+    grid-column: 1 / -1;
+  }
+
+  .removeWaveBtn {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .groupCardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .groupCardActions {
+    flex-wrap: wrap;
+  }
+}

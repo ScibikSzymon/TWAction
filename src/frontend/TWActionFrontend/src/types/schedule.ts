@@ -5,6 +5,8 @@ export const WorldType = {
   pl221: "pl221",
   pl222: "pl222",
   pl223: "pl223",
+  pl232: "pl232",
+  pl233: "pl233",
 } as const;
 
 export type WorldType = (typeof WorldType)[keyof typeof WorldType];
@@ -25,10 +27,10 @@ export interface Schedule {
   world: WorldType;
   scheduleType: ScheduleType;
   enemyIds?: number[];
+  sentToPlemionaRozpiskiAt?: string;
 }
 
 export interface CreateScheduleRequest {
-  userId: string;
   name: string;
   world: string;
   scheduleType: string;

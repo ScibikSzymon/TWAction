@@ -1,0 +1,73 @@
+@baseUrl = https://localhost:8000
+
+###
+# CI/CD SMOKE TESTS
+# Minimal tests to verify deployment
+# Run these after every deployment
+###
+
+### ? HEALTH CHECK: API is running
+GET {{baseUrl}}/
+
+### ? HEALTH CHECK: Tribes endpoint works
+GET {{baseUrl}}/tribes?world=pl244
+
+### ? AUTH: Login endpoint accessible
+GET {{baseUrl}}/auth/google
+
+### ? CRITICAL PATH: Create ? Upload ? Configure ? Generate ? Verify
+###
+
+### 1. Create Schedule
+# @name smokeSchedule
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+
+{
+  "name": "CI Smoke Test",
+  "world": "pl244",
+  "scheduleType": "Reconnaissance",
+  "enemyTribalWarsIds": [123]
+}
+
+###
+@smokeScheduleId = {{smokeSchedule.response.body.$.id}}
+
+### 2. Upload Troops
+POST {{baseUrl}}/schedules/{{smokeScheduleId}}/troops
+Content-Type: application/json
+
+{
+  "rawData": "12345\t67890\t500\t501\t100\t50\t30\t20\t150\t10\t5\t8\t0\t0"
+}
+
+### 3. Configure Settings
+PUT {{baseUrl}}/schedules/{{smokeScheduleId}}/reconnaissance
+Content-Type: application/json
+
+{
+  "minDepartureTime": "2026-02-15T08:00:00Z",
+  "minArrivalTime": "2026-02-15T12:00:00Z",
+  "maxArrivalTime": "2026-02-15T18:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 3,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true
+}
+
+### 4. Generate Actions (CRITICAL - tests Generator.Api integration)
+# @name smokeGenerate
+POST {{baseUrl}}/schedules/{{smokeScheduleId}}/reconnaissance/actions
+
+### 5. Verify Generation
+GET {{baseUrl}}/schedules/{{smokeScheduleId}}/reconnaissance/actions
+
+### 6. Cleanup
+DELETE {{baseUrl}}/schedules/{{smokeScheduleId}}
+
+###
+# Expected Results:
+# - All requests return 2xx status codes
+# - Generation returns generatedCommandsCount > 0
+# - Total execution time < 5 seconds
+###

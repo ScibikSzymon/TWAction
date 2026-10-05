@@ -15,9 +15,13 @@ public class ScheduleRepository(TWActionDbContext db) : IScheduleRepository
     {
         return await db.Schedules
             .Where(s => s.UserGuid == userId)
+            .OrderByDescending(s => s.CreationDate)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
+
+    public Task<int> CountByUserIdAsync(Guid userId, CancellationToken cancellationToken = default) =>
+        db.Schedules.CountAsync(s => s.UserGuid == userId, cancellationToken);
 
     public async Task<ScheduleEntity> AddAsync(ScheduleEntity schedule, CancellationToken cancellationToken = default)
     {

@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using TWAction.Application.Users.DTOs;
+using TWAction.Domain.Users;
 using TWAction.IntegrationTests.Helpers;
 using TWAction.Persistence;
 
@@ -26,15 +27,20 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     }
 
     [Fact]
-    public async Task GetUsers_WhenNoUsers_ReturnsEmptyList()
+    public async Task GetUsers_WhenAuthenticatedUserExists_ReturnsSingleUser()
     {
-        var response = await _client.GetAsync("/users");
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, role: UserRole.Admin);
+
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
+        var response = await _client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
         var users = await response.Content.ReadFromJsonAsync<List<UserDto>>();
 
         Assert.NotNull(users);
-        Assert.Empty(users);
+        Assert.Single(users); // The authenticated user
     }
 
     [Fact]
@@ -42,15 +48,17 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, role: UserRole.Admin);
         await TestDataSeeder.SeedMultipleUsersAsync(dbContext, 3);
 
-        var response = await _client.GetAsync("/users");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
+        var response = await _client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
         var users = await response.Content.ReadFromJsonAsync<List<UserDto>>();
 
         Assert.NotNull(users);
-        Assert.Equal(3, users.Count);
+        Assert.Equal(4, users.Count); // 3 + authenticated user
     }
 
     [Fact]
@@ -58,19 +66,23 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, role: UserRole.Admin);
         var seededUser = await TestDataSeeder.SeedUserAsync(
             dbContext,
             email: "john.doe@example.com",
             displayName: "John Doe",
             provider: "google");
 
-        var response = await _client.GetAsync("/users");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
+        var response = await _client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
         var users = await response.Content.ReadFromJsonAsync<List<UserDto>>();
 
         Assert.NotNull(users);
-        var user = Assert.Single(users);
+        Assert.Equal(2, users.Count);
+        var user = users.FirstOrDefault(u => u.Email == "john.doe@example.com");
+        Assert.NotNull(user);
         Assert.Equal(seededUser.Id, user.Id);
         Assert.Equal(seededUser.Email, user.Email);
         Assert.Equal(seededUser.DisplayName, user.DisplayName);
@@ -81,7 +93,12 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     [Fact]
     public async Task GetUsers_ReturnsOkStatusCode()
     {
-        var response = await _client.GetAsync("/users");
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, role: UserRole.Admin);
+
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
+        var response = await _client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -89,8 +106,26 @@ public sealed class UsersEndpointsTests : IClassFixture<TWActionWebApplicationFa
     [Fact]
     public async Task GetUsers_ReturnsJsonContentType()
     {
-        var response = await _client.GetAsync("/users");
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, role: UserRole.Admin);
+
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
+        var response = await _client.SendAsync(request);
 
         Assert.Equal("application/json; charset=utf-8", response.Content.Headers.ContentType?.ToString());
+    }
+
+    [Fact]
+    public async Task GetUsers_WhenUserIsNotAdmin_ReturnsForbidden()
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
+
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/users", session.Id);
+        var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 }

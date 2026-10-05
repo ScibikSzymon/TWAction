@@ -7,10 +7,6 @@ public sealed record DeleteSessionCommand(Guid SessionId);
 
 public class DeleteSessionHandler(IUserSessionRepository sessionRepository)
 {
-    /// <summary>
-    /// Handles the deletion of a user session.
-    /// </summary>
-    /// <returns>A result indicating success or failure with an error message.</returns>
     public async Task<Result> Handle(DeleteSessionCommand command, CancellationToken cancellationToken = default)
     {
         var session = await sessionRepository.GetByIdAsync(command.SessionId, cancellationToken);

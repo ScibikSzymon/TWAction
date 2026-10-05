@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TWAction.Api.Endpoints;
 using TWAction.Application.Schedules.DTOs;
 using TWAction.Domain.Schedules;
+using TWAction.Domain.Users;
 using TWAction.IntegrationTests.Helpers;
 using TWAction.Persistence;
 
@@ -38,9 +39,12 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     [Fact]
     public async Task GetSchedulesByUser_WhenNoSchedules_ReturnsEmptyList()
     {
-        var userId = Guid.NewGuid();
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
 
-        var response = await _client.GetAsync($"/schedules/{userId}");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/schedules", session.Id);
+        var response = await _client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
         var schedules = await response.Content.ReadFromJsonAsync<List<ScheduleDto>>(_jsonOptions);
@@ -54,10 +58,11 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         await TestDataSeeder.SeedMultipleSchedulesAsync(dbContext, user.Id, 3);
 
-        var response = await _client.GetAsync($"/schedules/{user.Id}");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/schedules", session.Id);
+        var response = await _client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
         var schedules = await response.Content.ReadFromJsonAsync<List<ScheduleDto>>(_jsonOptions);
@@ -67,11 +72,30 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     }
 
     [Fact]
+    public async Task GetSchedulesByUserAsAdmin_WhenSchedulesExist_ReturnsAllSchedulesForUser()
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var user = await TestDataSeeder.SeedUserAsync(dbContext, email: "user@example.com");
+        var (_, adminSession) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, email: "admin@example.com", role: UserRole.Admin);
+        await TestDataSeeder.SeedMultipleSchedulesAsync(dbContext, user.Id, 2);
+
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, $"/schedules/admin/{user.Id}", adminSession.Id);
+        var response = await _client.SendAsync(request);
+
+        response.EnsureSuccessStatusCode();
+        var schedules = await response.Content.ReadFromJsonAsync<List<ScheduleDto>>(_jsonOptions);
+
+        Assert.NotNull(schedules);
+        Assert.Equal(2, schedules.Count);
+    }
+
+    [Fact]
     public async Task GetSchedulesByUser_ReturnsCorrectScheduleDtoStructure()
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var seededSchedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
@@ -79,7 +103,8 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
             world: WorldType.pl219,
             scheduleType: ScheduleType.Reconnaissance);
 
-        var response = await _client.GetAsync($"/schedules/{user.Id}");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/schedules", session.Id);
+        var response = await _client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
         var schedules = await response.Content.ReadFromJsonAsync<List<ScheduleDto>>(_jsonOptions);
@@ -98,10 +123,11 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(dbContext, userId: user.Id);
 
-        var response = await _client.GetAsync($"/schedules/{user.Id}/{schedule.Id}");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, $"/schedules/{schedule.Id}", session.Id);
+        var response = await _client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
         var returnedSchedule = await response.Content.ReadFromJsonAsync<ScheduleDto>(_jsonOptions);
@@ -114,10 +140,13 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     [Fact]
     public async Task GetScheduleById_WhenScheduleDoesNotExist_ReturnsNotFound()
     {
-        var userId = Guid.NewGuid();
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var scheduleId = Guid.NewGuid();
 
-        var response = await _client.GetAsync($"/schedules/{userId}/{scheduleId}");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, $"/schedules/{scheduleId}", session.Id);
+        var response = await _client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -127,11 +156,12 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user1 = await TestDataSeeder.SeedUserAsync(dbContext, email: "user1@example.com");
-        var user2 = await TestDataSeeder.SeedUserAsync(dbContext, email: "user2@example.com");
+        var (user1, _) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, email: "user1@example.com");
+        var (user2, session2) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext, email: "user2@example.com");
         var schedule = await TestDataSeeder.SeedScheduleAsync(dbContext, userId: user1.Id);
 
-        var response = await _client.GetAsync($"/schedules/{user2.Id}/{schedule.Id}");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, $"/schedules/{schedule.Id}", session2.Id);
+        var response = await _client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -141,17 +171,18 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
 
         var request = new CreateScheduleRequest(
-            UserId: user.Id,
             Name: "New Schedule",
-            World: WorldType.pl220.ToString(),
-            ScheduleType: ScheduleType.Main.ToString(),
+            World: WorldType.pl220,
+            ScheduleType: ScheduleType.Main,
             []
         );
 
-        var response = await _client.PostAsJsonAsync("/schedules", request, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Post, "/schedules", session.Id);
+        httpRequest.Content = JsonContent.Create(request, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var createdSchedule = await response.Content.ReadFromJsonAsync<ScheduleDto>(_jsonOptions);
@@ -171,40 +202,25 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
 
         var request = new CreateScheduleRequest(
-            UserId: user.Id,
             Name: "New Schedule",
-            World: WorldType.pl218.ToString(),
-            ScheduleType: ScheduleType.Fake.ToString(),
+            World: WorldType.pl218,
+            ScheduleType: ScheduleType.Fake,
             []
         );
 
-        var response = await _client.PostAsJsonAsync("/schedules", request, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Post, "/schedules", session.Id);
+        httpRequest.Content = JsonContent.Create(request, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
 
         var createdSchedule = await response.Content.ReadFromJsonAsync<ScheduleDto>(_jsonOptions);
         Assert.NotNull(createdSchedule);
-        Assert.Contains($"/schedules/{createdSchedule.UserId}/{createdSchedule.Id}", response.Headers.Location.ToString());
-    }
-
-    [Fact]
-    public async Task CreateSchedule_WithInvalidUserId_ReturnsBadRequest()
-    {
-        var request = new CreateScheduleRequest(
-            UserId: Guid.NewGuid(),
-            Name: "New Schedule",
-            World: WorldType.pl218.ToString(),
-            ScheduleType: ScheduleType.Main.ToString(),
-            []
-        );
-
-        var response = await _client.PostAsJsonAsync("/schedules", request, _jsonOptions);
-
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains($"/schedules/{createdSchedule.Id}", response.Headers.Location.ToString());
     }
 
     [Fact]
@@ -212,7 +228,7 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(
             dbContext,
             userId: user.Id,
@@ -222,12 +238,14 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
 
         var updateRequest = new UpdateScheduleRequest(
             Name: "Updated Name",
-            World: WorldType.pl221.ToString(),
-            ScheduleType: ScheduleType.Main.ToString(),
+            World: WorldType.pl221,
+            ScheduleType: ScheduleType.Main,
             []
         );
 
-        var response = await _client.PutAsJsonAsync($"/schedules/{schedule.Id}", updateRequest, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Put, $"/schedules/{schedule.Id}", session.Id);
+        httpRequest.Content = JsonContent.Create(updateRequest, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         response.EnsureSuccessStatusCode();
         var updatedSchedule = await response.Content.ReadFromJsonAsync<ScheduleDto>(_jsonOptions);
@@ -242,15 +260,21 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     [Fact]
     public async Task UpdateSchedule_WhenScheduleDoesNotExist_ReturnsNotFound()
     {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var scheduleId = Guid.NewGuid();
+
         var updateRequest = new UpdateScheduleRequest(
             Name: "Updated Name",
-            World: WorldType.pl218.ToString(),
-            ScheduleType: ScheduleType.Main.ToString(),
+            World: WorldType.pl218,
+            ScheduleType: ScheduleType.Main,
             []
         );
 
-        var response = await _client.PutAsJsonAsync($"/schedules/{scheduleId}", updateRequest, _jsonOptions);
+        var httpRequest = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Put, $"/schedules/{scheduleId}", session.Id);
+        httpRequest.Content = JsonContent.Create(updateRequest, options: _jsonOptions);
+        var response = await _client.SendAsync(httpRequest);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -260,10 +284,11 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     {
         await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
-        var user = await TestDataSeeder.SeedUserAsync(dbContext);
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var schedule = await TestDataSeeder.SeedScheduleAsync(dbContext, userId: user.Id);
 
-        var response = await _client.DeleteAsync($"/schedules/{schedule.Id}");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Delete, $"/schedules/{schedule.Id}", session.Id);
+        var response = await _client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
@@ -274,9 +299,13 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     [Fact]
     public async Task DeleteSchedule_WhenScheduleDoesNotExist_ReturnsNotFound()
     {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (_, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
         var scheduleId = Guid.NewGuid();
 
-        var response = await _client.DeleteAsync($"/schedules/{scheduleId}");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Delete, $"/schedules/{scheduleId}", session.Id);
+        var response = await _client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -284,9 +313,12 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     [Fact]
     public async Task GetSchedulesByUser_ReturnsOkStatusCode()
     {
-        var userId = Guid.NewGuid();
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
 
-        var response = await _client.GetAsync($"/schedules/{userId}");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/schedules", session.Id);
+        var response = await _client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -294,9 +326,12 @@ public sealed class ScheduleEndpointsTests : IClassFixture<TWActionWebApplicatio
     [Fact]
     public async Task GetSchedulesByUser_ReturnsJsonContentType()
     {
-        var userId = Guid.NewGuid();
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TWActionDbContext>();
+        var (user, session) = await TestDataSeeder.SeedUserWithSessionAsync(dbContext);
 
-        var response = await _client.GetAsync($"/schedules/{userId}");
+        var request = TestDataSeeder.CreateAuthenticatedRequest(HttpMethod.Get, "/schedules", session.Id);
+        var response = await _client.SendAsync(request);
 
         Assert.Equal("application/json; charset=utf-8", response.Content.Headers.ContentType?.ToString());
     }

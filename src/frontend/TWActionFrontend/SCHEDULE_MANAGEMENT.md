@@ -28,8 +28,8 @@ The system allows authenticated users to:
 
 **`services/scheduleService.ts`** - Handles all CRUD operations on schedules:
 
-- `getSchedulesByUser(userId)` - fetch user's schedules
-- `getScheduleById(userId, scheduleId)` - fetch single schedule
+- `getSchedules()` - fetch current user's schedules
+- `getScheduleById(scheduleId)` - fetch single schedule
 - `createSchedule(request)` - create new schedule
 - `updateSchedule(scheduleId, request)` - update schedule
 - `deleteSchedule(scheduleId)` - delete schedule
@@ -100,7 +100,7 @@ Unauthenticated user → "Sign in with Google" button
 ```
 HomePage mount → useAuth fetches user
 → useEffect detects user.id → loadSchedules()
-→ scheduleService.getSchedulesByUser() → Update schedules state
+→ scheduleService.getSchedules() → Update schedules state
 → ScheduleList renders list with active schedule highlighted
 ```
 
@@ -184,8 +184,9 @@ HomePage mount → useAuth fetches user
 ## API Endpoints (Backend)
 
 ```
-GET    /schedules/{userId}              - Get all user's schedules
-GET    /schedules/{userId}/{scheduleId} - Get single schedule
+GET    /schedules                       - Get current user's schedules
+GET    /schedules/{scheduleId}          - Get single schedule
+GET    /schedules/admin/{userId}        - Get schedules for user (admin only)
 POST   /schedules                       - Create new schedule
 PUT    /schedules/{scheduleId}          - Update schedule
 DELETE /schedules/{scheduleId}          - Delete schedule

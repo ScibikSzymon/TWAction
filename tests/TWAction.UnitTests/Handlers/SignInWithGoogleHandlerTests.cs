@@ -34,36 +34,37 @@ public sealed class SignInWithGoogleHandlerTests
         _userRepository.AddAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
-                var user = callInfo.Arg<UserEntity>();
+                var user = callInfo.Arg<UserEntity>()!;
                 user.Id = userId;
-                return user;
+                return Task.FromResult(user);
             });
 
         _sessionRepository.CreateSessionAsync(Arg.Any<UserSessionEntity>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
-                var session = callInfo.Arg<UserSessionEntity>();
+                var session = callInfo.Arg<UserSessionEntity>()!;
                 session.Id = sessionId;
-                return session;
+                return Task.FromResult(session);
             });
 
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.SessionId.Should().Be(sessionId);
-        result.Value.User.Email.Should().Be(email);
-        result.Value.User.DisplayName.Should().Be(displayName);
-        result.Value.User.Provider.Should().Be("google");
+        result.Value!.SessionId.Should().Be(sessionId);
+        result.Value!.User.Email.Should().Be(email);
+        result.Value!.User.DisplayName.Should().Be(displayName);
+        result.Value!.User.Provider.Should().Be("google");
 
         await _userRepository.Received(1).FindByEmailAsync(email, "google", Arg.Any<CancellationToken>());
         await _userRepository.Received(1).AddAsync(
             Arg.Is<UserEntity>(u => 
+                u != null &&
                 u.Email == email && 
                 u.DisplayName == displayName && 
                 u.Provider == "google"),
             Arg.Any<CancellationToken>());
         await _sessionRepository.Received(1).CreateSessionAsync(
-            Arg.Is<UserSessionEntity>(s => s.UserId == userId),
+            Arg.Is<UserSessionEntity>(s => s != null && s.UserId == userId),
             Arg.Any<CancellationToken>());
     }
 
@@ -90,23 +91,23 @@ public sealed class SignInWithGoogleHandlerTests
         _sessionRepository.CreateSessionAsync(Arg.Any<UserSessionEntity>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
-                var session = callInfo.Arg<UserSessionEntity>();
+                var session = callInfo.Arg<UserSessionEntity>()!;
                 session.Id = sessionId;
-                return session;
+                return Task.FromResult(session);
             });
 
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.SessionId.Should().Be(sessionId);
-        result.Value.User.Id.Should().Be(userId);
-        result.Value.User.Email.Should().Be(email);
-        result.Value.User.DisplayName.Should().Be("Original Name");
+        result.Value!.SessionId.Should().Be(sessionId);
+        result.Value!.User.Id.Should().Be(userId);
+        result.Value!.User.Email.Should().Be(email);
+        result.Value!.User.DisplayName.Should().Be("Original Name");
 
         await _userRepository.Received(1).FindByEmailAsync(email, "google", Arg.Any<CancellationToken>());
         await _userRepository.DidNotReceive().AddAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
         await _sessionRepository.Received(1).CreateSessionAsync(
-            Arg.Is<UserSessionEntity>(s => s.UserId == userId),
+            Arg.Is<UserSessionEntity>(s => s != null && s.UserId == userId),
             Arg.Any<CancellationToken>());
     }
 
@@ -121,14 +122,14 @@ public sealed class SignInWithGoogleHandlerTests
             .Returns((UserEntity?)null);
 
         _userRepository.AddAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<UserEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<UserEntity>()!));
 
         UserSessionEntity? capturedSession = null;
         _sessionRepository.CreateSessionAsync(Arg.Any<UserSessionEntity>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 capturedSession = callInfo.Arg<UserSessionEntity>();
-                return capturedSession;
+                return Task.FromResult(capturedSession!);
             });
 
         await _handler.Handle(command);
@@ -136,7 +137,7 @@ public sealed class SignInWithGoogleHandlerTests
         var afterTest = DateTimeOffset.UtcNow;
         capturedSession.Should().NotBeNull();
         capturedSession!.ExpiresAt.Should().BeCloseTo(beforeTest.AddHours(8), TimeSpan.FromSeconds(5));
-        capturedSession.ExpiresAt.Should().BeCloseTo(afterTest.AddHours(8), TimeSpan.FromSeconds(5));
+        capturedSession!.ExpiresAt.Should().BeCloseTo(afterTest.AddHours(8), TimeSpan.FromSeconds(5));
     }
 
     [Fact]
@@ -150,10 +151,10 @@ public sealed class SignInWithGoogleHandlerTests
             .Returns((UserEntity?)null);
 
         _userRepository.AddAsync(Arg.Any<UserEntity>(), cancellationToken)
-            .Returns(callInfo => callInfo.Arg<UserEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<UserEntity>()!));
 
         _sessionRepository.CreateSessionAsync(Arg.Any<UserSessionEntity>(), cancellationToken)
-            .Returns(callInfo => callInfo.Arg<UserSessionEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<UserSessionEntity>()!));
 
         await _handler.Handle(command, cancellationToken);
 
@@ -172,17 +173,17 @@ public sealed class SignInWithGoogleHandlerTests
             .Returns((UserEntity?)null);
 
         _userRepository.AddAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<UserEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<UserEntity>()!));
 
         _sessionRepository.CreateSessionAsync(Arg.Any<UserSessionEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<UserSessionEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<UserSessionEntity>()!));
 
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.User.DisplayName.Should().BeNull();
+        result.Value!.User.DisplayName.Should().BeNull();
         await _userRepository.Received(1).AddAsync(
-            Arg.Is<UserEntity>(u => u.DisplayName == null),
+            Arg.Is<UserEntity>(u => u != null && u.DisplayName == null),
             Arg.Any<CancellationToken>());
     }
 
@@ -197,15 +198,15 @@ public sealed class SignInWithGoogleHandlerTests
             .Returns((UserEntity?)null);
 
         _userRepository.AddAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<UserEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<UserEntity>()!));
 
         _sessionRepository.CreateSessionAsync(Arg.Any<UserSessionEntity>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => callInfo.Arg<UserSessionEntity>());
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<UserSessionEntity>()!));
 
         var result = await _handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.User.Provider.Should().Be(customProvider);
+        result.Value!.User.Provider.Should().Be(customProvider);
         await _userRepository.Received(1).FindByEmailAsync(email, customProvider, Arg.Any<CancellationToken>());
     }
 }

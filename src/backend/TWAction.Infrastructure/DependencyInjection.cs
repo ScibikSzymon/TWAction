@@ -1,21 +1,30 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
 using Wolverine;
 using TWAction.Application.Interfaces;
 using TWAction.Persistence;
 using TWAction.Persistence.Repositories;
 using TWAction.Infrastructure.Services;
+using TWAction.Infrastructure.Auth;
+using TWAction.Infrastructure.Options;
 using TWAction.Application.Handlers;
 using TWAction.Application.Users.Queries;
 using TWAction.Application.Users.Interfaces;
 using TWAction.Application.Schedules.Interfaces;
-using TWAction.Application.Schedules.Queries;
-using TWAction.Application.Schedules.Commands;
-using TWAction.Application.Users.Commands;
 using TWAction.Application.Schedules.Services;
 using TWAction.Application.Tribes.Interfaces;
 using TWAction.Application.Tribes.Queries;
+using TWAction.Application.Settings.Interfaces;
+using TWAction.Application.Templates.Interfaces;
+using TWAction.Application.TargetGroups.Interfaces;
+using TWAction.Application.AttackCommands.Interfaces;
+using TWAction.Application.ReconnaissanceActions.Interfaces;
+using TWAction.Application.MainActions.Services;
+using TWAction.Persistence.Seeders;
 
 namespace TWAction.Infrastructure;
 
@@ -37,38 +46,103 @@ public static class DependencyInjection
         {
             opts.Durability.Mode = DurabilityMode.MediatorOnly;
             opts.Discovery.IncludeAssembly(typeof(SignInWithGoogleHandler).Assembly);
+            opts.CodeGeneration
+                .AlwaysUseServiceLocationFor<TWActionDbContext>()
+                // TribesHttpService is registered through AddHttpClient, whose
+                // opaque factory cannot be inlined by Wolverine code generation.
+                .AlwaysUseServiceLocationFor<ITribesService>()
+                // The external API clients use the same typed HttpClient
+                // registration and therefore require the same treatment.
+                .AlwaysUseServiceLocationFor<IGeneratorApiClient>()
+                .AlwaysUseServiceLocationFor<IPlemionaRozpiskiApiClient>();
         });
 
-        // Register HttpClient factory and IMemoryCache for TribalWars API calls
+        // Register HttpClient factory and IMemoryCache for TribalWars Api calls
         services.AddHttpClient<TribesHttpService>();
         services.AddMemoryCache();
+        services.AddHttpContextAccessor();
+
+        // Register Generator.Api HTTP client
+        services.AddHttpClient<IGeneratorApiClient, GeneratorApiClient>((serviceProvider, client) =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<GeneratorApiOptions>>();
+            client.BaseAddress = new Uri(options.Value.BaseUrl);
+            client.DefaultRequestHeaders.Add("X-Api-KEY", options.Value.ApiKey);
+        });
+
+        // Register PlemionaRozpiski.pl API client
+        services.AddHttpClient<IPlemionaRozpiskiApiClient, PlemionaRozpiskiApiClient>((serviceProvider, client) =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<PlemionaRozpiskiApiOptions>>();
+            client.BaseAddress = new Uri(options.Value.BaseUrl);
+            client.DefaultRequestHeaders.Add("X-API-KEY", options.Value.ApiKey);
+        });
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ISubscriptionPlanLimitsRepository, SubscriptionPlanLimitsRepository>();
+        services.AddScoped<IUserQuotaGuardFactory, UserQuotaGuardFactory>();
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ITroopsStateRepository, TroopsStateRepository>();
+        services.AddScoped<ITroopsUploadRepository, TroopsUploadRepository>();
+        services.AddScoped<INobleBudgetRepository, NobleBudgetRepository>();
+        services.AddScoped<IReconnaissanceSettingsRepository, ReconnaissanceSettingsRepository>();
+        services.AddScoped<IMainActionSettingsRepository, MainActionSettingsRepository>();
+        services.AddScoped<IAttackCommandRepository, AttackCommandRepository>();
+        services.AddScoped<ITargetTemplateRepository, TargetTemplateRepository>();
+        services.AddScoped<ITargetGroupRepository, TargetGroupRepository>();
+        services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
+
 
         services.AddSingleton<TroopsStateValidator>();
         services.AddSingleton<TroopsStateCompressionService>();
         services.AddSingleton<TroopsStateStatsExtractor>();
         services.AddSingleton<TribesCsvParser>();
+        services.AddSingleton<PlayersCsvParser>();
+        services.AddSingleton<VillagesCsvParser>();
         services.AddScoped<ITribesService, TribesHttpService>();
 
-        services.AddTransient<SignInWithGoogleHandler>();
-        services.AddTransient<GetAllUsersHandler>();
-        services.AddTransient<GetUserBySessionHandler>();
-        services.AddTransient<DeleteSessionHandler>();
-        services.AddTransient<GetAllSchedulesHandler>();
-        services.AddTransient<GetScheduleByIdHandler>();
-        services.AddTransient<CreateScheduleHandler>();
-        services.AddTransient<UpdateScheduleHandler>();
-        services.AddTransient<DeleteScheduleHandler>();
-        services.AddTransient<UploadTroopsStateHandler>();
-        services.AddTransient<GetTroopsStateHandler>();
-        services.AddTransient<GetTribesHandler>();
+        services.AddScoped<TargetTemplateSeeder>();
+
+        // Register authentication with session-based authentication handler
+        services.AddAuthentication(SessionAuthenticationHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
+                SessionAuthenticationHandler.SchemeName, 
+                options => { });
 
         return services;
+    }
 
+    public static IServiceCollection AddApplicationHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("TWActionDatabase");
+        var authOptions = configuration.GetSection(AuthOptions.SectionName).Get<AuthOptions>();
+        var generatorOptions = configuration.GetSection(GeneratorApiOptions.SectionName).Get<GeneratorApiOptions>();
+        var rozpiskiOptions = configuration.GetSection(PlemionaRozpiskiApiOptions.SectionName).Get<PlemionaRozpiskiApiOptions>();
 
+        services.AddHealthChecks()
+            .AddNpgSql(
+                connectionString!,
+                name: "postgresql",
+                failureStatus: HealthStatus.Unhealthy,
+                tags: ["db", "ready"])
+            .AddUrlGroup(
+                new Uri(authOptions!.FrontendUrl!),
+                name: "frontend",
+                failureStatus: HealthStatus.Degraded,
+                tags: ["external", "ready"])
+            .AddUrlGroup(
+                new Uri(new Uri(generatorOptions!.BaseUrl), "/health"),
+                name: "action-generator-api",
+                failureStatus: HealthStatus.Degraded,
+                tags: ["external", "ready"])
+            .AddUrlGroup(
+                new Uri(new Uri(rozpiskiOptions!.BaseUrl), "/"),
+                name: "plemiona-rozpiski-api",
+                failureStatus: HealthStatus.Degraded,
+                tags: ["external", "ready"]);
+
+        return services;
     }
 }
+

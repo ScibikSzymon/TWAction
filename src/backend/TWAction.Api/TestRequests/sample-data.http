@@ -1,0 +1,253 @@
+###
+# SAMPLE DATA & FORMATS
+# Copy-paste ready examples for testing
+###
+
+###
+# 1. TROOPS STATE FORMAT
+# Format: VillageId\tPlayerId\tX\tY\tSpear\tSword\tAxe\tArcher\tSpy\tLight\tHorseArcher\tHeavy\tRam\tCatapult
+###
+
+## Minimal (2 villages)
+12345	67890	500	501	100	50	30	20	150	10	5	8	0	0
+12346	67890	501	502	120	60	40	25	180	15	8	10	0	0
+
+## Realistic (10 villages)
+12345	67890	500	501	100	50	30	20	150	10	5	8	0	0
+12346	67890	501	502	120	60	40	25	180	15	8	10	0	0
+12347	67891	502	503	90	45	25	18	160	12	6	9	0	0
+12348	67891	503	504	110	55	35	22	170	13	7	11	0	0
+12349	67892	504	505	95	48	28	19	165	11	5	8	0	0
+12350	67892	505	506	105	52	32	21	175	14	9	12	0	0
+12351	67893	506	507	115	58	38	24	185	16	10	13	0	0
+12352	67893	507	508	125	62	42	26	190	17	11	14	0	0
+12353	67894	508	509	130	65	45	28	195	18	12	15	0	0
+12354	67894	509	510	135	68	48	30	200	20	13	16	0	0
+
+## Large dataset (50 villages) - Use for performance testing
+# ... add more rows with pattern:
+# VillageId increments by 1
+# PlayerId groups of 5 villages per player
+# X, Y increment sequentially
+# Troop counts vary randomly
+
+###
+# 2. RECONNAISSANCE SETTINGS - PRESETS
+###
+
+## Morning Attack Window (8-12)
+{
+  "minDepartureTime": "2026-02-15T06:00:00Z",
+  "minArrivalTime": "2026-02-15T08:00:00Z",
+  "maxArrivalTime": "2026-02-15T12:00:00Z",
+  "minDistanceToFront": 5,
+  "minSpyCount": 3,
+  "maxPopulationInSourceVillage": 8000,
+  "skipNightSendings": true
+}
+
+## Afternoon Attack Window (14-18)
+{
+  "minDepartureTime": "2026-02-15T10:00:00Z",
+  "minArrivalTime": "2026-02-15T14:00:00Z",
+  "maxArrivalTime": "2026-02-15T18:00:00Z",
+  "minDistanceToFront": 10,
+  "minSpyCount": 5,
+  "maxPopulationInSourceVillage": 7000,
+  "skipNightSendings": true
+}
+
+## Night Operations (22-02)
+{
+  "minDepartureTime": "2026-02-15T20:00:00Z",
+  "minArrivalTime": "2026-02-15T22:00:00Z",
+  "maxArrivalTime": "2026-02-16T02:00:00Z",
+  "minDistanceToFront": 3,
+  "minSpyCount": 2,
+  "maxPopulationInSourceVillage": 9000,
+  "skipNightSendings": false
+}
+
+## Conservative (large distance, many spies)
+{
+  "minDepartureTime": "2026-02-15T08:00:00Z",
+  "minArrivalTime": "2026-02-15T12:00:00Z",
+  "maxArrivalTime": "2026-02-15T18:00:00Z",
+  "minDistanceToFront": 20,
+  "minSpyCount": 10,
+  "maxPopulationInSourceVillage": 6000,
+  "skipNightSendings": true
+}
+
+## Aggressive (close range, few spies)
+{
+  "minDepartureTime": "2026-02-15T08:00:00Z",
+  "minArrivalTime": "2026-02-15T10:00:00Z",
+  "maxArrivalTime": "2026-02-15T14:00:00Z",
+  "minDistanceToFront": 1,
+  "minSpyCount": 1,
+  "maxPopulationInSourceVillage": 10000,
+  "skipNightSendings": false
+}
+
+###
+# 3. SCHEDULE EXAMPLES
+###
+
+## Basic Reconnaissance
+{
+  "name": "Basic Recon",
+  "world": "pl244",
+  "scheduleType": "Reconnaissance",
+  "enemyTribalWarsIds": [123]
+}
+
+## Multi-Tribe Target
+{
+  "name": "Coalition Attack",
+  "world": "pl245",
+  "scheduleType": "Reconnaissance",
+  "enemyTribalWarsIds": [123, 456, 789, 999]
+}
+
+## Large Scale Operation
+{
+  "name": "World War III",
+  "world": "pl246",
+  "scheduleType": "Reconnaissance",
+  "enemyTribalWarsIds": [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+}
+
+###
+# 4. COMMON WORLD CODES (Polish servers)
+###
+# pl244 - Active world
+# pl245 - Active world
+# pl246 - Active world
+# pl243 - Previous world
+# pl247 - Future world
+
+###
+# 5. EXPECTED RESPONSE FORMATS
+###
+
+## Create Schedule Response (201 Created)
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "userId": "660e8400-e29b-41d4-a716-446655440001",
+  "name": "Spring 2026 Reconnaissance",
+  "world": "pl244",
+  "scheduleType": "Reconnaissance",
+  "creationDate": "2026-02-10T12:00:00Z",
+  "enemies": [
+    {
+      "tribalWarsId": 123,
+      "name": "Enemy Tribe 1",
+      "short": "ET1",
+      "villagesCount": 45
+    }
+  ]
+}
+
+## Get Attack Commands Response (200 OK)
+[
+  {
+    "id": "770e8400-e29b-41d4-a716-446655440002",
+    "timeWindow": {
+      "minDepartureTime": "2026-02-15T08:30:00Z",
+      "maxDepartureTime": "2026-02-15T09:00:00Z",
+      "minArrivalTime": "2026-02-15T12:00:00Z",
+      "maxArrivalTime": "2026-02-15T12:30:00Z"
+    },
+    "source": {
+      "id": 12345,
+      "x": 500,
+      "y": 501,
+      "playerId": 67890
+    },
+    "destination": {
+      "id": 99999,
+      "x": 520,
+      "y": 521,
+      "playerId": 88888
+    },
+    "commandType": "Reconnaissance",
+    "createdAt": "2026-02-10T12:05:00Z"
+  }
+]
+
+## Generate Actions Response (200 OK)
+{
+  "scheduleId": "550e8400-e29b-41d4-a716-446655440000",
+  "generatedCommandsCount": 42
+}
+
+## Error Response (400 Bad Request)
+{
+  "error": "Troops state not found. Please upload troops data first."
+}
+
+## Validation Error (400 Bad Request)
+{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "Name": [
+      "Name is required."
+    ],
+    "World": [
+      "World must be a valid WorldType value."
+    ]
+  }
+}
+
+###
+# 6. CURL EQUIVALENTS (for bash/terminal testing)
+###
+
+## Login
+curl -X GET "https://localhost:8000/auth/google" -L
+
+## Create Schedule
+curl -X POST "https://localhost:8000/schedules" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test Recon",
+    "world": "pl244",
+    "scheduleType": "Reconnaissance",
+    "enemyTribalWarsIds": [123]
+  }' \
+  --cookie-jar cookies.txt
+
+## Generate Actions
+curl -X POST "https://localhost:8000/schedules/{scheduleId}/reconnaissance/actions" \
+  --cookie cookies.txt
+
+###
+# 7. ENVIRONMENT-SPECIFIC URLS
+###
+
+# Development
+@devUrl = https://localhost:8000
+
+# Staging (if applicable)
+@stagingUrl = https://staging.twaction.com
+
+# Production (if applicable)
+@prodUrl = https://api.twaction.com
+
+###
+# 8. LOAD TESTING DATA GENERATOR
+# Use this pattern to generate large datasets
+###
+
+# Python script to generate troops data:
+"""
+for i in range(1, 1001):
+    village_id = 10000 + i
+    player_id = 50000 + (i // 20)  # 20 villages per player
+    x = 500 + (i // 50)
+    y = 500 + (i % 50)
+    print(f"{village_id}\t{player_id}\t{x}\t{y}\t100\t50\t30\t20\t{150+i%50}\t10\t5\t8\t0\t0")
+"""

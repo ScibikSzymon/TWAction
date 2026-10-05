@@ -5,15 +5,15 @@ using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Tribes.Interfaces;
 using TWAction.Application.Users.Interfaces;
 using TWAction.Domain.Schedules;
-using TWAction.Domain.Tribes;
+using TWAction.Domain.Users;
 
 namespace TWAction.Application.Schedules.Commands;
 
 public sealed record CreateScheduleCommand(
     Guid UserId,
     string Name,
-    string World,
-    string ScheduleType,
+    WorldType World,
+    ScheduleType ScheduleType,
     IReadOnlyList<int> EnemyTribalWarsIds
 );
 
@@ -21,29 +21,26 @@ public sealed record CreateScheduleCommand(
 public class CreateScheduleHandler(
     IScheduleRepository scheduleRepository,
     IUserRepository userRepository,
-    ITribesService tribesService)
+    ITribesService tribesService,
+    IUserQuotaGuardFactory quotaGuards,
+    ISubscriptionPlanLimitsRepository planLimitsRepository)
 {
     public async Task<Result<ScheduleDto>> Handle(CreateScheduleCommand command, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(command.Name))
-        {
-            return Result.Failure<ScheduleDto>("Schedule name cannot be empty.");
-        }
-
+        await using var quota = await quotaGuards.AcquireAsync(command.UserId, cancellationToken);
         var user = await userRepository.GetByIdAsync(command.UserId, cancellationToken);
         if (user is null)
         {
             return Result.Failure<ScheduleDto>($"User with ID '{command.UserId}' not found.");
         }
 
-        if (!Enum.TryParse<WorldType>(command.World, ignoreCase: true, out var world))
+        var planLimits = await planLimitsRepository.GetAsync(
+            user.SubscriptionTier,
+            cancellationToken);
+        var limit = UserLimits.Schedules(user, planLimits);
+        if (limit.HasValue && await scheduleRepository.CountByUserIdAsync(command.UserId, cancellationToken) >= limit.Value)
         {
-            return Result.Failure<ScheduleDto>($"Invalid world value '{command.World}'.");
-        }
-
-        if (!Enum.TryParse<ScheduleType>(command.ScheduleType, ignoreCase: true, out var scheduleType))
-        {
-            return Result.Failure<ScheduleDto>($"Invalid schedule type value '{command.ScheduleType}'.");
+            return Result.Failure<ScheduleDto>($"Schedule limit reached ({limit.Value}).");
         }
 
         var schedule = new ScheduleEntity
@@ -52,9 +49,9 @@ public class CreateScheduleHandler(
             UserGuid = command.UserId,
             Name = command.Name,
             CreationDate = DateTimeOffset.UtcNow,
-            World = world,
-            ScheduleType = scheduleType,
-            Enemies = new List<TribeInfo>()
+            World = command.World,
+            ScheduleType = command.ScheduleType,
+            Enemies = []
         };
 
 
@@ -63,7 +60,7 @@ public class CreateScheduleHandler(
         {
             try
             {
-                var tribes = await tribesService.GetTribesAsync(world, cancellationToken);
+                var tribes = await tribesService.GetTribesAsync(command.World, cancellationToken);
 
                 var enemies = tribes
                     .Where(t => command.EnemyTribalWarsIds.Contains(t.TribalWarsId))
@@ -87,6 +84,7 @@ public class CreateScheduleHandler(
         }
 
         await scheduleRepository.AddAsync(schedule, cancellationToken);
+        await quota.CommitAsync(cancellationToken);
 
         return Result.Success(IScheduleMapper.ToDto(schedule));
     }

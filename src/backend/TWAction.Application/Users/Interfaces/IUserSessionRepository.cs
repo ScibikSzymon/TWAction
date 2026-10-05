@@ -8,7 +8,11 @@ public interface IUserSessionRepository
 
     Task<UserSessionEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<UserSessionEntity>> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+
     Task DeleteExpiredAsync(CancellationToken cancellationToken = default);
 
     Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task DeleteByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 }

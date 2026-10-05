@@ -10,7 +10,6 @@ import type { EnemyTribeSnapshot } from "../types/tribe";
 import styles from "./ScheduleForm.module.css";
 
 interface ScheduleFormProps {
-  userId: string;
   schedule?: Schedule;
   onSubmit: (
     request: CreateScheduleRequest | UpdateScheduleRequest,
@@ -19,7 +18,6 @@ interface ScheduleFormProps {
 }
 
 export const ScheduleForm = ({
-  userId,
   schedule,
   onSubmit,
   onCancel,
@@ -94,7 +92,7 @@ export const ScheduleForm = ({
 
       const requestData = schedule
         ? { name, world, scheduleType, enemyTribalWarsIds }
-        : { userId, name, world, scheduleType, enemyTribalWarsIds };
+        : { name, world, scheduleType, enemyTribalWarsIds };
 
       if (schedule) {
         await onSubmit(requestData as UpdateScheduleRequest);

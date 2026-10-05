@@ -187,6 +187,8 @@ public sealed class ArchitectureTests
             .HaveNameStartingWith("I")
             .And()
             .DoNotHaveName("IRepository`1") // Exclude generic base interface
+            .And()
+            .DoNotHaveName("ICurrentUserAccessor")
             .Should()
             .HaveNameEndingWith("Repository")
             .GetResult();

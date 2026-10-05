@@ -8,6 +8,8 @@ public interface IScheduleRepository
 
     Task<IReadOnlyList<ScheduleEntity>> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
+    Task<int> CountByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+
     Task<ScheduleEntity> AddAsync(ScheduleEntity schedule, CancellationToken cancellationToken = default);
 
     Task<ScheduleEntity> UpdateAsync(ScheduleEntity schedule, CancellationToken cancellationToken = default);

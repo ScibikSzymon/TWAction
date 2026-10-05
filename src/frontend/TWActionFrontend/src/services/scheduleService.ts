@@ -6,15 +6,13 @@ import type {
 } from "../types/schedule";
 
 export const scheduleService = {
-  async getSchedulesByUser(userId: string): Promise<Schedule[]> {
-    const { data } = await apiClient.get<Schedule[]>(`/schedules/${userId}`);
+  async getSchedules(): Promise<Schedule[]> {
+    const { data } = await apiClient.get<Schedule[]>("/schedules");
     return data;
   },
 
-  async getScheduleById(userId: string, scheduleId: string): Promise<Schedule> {
-    const { data } = await apiClient.get<Schedule>(
-      `/schedules/${userId}/${scheduleId}`,
-    );
+  async getScheduleById(scheduleId: string): Promise<Schedule> {
+    const { data } = await apiClient.get<Schedule>(`/schedules/${scheduleId}`);
     return data;
   },
 

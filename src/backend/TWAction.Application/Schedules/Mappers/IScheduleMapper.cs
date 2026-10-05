@@ -15,7 +15,8 @@ public static partial class IScheduleMapper
         CreationDate = schedule.CreationDate,
         World = schedule.World,
         ScheduleType = schedule.ScheduleType,
-        EnemyIds = schedule.Enemies.Select(e => e.TribalWarsId).ToList()
+        EnemyIds = schedule.Enemies.Select(e => e.TribalWarsId).ToList(),
+        SentToPlemionaRozpiskiAt = schedule.SentToPlemionaRozpiskiAt
     };
 }
 

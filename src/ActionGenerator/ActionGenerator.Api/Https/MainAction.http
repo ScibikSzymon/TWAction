@@ -1,0 +1,403 @@
+@hostname = localhost
+@port = 62252
+@baseUrl = https://{{hostname}}:{{port}}
+@contentType = application/json
+@ApiKey = RmgcH1KVJNyU9WxArXlfdx03tXFBz0MW
+
+### Generate Main Action — custom settings + Off + Catas + FakeOff + FakeDeff + Nobles
+# @name generateMainAction
+POST {{baseUrl}}/Api/main-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-03-01T06:00:00Z",
+  "skipNightSendings": true,
+  "maxNobleDistance": 49,
+  "offSettings": {
+    "minOffUnits": 15000,
+    "minDistanceFromFront": 6
+  },
+  "catasSettings": {
+    "minCatasNumber": 50,
+    "minDistanceFromFront": 4,
+    "maxOffUnits": 1000000
+  },
+  "fakeOffSettings": {
+    "minOffUnits": 10000,
+    "minDistanceFromFront": 5,
+    "minMachineUnits": 8
+  },
+  "fakeDeffSettings": {
+    "maxOffUnits": 10000,
+    "minDistanceFromFront": 3,
+    "minTotalUnits": 600,
+    "minMachineUnits": 7
+  },
+  "nobleSettings": {
+    "minDistanceFromFront": 5,
+    "minOffUnitsForOffNoble": 10000,
+    "minOffUnitsForFakeOffNoble": 7000,
+    "maxOffUnitsForDefNoble": 10000
+  },
+  "playerNobleBudgets": {
+    "100": 4,
+    "101": 6
+  },
+  "allyVillages": [
+    {
+      "id": 1, "playerId": 100, "x": 500, "y": 500,
+      "army": { "spear": 0, "sword": 0, "axe": 3000, "archer": 0, "spy": 10, "light": 1200, "horseArcher": 0, "heavy": 0, "ram": 300, "catapult": 0, "noble": 2 }
+    },
+    {
+      "id": 2, "playerId": 100, "x": 497, "y": 503,
+      "army": { "spear": 0, "sword": 0, "axe": 2800, "archer": 0, "spy": 10, "light": 1000, "horseArcher": 0, "heavy": 0, "ram": 280, "catapult": 0, "noble": 2 }
+    },
+    {
+      "id": 3, "playerId": 100, "x": 503, "y": 498,
+      "army": { "spear": 0, "sword": 0, "axe": 100, "archer": 0, "spy": 5, "light": 50, "horseArcher": 0, "heavy": 0, "ram": 0, "catapult": 80, "noble": 0 }
+    },
+    {
+      "id": 4, "playerId": 101, "x": 510, "y": 495,
+      "army": { "spear": 0, "sword": 0, "axe": 3200, "archer": 0, "spy": 10, "light": 1300, "horseArcher": 0, "heavy": 0, "ram": 320, "catapult": 0, "noble": 3 }
+    },
+    {
+      "id": 5, "playerId": 101, "x": 508, "y": 505,
+      "army": { "spear": 2000, "sword": 2000, "axe": 200, "archer": 0, "spy": 10, "light": 0, "horseArcher": 0, "heavy": 500, "ram": 20, "catapult": 60, "noble": 0 }
+    }
+  ],
+  "targets": [
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "Off",
+      "commandNumber": 2,
+      "village": { "id": 201, "playerId": 999, "x": 520, "y": 480 }
+    },
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "Catapults",
+      "commandNumber": 1,
+      "village": { "id": 202, "playerId": 999, "x": 525, "y": 475 }
+    },
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "FakeOffensive",
+      "commandNumber": 3,
+      "village": { "id": 203, "playerId": 998, "x": 515, "y": 490 }
+    },
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "FakeDefensive",
+      "commandNumber": 4,
+      "village": { "id": 204, "playerId": 997, "x": 530, "y": 470 }
+    },
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "NobleWithFullOff",
+      "commandNumber": 1,
+      "village": { "id": 205, "playerId": 999, "x": 522, "y": 478 }
+    }
+  ]
+}
+
+###
+
+### Generate Main Action — defaults only (settings omitted, backend uses defaults)
+# @name generateMainActionDefaults
+POST {{baseUrl}}/Api/main-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-03-01T06:00:00Z",
+  "skipNightSendings": true,
+  "allyVillages": [
+    {
+      "id": 1, "playerId": 100, "x": 500, "y": 500,
+      "army": { "spear": 0, "sword": 0, "axe": 3000, "archer": 0, "spy": 10, "light": 1200, "horseArcher": 0, "heavy": 0, "ram": 300, "catapult": 0, "noble": 0 }
+    }
+  ],
+  "targets": [
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "Off",
+      "commandNumber": 1,
+      "village": { "id": 201, "playerId": 999, "x": 520, "y": 480 }
+    }
+  ]
+}
+
+###
+
+### Validation error — empty AllyVillages
+POST {{baseUrl}}/Api/main-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-03-01T08:00:00Z",
+  "skipNightSendings": false,
+  "allyVillages": [],
+  "targets": [
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "Off",
+      "commandNumber": 1,
+      "village": { "id": 301, "playerId": 999, "x": 510, "y": 510 }
+    }
+  ]
+}
+
+###
+
+### Validation error — Reconnaissance not allowed in main action
+POST {{baseUrl}}/Api/main-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-03-01T08:00:00Z",
+  "skipNightSendings": false,
+  "allyVillages": [
+    {
+      "id": 1, "playerId": 100, "x": 500, "y": 500,
+      "army": { "spear": 0, "sword": 0, "axe": 3000, "archer": 0, "spy": 10, "light": 1200, "horseArcher": 0, "heavy": 0, "ram": 300, "catapult": 0, "noble": 0 }
+    }
+  ],
+  "targets": [
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "Reconnaissance",
+      "commandNumber": 1,
+      "village": { "id": 301, "playerId": 999, "x": 510, "y": 510 }
+    }
+  ]
+}
+
+
+### Generate Main Action — Off + Catas + FakeOff + FakeDeff + Nobles
+# @name generateMainAction
+POST {{baseUrl}}/Api/main-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-03-01T06:00:00Z",
+  "skipNightSendings": true,
+  "maxNobleDistance": 49,
+  "playerNobleBudgets": {
+    "100": 4,
+    "101": 6
+  },
+  "allyVillages": [
+    {
+      "id": 1,
+      "playerId": 100,
+      "x": 500,
+      "y": 500,
+      "army": {
+        "spear": 0, "sword": 0, "axe": 3000, "archer": 0,
+        "spy": 10, "light": 1200, "horseArcher": 0, "heavy": 0,
+        "ram": 300, "catapult": 0, "noble": 2
+      }
+    },
+    {
+      "id": 2,
+      "playerId": 100,
+      "x": 497,
+      "y": 503,
+      "army": {
+        "spear": 0, "sword": 0, "axe": 2800, "archer": 0,
+        "spy": 10, "light": 1000, "horseArcher": 0, "heavy": 0,
+        "ram": 280, "catapult": 0, "noble": 2
+      }
+    },
+    {
+      "id": 3,
+      "playerId": 100,
+      "x": 503,
+      "y": 498,
+      "army": {
+        "spear": 0, "sword": 0, "axe": 100, "archer": 0,
+        "spy": 5, "light": 50, "horseArcher": 0, "heavy": 0,
+        "ram": 0, "catapult": 80, "noble": 0
+      }
+    },
+    {
+      "id": 4,
+      "playerId": 101,
+      "x": 510,
+      "y": 495,
+      "army": {
+        "spear": 0, "sword": 0, "axe": 3200, "archer": 0,
+        "spy": 10, "light": 1300, "horseArcher": 0, "heavy": 0,
+        "ram": 320, "catapult": 0, "noble": 3
+      }
+    },
+    {
+      "id": 5,
+      "playerId": 101,
+      "x": 508,
+      "y": 505,
+      "army": {
+        "spear": 2000, "sword": 2000, "axe": 200, "archer": 0,
+        "spy": 10, "light": 0, "horseArcher": 0, "heavy": 500,
+        "ram": 20, "catapult": 60, "noble": 0
+      }
+    },
+    {
+      "id": 6,
+      "playerId": 100,
+      "x": 495,
+      "y": 507,
+      "army": {
+        "spear": 0, "sword": 0, "axe": 1500, "archer": 0,
+        "spy": 5, "light": 600, "horseArcher": 0, "heavy": 0,
+        "ram": 150, "catapult": 0, "noble": 0
+      }
+    }
+  ],
+  "targets": [
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "Off",
+      "commandNumber": 2,
+      "village": { "id": 201, "playerId": 999, "x": 520, "y": 480 }
+    },
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "Catapults",
+      "commandNumber": 1,
+      "village": { "id": 202, "playerId": 999, "x": 525, "y": 475 }
+    },
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "FakeOffensive",
+      "commandNumber": 3,
+      "village": { "id": 203, "playerId": 998, "x": 515, "y": 490 }
+    },
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "FakeDefensive",
+      "commandNumber": 4,
+      "village": { "id": 204, "playerId": 997, "x": 530, "y": 470 }
+    },
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "NobleWithFullOff",
+      "commandNumber": 1,
+      "village": { "id": 205, "playerId": 999, "x": 522, "y": 478 }
+    },
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "NobleWithHalfOff",
+      "commandNumber": 2,
+      "village": { "id": 206, "playerId": 998, "x": 518, "y": 488 }
+    }
+  ]
+}
+
+###
+
+### Generate Main Action — Only Fakes (minimal example)
+# @name generateFakesOnly
+POST {{baseUrl}}/Api/main-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-03-01T08:00:00Z",
+  "skipNightSendings": false,
+  "allyVillages": [
+    {
+      "id": 10,
+      "playerId": 200,
+      "x": 480,
+      "y": 480,
+      "army": {
+        "spear": 0, "sword": 0, "axe": 12000, "archer": 0,
+        "spy": 0, "light": 500, "horseArcher": 0, "heavy": 0,
+        "ram": 120, "catapult": 10, "noble": 0
+      }
+    }
+  ],
+  "targets": [
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T14:00:00Z",
+      "commandType": "FakeOffensive",
+      "commandNumber": 5,
+      "village": { "id": 301, "playerId": 999, "x": 510, "y": 510 }
+    }
+  ]
+}
+
+###
+
+### Validation error — empty AllyVillages
+POST {{baseUrl}}/Api/main-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-03-01T08:00:00Z",
+  "skipNightSendings": false,
+  "allyVillages": [],
+  "targets": [
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "Off",
+      "commandNumber": 1,
+      "village": { "id": 301, "playerId": 999, "x": 510, "y": 510 }
+    }
+  ]
+}
+
+###
+
+### Validation error — Reconnaissance command type not allowed
+POST {{baseUrl}}/Api/main-actions
+Content-Type: {{contentType}}
+X-Api-KEY: {{ApiKey}}
+
+{
+  "minDepartureTime": "2026-03-01T08:00:00Z",
+  "skipNightSendings": false,
+  "allyVillages": [
+    {
+      "id": 1,
+      "playerId": 100,
+      "x": 500,
+      "y": 500,
+      "army": {
+        "spear": 0, "sword": 0, "axe": 3000, "archer": 0,
+        "spy": 10, "light": 1200, "horseArcher": 0, "heavy": 0,
+        "ram": 300, "catapult": 0, "noble": 0
+      }
+    }
+  ],
+  "targets": [
+    {
+      "minArrivalTime": "2026-03-02T10:00:00Z",
+      "maxArrivalTime": "2026-03-02T12:00:00Z",
+      "commandType": "Reconnaissance",
+      "commandNumber": 1,
+      "village": { "id": 301, "playerId": 999, "x": 510, "y": 510 }
+    }
+  ]
+}

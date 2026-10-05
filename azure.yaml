@@ -19,8 +19,18 @@ services:
         docker:
             path: src/frontend/TWActionFrontend/Dockerfile
             context: src/frontend/TWActionFrontend
+    actiongenerator-api:
+        project: src/ActionGenerator/ActionGenerator.API
+        host: containerapp
+        language: dotnet
+        docker:
+            path: src/ActionGenerator/ActionGenerator.API/Dockerfile
+            context: .
 resources:
     twaction-api:
+        type: host.containerapp
+        port: 8080
+    actiongenerator-api:
         type: host.containerapp
         port: 8080
     twaction-frontend:

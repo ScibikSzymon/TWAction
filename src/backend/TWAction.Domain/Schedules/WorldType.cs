@@ -7,6 +7,8 @@ public enum WorldType
     pl220,
     pl221,
     pl222,
-    pl223
+    pl223,
+    pl232,
+    pl233
 }
 

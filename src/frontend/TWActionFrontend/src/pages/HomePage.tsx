@@ -7,27 +7,25 @@ import type {
   UpdateScheduleRequest,
 } from "../types/schedule";
 import { scheduleService } from "../services/scheduleService";
+import { userService } from "../services/userService";
+import type { UserLimits } from "../types/user";
 import { ScheduleList } from "../components/ScheduleList";
 import { ScheduleForm } from "../components/ScheduleForm";
-import { TroopsStateManager } from "../components/TroopsStateManager";
+import { ScheduleTabs } from "../components/ScheduleTabs";
 import styles from "./HomePage.module.css";
 
 const HomePage = () => {
-  const {
-    user,
-    isLoading: authLoading,
-    login,
-    logout,
-    isAuthenticated,
-  } = useAuth();
+  const { user } = useAuth();
   const { activeScheduleId, setActive, clearActive } = useActiveSchedule();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [limits, setLimits] = useState<UserLimits | null>(null);
   const [isLoadingSchedules, setIsLoadingSchedules] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | undefined>(
     undefined,
   );
+  const [searchQuery, setSearchQuery] = useState("");
 
   const loadSchedules = useCallback(async () => {
     if (!user?.id) return;
@@ -35,8 +33,9 @@ const HomePage = () => {
     setIsLoadingSchedules(true);
     setError(null);
     try {
-      const data = await scheduleService.getSchedulesByUser(user.id);
+      const data = await scheduleService.getSchedules();
       setSchedules(data);
+      setLimits(await userService.getMyLimits());
     } catch (err) {
       console.error("Error loading schedules:", err);
       setError("Nie udało się załadować rozpisek");
@@ -55,6 +54,7 @@ const HomePage = () => {
     try {
       const newSchedule = await scheduleService.createSchedule(request);
       setSchedules((prev) => [...prev, newSchedule]);
+      setLimits((prev) => prev ? { ...prev, scheduleCount: prev.scheduleCount + 1 } : prev);
       setShowForm(false);
     } catch (err) {
       console.error("Error creating schedule:", err);
@@ -94,6 +94,7 @@ const HomePage = () => {
   const handleDeleteSchedule = async (scheduleId: string) => {
     await scheduleService.deleteSchedule(scheduleId);
     setSchedules((prev) => prev.filter((s) => s.id !== scheduleId));
+    setLimits((prev) => prev ? { ...prev, scheduleCount: Math.max(0, prev.scheduleCount - 1) } : prev);
     if (activeScheduleId === scheduleId) {
       clearActive();
     }
@@ -102,10 +103,7 @@ const HomePage = () => {
   const handleEdit = async (schedule: Schedule) => {
     try {
       // Pobierz najnowsze dane rozpiski z bazy
-      const freshSchedule = await scheduleService.getScheduleById(
-        user!.id,
-        schedule.id,
-      );
+      const freshSchedule = await scheduleService.getScheduleById(schedule.id);
       setEditingSchedule(freshSchedule);
       setShowForm(true);
     } catch (err) {
@@ -119,80 +117,90 @@ const HomePage = () => {
     setEditingSchedule(undefined);
   };
 
+  const handleScheduleUpdate = (
+    scheduleId: string,
+    updates: Partial<Schedule>,
+  ) => {
+    setSchedules((prev) =>
+      prev.map((s) => (s.id === scheduleId ? { ...s, ...updates } : s)),
+    );
+  };
+
   const handleNewSchedule = () => {
     setEditingSchedule(undefined);
     setShowForm(true);
   };
 
-  if (authLoading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>Ładowanie...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loginCard}>
-          <h1>TWAction</h1>
-          <p>Zarządzaj swoimi rozpiskami</p>
-          <button onClick={login} className={styles.loginBtn}>
-            Zaloguj się przez Google
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const filteredSchedules = schedules.filter((schedule) =>
+    schedule.name.toLowerCase().includes(searchQuery.trim().toLowerCase()),
+  );
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.userInfo}>
           <h1>Moje Rozpiski</h1>
-          <p>Zalogowany jako: {user?.email}</p>
         </div>
-        <button onClick={logout} className={styles.logoutBtn}>
-          Wyloguj się
-        </button>
       </header>
+
+      {limits && <p className={styles.limitInfo}>
+        Plan: {limits.subscriptionTier === "Premium" ? "Premium" : "Darmowy"} ·
+        Rozpiski: {limits.scheduleCount}/{limits.scheduleLimit ?? "bez limitu"} ·
+        Szablony: {limits.templateCount}/{limits.templateLimit ?? "bez limitu"} ·
+        Wgrania wojsk: {limits.troopsUploadLimit ?? "bez limitu"} na rozpiskę / {limits.troopsUploadWindowHours} h
+      </p>}
 
       {error && <div className={styles.error}>{error}</div>}
 
       {showForm ? (
         <ScheduleForm
-          userId={user!.id}
           schedule={editingSchedule}
           onSubmit={handleSubmitSchedule}
           onCancel={handleCancelForm}
         />
+      ) : isLoadingSchedules ? (
+        <div className={styles.loading}>Ładowanie rozpisek...</div>
       ) : (
-        <>
-          <div className={styles.actions}>
-            <button onClick={handleNewSchedule} className={styles.newBtn}>
-              + Nowa rozpiska
-            </button>
-          </div>
-
-          {isLoadingSchedules ? (
-            <div className={styles.loading}>Ładowanie rozpisek...</div>
-          ) : (
-            <>
+        <div className={styles.body}>
+          <div className={styles.listColumn}>
+            <div className={styles.actions}>
+              <button onClick={handleNewSchedule} className={styles.newBtn}
+                disabled={limits?.scheduleLimit != null && limits.scheduleCount >= limits.scheduleLimit}
+                title={limits?.scheduleLimit != null && limits.scheduleCount >= limits.scheduleLimit ? "Osiągnięto limit rozpisek" : undefined}>
+                + Nowa
+              </button>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Szukaj rozpiski..."
+                className={styles.searchInput}
+              />
+            </div>
+            <div className={styles.listScroll}>
               <ScheduleList
-                schedules={schedules}
+                schedules={filteredSchedules}
                 activeScheduleId={activeScheduleId}
                 onEdit={handleEdit}
                 onDelete={handleDeleteSchedule}
                 onSetActive={setActive}
               />
-              {activeScheduleId &&
-                schedules.some((s) => s.id === activeScheduleId) && (
-                  <TroopsStateManager scheduleId={activeScheduleId} />
-                )}
-            </>
-          )}
-        </>
+            </div>
+          </div>
+
+          {activeScheduleId &&
+            schedules.some((s) => s.id === activeScheduleId) && (
+              <div className={styles.tabsColumn}>
+                <ScheduleTabs
+                  key={activeScheduleId}
+                  schedule={schedules.find((s) => s.id === activeScheduleId)!}
+                  onScheduleUpdate={(updates) =>
+                    handleScheduleUpdate(activeScheduleId, updates)
+                  }
+                />
+              </div>
+            )}
+        </div>
       )}
     </div>
   );
