@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using Respawn;
+using Respawn.Graph;
 using Testcontainers.PostgreSql;
 using TWAction.Persistence;
 
@@ -36,7 +37,8 @@ public sealed class TWActionWebApplicationFactory : WebApplicationFactory<Progra
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions
         {
             DbAdapter = DbAdapter.Postgres,
-            SchemasToInclude = ["public"]
+            SchemasToInclude = ["public"],
+            TablesToIgnore = [new Table("SubscriptionPlanLimits")]
         });
     }
 
