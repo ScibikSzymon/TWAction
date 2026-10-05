@@ -9,4 +9,8 @@ public sealed record UpdateUserRequest
     public string? DisplayName { get; init; }
 
     public required UserRole Role { get; init; }
+    public SubscriptionTier? SubscriptionTier { get; init; }
+    public int? ScheduleLimitOverride { get; init; }
+    public int? TemplateLimitOverride { get; init; }
+    public int? TroopsUploadLimitOverride { get; init; }
 }

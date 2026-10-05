@@ -12,6 +12,8 @@ public interface ITargetTemplateRepository
     /// </summary>
     Task<IEnumerable<TargetTemplate>> GetAllAsync(Guid userId, CancellationToken ct = default);
 
+    Task<int> CountOwnedAsync(Guid userId, CancellationToken ct = default);
+
     /// <summary>Returns a single template by its identifier, or null when not found.</summary>
     Task<TargetTemplate?> GetByIdAsync(Guid id, CancellationToken ct = default);
 

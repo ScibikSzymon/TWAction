@@ -15,9 +15,13 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
 
     public DbSet<UserSessionEntity> UserSessions { get; set; } = null!;
 
+    public DbSet<SubscriptionPlanLimitsEntity> SubscriptionPlanLimits { get; set; } = null!;
+
     public DbSet<ScheduleEntity> Schedules { get; set; } = null!;
 
     public DbSet<TroopsStateEntity> TroopsStates { get; set; } = null!;
+
+    public DbSet<TroopsUploadEntity> TroopsUploads { get; set; } = null!;
 
     public DbSet<NobleBudgetEntity> NobleBudgets { get; set; } = null!;
 
@@ -35,8 +39,17 @@ public class TWActionDbContext(DbContextOptions<TWActionDbContext> options) : Db
     {
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
+        modelBuilder.ApplyConfiguration(new SubscriptionPlanLimitsConfiguration());
         modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
         modelBuilder.ApplyConfiguration(new TroopsStateConfiguration());
+        modelBuilder.Entity<TroopsUploadEntity>(entity =>
+        {
+            entity.ToTable("TroopsUploads");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.ScheduleId, x.UploadedAt });
+            entity.HasOne<UserEntity>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<ScheduleEntity>().WithMany().HasForeignKey(x => x.ScheduleId).OnDelete(DeleteBehavior.Cascade);
+        });
         modelBuilder.ApplyConfiguration(new NobleBudgetConfiguration());
         modelBuilder.ApplyConfiguration(new ReconnaissanceSettingsConfiguration());
         modelBuilder.ApplyConfiguration(new MainActionSettingsConfiguration());

@@ -4,6 +4,7 @@ import { ProtectedRoute } from './components/navigation/ProtectedRoute';
 import "./App.css";
 import HomePage from "./pages/HomePage";
 import TemplatesPage from "./pages/TemplatesPage";
+import AboutPage from "./pages/AboutPage";
 import MainLayout from "./layout/MainLayout";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
         element: <HomePage/>
       },
       { path: "/templates", element: <TemplatesPage /> },
+      { path: "/about", element: <AboutPage /> },
       {
         element: <ProtectedRoute requiredRole="Admin" />,
         children: [

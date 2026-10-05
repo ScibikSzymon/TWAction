@@ -5,6 +5,7 @@ using TWAction.Application.Schedules.Interfaces;
 using TWAction.Application.Tribes.Interfaces;
 using TWAction.Application.Users.Interfaces;
 using TWAction.Domain.Schedules;
+using TWAction.Domain.Users;
 
 namespace TWAction.Application.Schedules.Commands;
 
@@ -20,14 +21,26 @@ public sealed record CreateScheduleCommand(
 public class CreateScheduleHandler(
     IScheduleRepository scheduleRepository,
     IUserRepository userRepository,
-    ITribesService tribesService)
+    ITribesService tribesService,
+    IUserQuotaGuardFactory quotaGuards,
+    ISubscriptionPlanLimitsRepository planLimitsRepository)
 {
     public async Task<Result<ScheduleDto>> Handle(CreateScheduleCommand command, CancellationToken cancellationToken = default)
     {
+        await using var quota = await quotaGuards.AcquireAsync(command.UserId, cancellationToken);
         var user = await userRepository.GetByIdAsync(command.UserId, cancellationToken);
         if (user is null)
         {
             return Result.Failure<ScheduleDto>($"User with ID '{command.UserId}' not found.");
+        }
+
+        var planLimits = await planLimitsRepository.GetAsync(
+            user.SubscriptionTier,
+            cancellationToken);
+        var limit = UserLimits.Schedules(user, planLimits);
+        if (limit.HasValue && await scheduleRepository.CountByUserIdAsync(command.UserId, cancellationToken) >= limit.Value)
+        {
+            return Result.Failure<ScheduleDto>($"Schedule limit reached ({limit.Value}).");
         }
 
         var schedule = new ScheduleEntity
@@ -71,6 +84,7 @@ public class CreateScheduleHandler(
         }
 
         await scheduleRepository.AddAsync(schedule, cancellationToken);
+        await quota.CommitAsync(cancellationToken);
 
         return Result.Success(IScheduleMapper.ToDto(schedule));
     }

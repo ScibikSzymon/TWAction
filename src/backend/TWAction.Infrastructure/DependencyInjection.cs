@@ -79,9 +79,12 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ISubscriptionPlanLimitsRepository, SubscriptionPlanLimitsRepository>();
+        services.AddScoped<IUserQuotaGuardFactory, UserQuotaGuardFactory>();
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ITroopsStateRepository, TroopsStateRepository>();
+        services.AddScoped<ITroopsUploadRepository, TroopsUploadRepository>();
         services.AddScoped<INobleBudgetRepository, NobleBudgetRepository>();
         services.AddScoped<IReconnaissanceSettingsRepository, ReconnaissanceSettingsRepository>();
         services.AddScoped<IMainActionSettingsRepository, MainActionSettingsRepository>();

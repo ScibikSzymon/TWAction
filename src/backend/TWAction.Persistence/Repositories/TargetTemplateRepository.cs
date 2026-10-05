@@ -12,6 +12,9 @@ public sealed class TargetTemplateRepository(TWActionDbContext context) : ITarge
             .Where(t => t.IsDefault || t.UserId == userId)
             .ToListAsync(ct);
 
+    public Task<int> CountOwnedAsync(Guid userId, CancellationToken ct = default) =>
+        context.TargetTemplates.CountAsync(t => !t.IsDefault && t.UserId == userId, ct);
+
     public async Task<TargetTemplate?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         await context.TargetTemplates.FirstOrDefaultAsync(t => t.Id == id, ct);
 

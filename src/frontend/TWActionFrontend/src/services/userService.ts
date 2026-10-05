@@ -1,7 +1,11 @@
 import { apiClient } from "../config/api";
-import type { UpdateUserRequest, User, UserSession } from "../types/user";
+import type { UpdateUserRequest, User, UserSession, UserLimits } from "../types/user";
 
 export const userService = {
+  async getMyLimits(): Promise<UserLimits> {
+    const { data } = await apiClient.get<UserLimits>("/users/me/limits");
+    return data;
+  },
   async getAllUsers(): Promise<User[]> {
     const { data } = await apiClient.get<User[]>("/users");
     return data;

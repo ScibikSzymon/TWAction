@@ -6,6 +6,8 @@ import type {
   UserSession,
 } from "../types/user";
 import { userService } from "../services/userService";
+import { aboutService } from "../services/aboutService";
+import type { SubscriptionPlanLimits } from "../types/subscriptionPlan";
 import { useI18n } from "../i18n/useI18n";
 import styles from "./UserPanel.module.css";
 
@@ -18,6 +20,7 @@ const PAGE_SIZE_OPTIONS = [10, 25, 50];
 const UserPanel = () => {
   const { t, language } = useI18n();
   const [users, setUsers] = useState<User[]>([]);
+  const [planLimits, setPlanLimits] = useState<SubscriptionPlanLimits[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +49,12 @@ const UserPanel = () => {
         else setIsLoading(true);
         setError(null);
         setOperationError(null);
-        setUsers(await userService.getAllUsers());
+        const [loadedUsers, loadedPlanLimits] = await Promise.all([
+          userService.getAllUsers(),
+          aboutService.getDefaultLimits(),
+        ]);
+        setUsers(loadedUsers);
+        setPlanLimits(loadedPlanLimits);
       } catch (err) {
         console.error("Error loading users:", err);
         setError(t.userPanel.error);
@@ -303,6 +311,10 @@ const UserPanel = () => {
               <dt>{t.userPanel.emailLabel}</dt><dd>{selectedUser.email}</dd>
               <dt>{t.userPanel.nameLabel}</dt><dd>{selectedUser.displayName ?? t.userPanel.noName}</dd>
               <dt>{t.userPanel.roleLabel}</dt><dd>{roleLabel(selectedUser.role)}</dd>
+              <dt>Plan</dt><dd>{selectedUser.subscriptionTier === "Premium" ? "Premium" : "Darmowy"}</dd>
+              <dt>Limit rozpisek</dt><dd>{displayEffectiveLimit(selectedUser, planLimits, "scheduleLimitOverride", "scheduleLimit")}</dd>
+              <dt>Limit szablonów</dt><dd>{displayEffectiveLimit(selectedUser, planLimits, "templateLimitOverride", "templateLimit")}</dd>
+              <dt>Wgrania stanu wojsk</dt><dd>{displayEffectiveLimit(selectedUser, planLimits, "troopsUploadLimitOverride", "troopsUploadLimit")}</dd>
               <dt>{t.userPanel.providerLabel}</dt><dd>{selectedUser.provider}</dd>
               <dt>{t.userPanel.createdAtLabel}</dt><dd>{formatDateTime(selectedUser.createdAt)}</dd>
             </dl>
@@ -315,13 +327,14 @@ const UserPanel = () => {
         </div>
       </div>}
 
-      {editingUser && <UserEditModal user={editingUser} onSave={(request) => void handleSave(request)} onClose={() => setEditingUser(null)} isSaving={isSaving} error={operationError} t={t.userPanel} />}
+      {editingUser && <UserEditModal user={editingUser} planLimits={planLimits} onSave={(request) => void handleSave(request)} onClose={() => setEditingUser(null)} isSaving={isSaving} error={operationError} t={t.userPanel} />}
     </div>
   );
 };
 
 interface UserEditModalProps {
   user: User;
+  planLimits: SubscriptionPlanLimits[];
   onSave: (request: UpdateUserRequest) => void;
   onClose: () => void;
   isSaving: boolean;
@@ -329,15 +342,25 @@ interface UserEditModalProps {
   t: ReturnType<typeof useI18n>["t"]["userPanel"];
 }
 
-const UserEditModal = ({ user, onSave, onClose, isSaving, error, t }: UserEditModalProps) => {
+const UserEditModal = ({ user, planLimits, onSave, onClose, isSaving, error, t }: UserEditModalProps) => {
   const [email, setEmail] = useState(user.email);
   const [displayName, setDisplayName] = useState(user.displayName ?? "");
   const [role, setRole] = useState<UserRole>(user.role === "Admin" ? "Admin" : "User");
+  const [subscriptionTier, setSubscriptionTier] = useState<"Free" | "Premium">(user.subscriptionTier);
+  const [scheduleLimitOverride, setScheduleLimitOverride] = useState(user.scheduleLimitOverride?.toString() ?? "");
+  const [templateLimitOverride, setTemplateLimitOverride] = useState(user.templateLimitOverride?.toString() ?? "");
+  const [troopsUploadLimitOverride, setTroopsUploadLimitOverride] = useState(user.troopsUploadLimitOverride?.toString() ?? "");
+  const selectedPlanLimits = planLimits.find(
+    (plan) => plan.subscriptionTier === subscriptionTier,
+  );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!email.trim() || !email.includes("@")) return;
-    onSave({ email: email.trim(), displayName: displayName.trim(), role });
+    onSave({ email: email.trim(), displayName: displayName.trim(), role, subscriptionTier,
+      scheduleLimitOverride: scheduleLimitOverride === "" ? null : Number(scheduleLimitOverride),
+      templateLimitOverride: templateLimitOverride === "" ? null : Number(templateLimitOverride),
+      troopsUploadLimitOverride: troopsUploadLimitOverride === "" ? null : Number(troopsUploadLimitOverride) });
   };
 
   return <div className={styles.modalOverlay} onClick={onClose}>
@@ -348,11 +371,42 @@ const UserEditModal = ({ user, onSave, onClose, isSaving, error, t }: UserEditMo
         <label>{t.emailLabel}<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
         <label>{t.nameLabel}<input type="text" value={displayName} onChange={(event) => setDisplayName(event.target.value)} /></label>
         <label>{t.roleLabel}<select value={role} onChange={(event) => setRole(event.target.value as UserRole)}><option value="User">{t.userRole}</option><option value="Admin">{t.adminRole}</option></select></label>
+        <label>Plan<select value={subscriptionTier} onChange={(event) => setSubscriptionTier(event.target.value as "Free" | "Premium")}><option value="Free">Darmowy</option><option value="Premium">Premium</option></select></label>
+        <p>Puste pole oznacza limit domyślny. Wpisz 0, aby zablokować tworzenie lub wgrywanie.</p>
+        <label>Limit rozpisek<input type="number" min="0" value={scheduleLimitOverride} onChange={(event) => setScheduleLimitOverride(event.target.value)} placeholder={displayLimit(selectedPlanLimits?.scheduleLimit)} /></label>
+        <label>Limit szablonów<input type="number" min="0" value={templateLimitOverride} onChange={(event) => setTemplateLimitOverride(event.target.value)} placeholder={displayLimit(selectedPlanLimits?.templateLimit)} /></label>
+        <label>Limit wgrań wojsk na rozpiskę / {selectedPlanLimits?.troopsUploadWindowHours ?? "—"} h<input type="number" min="0" value={troopsUploadLimitOverride} onChange={(event) => setTroopsUploadLimitOverride(event.target.value)} placeholder={displayLimit(selectedPlanLimits?.troopsUploadLimit)} /></label>
         {email.trim() && !email.includes("@") && <p className={styles.validationError}>{t.invalidEmail}</p>}
         <div className={styles.modalActions}><button type="button" className={styles.secondaryButton} onClick={onClose} disabled={isSaving}>{t.cancel}</button><button type="submit" className={styles.primaryButton} disabled={isSaving || !email.trim() || !email.includes("@")}>{isSaving ? t.saving : t.save}</button></div>
       </form>
     </div>
   </div>;
+};
+
+const displayLimit = (limit: number | null | undefined) =>
+  limit == null ? "Bez limitu" : limit.toString();
+
+const displayEffectiveLimit = (
+  user: User,
+  plans: SubscriptionPlanLimits[],
+  overrideKey:
+    | "scheduleLimitOverride"
+    | "templateLimitOverride"
+    | "troopsUploadLimitOverride",
+  planKey: "scheduleLimit" | "templateLimit" | "troopsUploadLimit",
+) => {
+  if (user[overrideKey] !== null) {
+    return user[overrideKey];
+  }
+
+  if (user.role === "Admin") {
+    return "Bez limitu";
+  }
+
+  const plan = plans.find(
+    (candidate) => candidate.subscriptionTier === user.subscriptionTier,
+  );
+  return displayLimit(plan?.[planKey]);
 };
 
 export default UserPanel;

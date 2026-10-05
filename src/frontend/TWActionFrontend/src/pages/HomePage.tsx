@@ -7,6 +7,8 @@ import type {
   UpdateScheduleRequest,
 } from "../types/schedule";
 import { scheduleService } from "../services/scheduleService";
+import { userService } from "../services/userService";
+import type { UserLimits } from "../types/user";
 import { ScheduleList } from "../components/ScheduleList";
 import { ScheduleForm } from "../components/ScheduleForm";
 import { ScheduleTabs } from "../components/ScheduleTabs";
@@ -16,6 +18,7 @@ const HomePage = () => {
   const { user } = useAuth();
   const { activeScheduleId, setActive, clearActive } = useActiveSchedule();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [limits, setLimits] = useState<UserLimits | null>(null);
   const [isLoadingSchedules, setIsLoadingSchedules] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -32,6 +35,7 @@ const HomePage = () => {
     try {
       const data = await scheduleService.getSchedules();
       setSchedules(data);
+      setLimits(await userService.getMyLimits());
     } catch (err) {
       console.error("Error loading schedules:", err);
       setError("Nie udało się załadować rozpisek");
@@ -50,6 +54,7 @@ const HomePage = () => {
     try {
       const newSchedule = await scheduleService.createSchedule(request);
       setSchedules((prev) => [...prev, newSchedule]);
+      setLimits((prev) => prev ? { ...prev, scheduleCount: prev.scheduleCount + 1 } : prev);
       setShowForm(false);
     } catch (err) {
       console.error("Error creating schedule:", err);
@@ -89,6 +94,7 @@ const HomePage = () => {
   const handleDeleteSchedule = async (scheduleId: string) => {
     await scheduleService.deleteSchedule(scheduleId);
     setSchedules((prev) => prev.filter((s) => s.id !== scheduleId));
+    setLimits((prev) => prev ? { ...prev, scheduleCount: Math.max(0, prev.scheduleCount - 1) } : prev);
     if (activeScheduleId === scheduleId) {
       clearActive();
     }
@@ -137,6 +143,13 @@ const HomePage = () => {
         </div>
       </header>
 
+      {limits && <p className={styles.limitInfo}>
+        Plan: {limits.subscriptionTier === "Premium" ? "Premium" : "Darmowy"} ·
+        Rozpiski: {limits.scheduleCount}/{limits.scheduleLimit ?? "bez limitu"} ·
+        Szablony: {limits.templateCount}/{limits.templateLimit ?? "bez limitu"} ·
+        Wgrania wojsk: {limits.troopsUploadLimit ?? "bez limitu"} na rozpiskę / {limits.troopsUploadWindowHours} h
+      </p>}
+
       {error && <div className={styles.error}>{error}</div>}
 
       {showForm ? (
@@ -151,7 +164,9 @@ const HomePage = () => {
         <div className={styles.body}>
           <div className={styles.listColumn}>
             <div className={styles.actions}>
-              <button onClick={handleNewSchedule} className={styles.newBtn}>
+              <button onClick={handleNewSchedule} className={styles.newBtn}
+                disabled={limits?.scheduleLimit != null && limits.scheduleCount >= limits.scheduleLimit}
+                title={limits?.scheduleLimit != null && limits.scheduleCount >= limits.scheduleLimit ? "Osiągnięto limit rozpisek" : undefined}>
                 + Nowa
               </button>
               <input

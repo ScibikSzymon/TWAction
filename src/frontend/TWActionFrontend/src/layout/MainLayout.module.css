@@ -63,6 +63,56 @@
   transform: translateY(0);
 }
 
+.aboutLink {
+  display: block;
+  margin-top: 1.25rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.aboutLink:hover {
+  color: var(--accent-primary);
+}
+
+.publicLayout {
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.publicHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+}
+
+.publicLogo {
+  color: var(--accent-primary);
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.publicLoginBtn {
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--accent-primary);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.publicLoginBtn:hover {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.publicContent {
+  min-height: calc(100vh - 65px);
+}
+
 /* Layout */
 .layout {
   display: flex;

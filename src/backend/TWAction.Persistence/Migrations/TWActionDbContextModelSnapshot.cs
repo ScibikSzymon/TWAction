@@ -176,6 +176,18 @@ namespace TWAction.Persistence.Migrations
                     b.ToTable("TroopsStates", (string)null);
                 });
 
+            modelBuilder.Entity("TWAction.Domain.Schedules.TroopsUploadEntity", b =>
+                {
+                    b.Property<Guid>("Id").ValueGeneratedOnAdd().HasColumnType("uuid");
+                    b.Property<Guid>("UserId").HasColumnType("uuid");
+                    b.Property<Guid>("ScheduleId").HasColumnType("uuid");
+                    b.Property<DateTimeOffset>("UploadedAt").HasColumnType("timestamp with time zone");
+                    b.HasKey("Id");
+                    b.HasIndex("UserId");
+                    b.HasIndex("ScheduleId", "UploadedAt");
+                    b.ToTable("TroopsUploads", (string)null);
+                });
+
             modelBuilder.Entity("TWAction.Domain.Settings.MainActionSettings", b =>
                 {
                     b.Property<Guid>("Id")
@@ -335,12 +347,39 @@ namespace TWAction.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("SubscriptionTier").IsRequired().HasColumnType("text");
+                    b.Property<int?>("ScheduleLimitOverride").HasColumnType("integer");
+                    b.Property<int?>("TemplateLimitOverride").HasColumnType("integer");
+                    b.Property<int?>("TroopsUploadLimitOverride").HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email", "Provider")
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("TWAction.Domain.Users.SubscriptionPlanLimitsEntity", b =>
+                {
+                    b.Property<string>("SubscriptionTier")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ScheduleLimit")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TemplateLimit")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TroopsUploadLimit")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TroopsUploadWindowHours")
+                        .HasColumnType("integer");
+
+                    b.HasKey("SubscriptionTier");
+
+                    b.ToTable("SubscriptionPlanLimits", (string)null);
                 });
 
             modelBuilder.Entity("TWAction.Domain.Users.UserSessionEntity", b =>
@@ -393,6 +432,14 @@ namespace TWAction.Persistence.Migrations
                         .HasForeignKey("ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TWAction.Domain.Schedules.TroopsUploadEntity", b =>
+                {
+                    b.HasOne("TWAction.Domain.Schedules.ScheduleEntity", null)
+                        .WithMany().HasForeignKey("ScheduleId").OnDelete(DeleteBehavior.Cascade).IsRequired();
+                    b.HasOne("TWAction.Domain.Users.UserEntity", null)
+                        .WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.Cascade).IsRequired();
                 });
 
             modelBuilder.Entity("TWAction.Domain.Settings.MainActionSettings", b =>

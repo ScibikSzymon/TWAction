@@ -35,6 +35,14 @@ export const Sidebar = ({ user, onLogout }: SidebarProps) => {
         >
           📋 Rozpiski
         </NavLink>
+        <NavLink
+          to="/about"
+          className={({ isActive }) =>
+            `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
+          }
+        >
+          ℹ️ O aplikacji
+        </NavLink>
 
         {user.role === "Admin" && (
           <NavLink

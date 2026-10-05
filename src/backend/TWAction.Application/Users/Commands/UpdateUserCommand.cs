@@ -34,7 +34,11 @@ public sealed class UpdateUserHandler(IUserRepository userRepository)
             ? null
             : command.Request.DisplayName.Trim();
         user.Role = command.Request.Role;
-
+        if (command.Request.SubscriptionTier.HasValue)
+            user.SubscriptionTier = command.Request.SubscriptionTier.Value;
+        user.ScheduleLimitOverride = command.Request.ScheduleLimitOverride;
+        user.TemplateLimitOverride = command.Request.TemplateLimitOverride;
+        user.TroopsUploadLimitOverride = command.Request.TroopsUploadLimitOverride;
         var updatedUser = await userRepository.UpdateAsync(user, cancellationToken);
         return Result.Success(IUserMapper.ToDto(updatedUser));
     }

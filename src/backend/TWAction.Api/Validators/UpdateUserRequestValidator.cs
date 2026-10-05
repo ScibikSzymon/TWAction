@@ -23,5 +23,10 @@ public sealed class UpdateUserRequestValidator : AbstractValidator<UpdateUserReq
         RuleFor(x => x.Role)
             .IsInEnum()
             .WithMessage("Role must be a valid UserRole value.");
+
+        RuleFor(x => x.SubscriptionTier).IsInEnum().When(x => x.SubscriptionTier.HasValue);
+        RuleFor(x => x.ScheduleLimitOverride).GreaterThanOrEqualTo(0).When(x => x.ScheduleLimitOverride.HasValue);
+        RuleFor(x => x.TemplateLimitOverride).GreaterThanOrEqualTo(0).When(x => x.TemplateLimitOverride.HasValue);
+        RuleFor(x => x.TroopsUploadLimitOverride).GreaterThanOrEqualTo(0).When(x => x.TroopsUploadLimitOverride.HasValue);
     }
 }
