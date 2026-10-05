@@ -15,6 +15,8 @@ public sealed class CreateScheduleHandlerTests
 {
     private readonly IScheduleRepository _scheduleRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IUserQuotaGuardFactory _quotaGuards;
+    private readonly ISubscriptionPlanLimitsRepository _planLimits;
     private readonly ITribesService _tribesService;
     private readonly CreateScheduleHandler _handler;
 
@@ -22,8 +24,26 @@ public sealed class CreateScheduleHandlerTests
     {
         _scheduleRepository = Substitute.For<IScheduleRepository>();
         _userRepository = Substitute.For<IUserRepository>();
+        _quotaGuards = Substitute.For<IUserQuotaGuardFactory>();
+        _quotaGuards.AcquireAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Substitute.For<IUserQuotaGuard>());
+        _planLimits = Substitute.For<ISubscriptionPlanLimitsRepository>();
+        _planLimits.GetAsync(Arg.Any<SubscriptionTier>(), Arg.Any<CancellationToken>())
+            .Returns(new SubscriptionPlanLimitsEntity
+            {
+                SubscriptionTier = SubscriptionTier.Free,
+                ScheduleLimit = 3,
+                TemplateLimit = 1,
+                TroopsUploadLimit = 2,
+                TroopsUploadWindowHours = 12
+            });
         _tribesService = Substitute.For<ITribesService>();
-        _handler = new CreateScheduleHandler(_scheduleRepository, _userRepository, _tribesService);
+        _handler = new CreateScheduleHandler(
+            _scheduleRepository,
+            _userRepository,
+            _tribesService,
+            _quotaGuards,
+            _planLimits);
     }
 
     [Fact]

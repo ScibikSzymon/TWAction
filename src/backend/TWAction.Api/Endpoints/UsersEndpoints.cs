@@ -10,12 +10,41 @@ using TWAction.Application.Users.Commands;
 using TWAction.Application.Users.DTOs;
 using TWAction.Application.Users.Queries;
 using TWAction.Domain.Users;
+using TWAction.Application.Interfaces;
+using TWAction.Application.Users.Interfaces;
+using TWAction.Application.Schedules.Interfaces;
+using TWAction.Application.Templates.Interfaces;
 using Wolverine;
 
 public static class UsersEndpoints
 {
     public static IEndpointRouteBuilder MapUsersEndpoints(this IEndpointRouteBuilder app)
     {
+        app.MapGet("/users/me/limits", async (
+            ICurrentUserAccessor currentUser,
+            IUserRepository users,
+            IScheduleRepository schedules,
+            ITargetTemplateRepository templates,
+            ISubscriptionPlanLimitsRepository planLimitsRepository,
+            CancellationToken ct) =>
+        {
+            if (!currentUser.TryGetUserId(out var userId)) return Results.Unauthorized();
+            var user = await users.GetByIdAsync(userId, ct);
+            if (user is null) return Results.NotFound();
+            var planLimits = await planLimitsRepository.GetAsync(user.SubscriptionTier, ct);
+
+            return Results.Ok(new
+            {
+                subscriptionTier = user.SubscriptionTier.ToString(),
+                scheduleLimit = UserLimits.Schedules(user, planLimits),
+                scheduleCount = await schedules.CountByUserIdAsync(userId, ct),
+                templateLimit = UserLimits.Templates(user, planLimits),
+                templateCount = await templates.CountOwnedAsync(userId, ct),
+                troopsUploadLimit = UserLimits.TroopsUploads(user, planLimits),
+                troopsUploadWindowHours = planLimits.TroopsUploadWindowHours
+            });
+        }).RequireAuthorization(AuthorizationPolicies.UserOrAbove);
+
         app.MapGet("/users", async (IMessageBus bus) =>
         {
             var users = await bus.InvokeAsync<Result<IEnumerable<UserDto>>>(new GetAllUsersQuery());

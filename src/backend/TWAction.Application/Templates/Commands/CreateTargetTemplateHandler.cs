@@ -3,6 +3,8 @@ using TWAction.Application.Templates.DTOs;
 using TWAction.Application.Templates.Interfaces;
 using TWAction.Application.Templates.Mappers;
 using TWAction.Domain.Templates;
+using TWAction.Application.Users.Interfaces;
+using TWAction.Domain.Users;
 
 namespace TWAction.Application.Templates.Commands;
 
@@ -12,7 +14,11 @@ public sealed record CreateTargetTemplateCommand(
     string Name,
     IReadOnlyList<TemplateWaveDto> Waves);
 
-public class CreateTargetTemplateHandler(ITargetTemplateRepository repository)
+public class CreateTargetTemplateHandler(
+    ITargetTemplateRepository repository,
+    IUserRepository users,
+    IUserQuotaGuardFactory quotaGuards,
+    ISubscriptionPlanLimitsRepository planLimitsRepository)
 {
     public async Task<Result<TargetTemplateDto>> Handle(
         CreateTargetTemplateCommand command,
@@ -39,6 +45,20 @@ public class CreateTargetTemplateHandler(ITargetTemplateRepository repository)
             return Result.Failure<TargetTemplateDto>(waveError);
         }
 
+        await using var quota = await quotaGuards.AcquireAsync(command.UserId, ct);
+        var user = await users.GetByIdAsync(command.UserId, ct);
+        if (user is null)
+        {
+            return Result.Failure<TargetTemplateDto>("User not found.");
+        }
+
+        var planLimits = await planLimitsRepository.GetAsync(user.SubscriptionTier, ct);
+        var limit = UserLimits.Templates(user, planLimits);
+        if (limit.HasValue && await repository.CountOwnedAsync(command.UserId, ct) >= limit.Value)
+        {
+            return Result.Failure<TargetTemplateDto>($"Template limit reached ({limit.Value}).");
+        }
+
         var template = new TargetTemplate
         {
             Id = Guid.NewGuid(),
@@ -49,6 +69,7 @@ public class CreateTargetTemplateHandler(ITargetTemplateRepository repository)
         };
 
         var created = await repository.CreateAsync(template, ct);
+        await quota.CommitAsync(ct);
         return Result.Success(created.ToDto());
     }
 

@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { userService } from "../services/userService";
+import type { UserLimits } from "../types/user";
 import { targetTemplateService } from "../services/targetTemplateService";
 import type { TargetTemplate, TemplateWave } from "../types/targetTemplate";
 import {
@@ -382,6 +384,7 @@ const DeleteDialog = ({
 const TemplatesPage = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [templates, setTemplates] = useState<TargetTemplate[]>([]);
+  const [limits, setLimits] = useState<UserLimits | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -406,6 +409,7 @@ const TemplatesPage = () => {
     try {
       const data = await targetTemplateService.getTemplates();
       setTemplates(data);
+      setLimits(await userService.getMyLimits());
     } catch (err) {
       console.error("Error loading templates:", err);
       setError("Nie udało się załadować szablonów.");
@@ -520,10 +524,16 @@ const TemplatesPage = () => {
           type="button"
           className={styles.newBtn}
           onClick={handleOpenCreate}
+          disabled={limits?.templateLimit != null && userTemplates.length >= limits.templateLimit}
         >
           + Nowy szablon
         </button>
       </header>
+
+      {limits && <p className={styles.sectionHint}>
+        Plan: {limits.subscriptionTier === "Premium" ? "Premium" : "Darmowy"}. Własne szablony:
+        {" "}{userTemplates.length}/{limits.templateLimit ?? "bez limitu"}.
+      </p>}
 
       {error && (
         <div className={styles.error} role="alert">
@@ -569,6 +579,7 @@ const TemplatesPage = () => {
                   type="button"
                   className={styles.newBtn}
                   onClick={handleOpenCreate}
+                  disabled={limits?.templateLimit === 0}
                 >
                   Utwórz pierwszy szablon
                 </button>

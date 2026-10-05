@@ -9,6 +9,12 @@ interface TroopsStateManagerProps {
 
 export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
   const [troopsState, setTroopsState] = useState<TroopsState | null>(null);
+  const [uploadLimit, setUploadLimit] = useState<{
+    limit: number | null;
+    used: number;
+    windowHours: number;
+    nextAvailableAt: string | null;
+  } | null>(null);
   const [rawData, setRawData] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -22,6 +28,7 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
     setIsLoading(true);
     setError(null);
     try {
+      setUploadLimit(await troopsStateService.getUploadLimit(scheduleId));
       const data = await troopsStateService.getTroopsState(scheduleId);
       setTroopsState(data);
     } catch (err: unknown) {
@@ -109,6 +116,7 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
       }
       setError(errorMessage);
     } finally {
+      if (scheduleId) void troopsStateService.getUploadLimit(scheduleId).then(setUploadLimit).catch(() => {});
       setIsUploading(false);
     }
   };
@@ -136,6 +144,12 @@ export const TroopsStateManager = ({ scheduleId }: TroopsStateManagerProps) => {
   return (
     <div className={styles.container}>
       <h3>Stan wojsk</h3>
+
+      {uploadLimit && <p className={styles.hint}>
+        Wgrania w ostatnich {uploadLimit.windowHours} h: {uploadLimit.used}/{uploadLimit.limit ?? "bez limitu"}.
+        {uploadLimit.limit !== null && uploadLimit.used >= uploadLimit.limit && uploadLimit.nextAvailableAt &&
+          <> Kolejne dostępne: {new Date(uploadLimit.nextAvailableAt).toLocaleString("pl-PL")}.</>}
+      </p>}
 
       {error && <div className={styles.error}>{error}</div>}
       {successMessage && <div className={styles.success}>{successMessage}</div>}

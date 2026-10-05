@@ -15,6 +15,7 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         builder.Property(x => x.Role)
             .IsRequired()
             .HasConversion<string>();
+        builder.Property(x => x.SubscriptionTier).IsRequired().HasConversion<string>();
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.HasIndex(x => new { x.Email, x.Provider }).IsUnique();
     }

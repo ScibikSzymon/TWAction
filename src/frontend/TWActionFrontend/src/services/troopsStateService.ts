@@ -5,6 +5,15 @@ import type {
 } from "../types/troopsState";
 
 export const troopsStateService = {
+  async getUploadLimit(scheduleId: string): Promise<{
+    limit: number | null;
+    used: number;
+    windowHours: number;
+    nextAvailableAt: string | null;
+  }> {
+    const { data } = await apiClient.get(`/schedules/${scheduleId}/troops/limit`);
+    return data;
+  },
   async getTroopsState(scheduleId: string): Promise<TroopsState> {
     const { data } = await apiClient.get<TroopsState>(
       `/schedules/${scheduleId}/troops`,

@@ -14,6 +14,14 @@ public sealed class UserEntity
 
     public UserRole Role { get; set; } = UserRole.User;
 
+    public SubscriptionTier SubscriptionTier { get; set; } = SubscriptionTier.Free;
+
+    public int? ScheduleLimitOverride { get; set; }
+
+    public int? TemplateLimitOverride { get; set; }
+
+    public int? TroopsUploadLimitOverride { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public ICollection<UserSessionEntity> Sessions { get; set; } = [];

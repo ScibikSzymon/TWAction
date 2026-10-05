@@ -124,6 +124,8 @@ public static class ScheduleEndpoints
 
         if (result.IsFailure)
         {
+            if (result.Error.Contains("limit reached", StringComparison.OrdinalIgnoreCase))
+                return Results.Conflict(new { error = result.Error });
             return Results.BadRequest(new { error = result.Error });
         }
 
