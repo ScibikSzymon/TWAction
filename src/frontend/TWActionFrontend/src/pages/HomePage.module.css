@@ -16,7 +16,7 @@
 
 .limitInfo {
   color: var(--text-secondary);
-  margin: 0 0 1rem;
+  margin: 0;
 }
 
 .listColumn {

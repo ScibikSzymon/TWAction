@@ -140,15 +140,13 @@ const HomePage = () => {
       <header className={styles.header}>
         <div className={styles.userInfo}>
           <h1>Moje Rozpiski</h1>
+          {limits && <p className={styles.limitInfo}>
+            Plan: {limits.subscriptionTier === "Premium" ? "Premium" : "Darmowy"} ·
+            Rozpiski: {limits.scheduleCount}/{limits.scheduleLimit ?? "bez limitu"} ·
+            Wgrania wojsk: {limits.troopsUploadLimit ?? "bez limitu"} na rozpiskę / {limits.troopsUploadWindowHours} h
+          </p>}
         </div>
       </header>
-
-      {limits && <p className={styles.limitInfo}>
-        Plan: {limits.subscriptionTier === "Premium" ? "Premium" : "Darmowy"} ·
-        Rozpiski: {limits.scheduleCount}/{limits.scheduleLimit ?? "bez limitu"} ·
-        Szablony: {limits.templateCount}/{limits.templateLimit ?? "bez limitu"} ·
-        Wgrania wojsk: {limits.troopsUploadLimit ?? "bez limitu"} na rozpiskę / {limits.troopsUploadWindowHours} h
-      </p>}
 
       {error && <div className={styles.error}>{error}</div>}
 
