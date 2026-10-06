@@ -519,6 +519,10 @@ const TemplatesPage = () => {
           <p className={styles.subtitle}>
             Zarządzaj szablonami rozkazów używanymi przy generowaniu akcji
           </p>
+          {limits && <p className={styles.limitInfo}>
+            Plan: {limits.subscriptionTier === "Premium" ? "Premium" : "Darmowy"} · Własne szablony:
+            {" "}{userTemplates.length}/{limits.templateLimit ?? "bez limitu"}
+          </p>}
         </div>
         <button
           type="button"
@@ -530,10 +534,6 @@ const TemplatesPage = () => {
         </button>
       </header>
 
-      {limits && <p className={styles.sectionHint}>
-        Plan: {limits.subscriptionTier === "Premium" ? "Premium" : "Darmowy"}. Własne szablony:
-        {" "}{userTemplates.length}/{limits.templateLimit ?? "bez limitu"}.
-      </p>}
 
       {error && (
         <div className={styles.error} role="alert">
