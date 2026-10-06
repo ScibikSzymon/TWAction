@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../hooks/useAuth";
 import { aboutService } from "../services/aboutService";
 import type { SubscriptionPlanLimits } from "../types/subscriptionPlan";
 import styles from "./AboutPage.module.css";
@@ -7,6 +8,7 @@ const displayLimit = (limit: number | null) =>
   limit === null ? "Bez limitu" : limit.toLocaleString("pl-PL");
 
 const AboutPage = () => {
+  const { user } = useAuth();
   const [plans, setPlans] = useState<SubscriptionPlanLimits[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +43,9 @@ const AboutPage = () => {
           {plans.map((plan) => (
             <article
               className={`${styles.planCard} ${
-                plan.subscriptionTier === "Premium" ? styles.premium : ""
+                plan.subscriptionTier === user?.subscriptionTier
+                  ? styles.selected
+                  : ""
               }`}
               key={plan.subscriptionTier}
             >
@@ -74,7 +78,11 @@ const AboutPage = () => {
                 </div>
                 <div>
                   <dt>Okno limitu wgrań</dt>
-                  <dd>{plan.troopsUploadWindowHours} h</dd>
+                  <dd>
+                    {plan.troopsUploadLimit === null
+                      ? "Bez limitu"
+                      : `${plan.troopsUploadWindowHours} h`}
+                  </dd>
                 </div>
               </dl>
 

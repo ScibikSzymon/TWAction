@@ -44,7 +44,7 @@
   box-shadow: var(--shadow-md);
 }
 
-.premium {
+.selected {
   border-color: var(--accent-primary);
   background: linear-gradient(145deg, var(--bg-secondary), #15243a);
 }
